@@ -40,12 +40,12 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 
 | Task | Depends on | Exit check |
 | --- | --- | --- |
-| [ ] 3.1 PDF metadata extraction | 2.6 | Extract the specified fields from real fixtures and preserve raw, missing, malformed, and encrypted metadata cases. |
-| [ ] 3.2 Filename fallback | 3.1 | Verify empty, punctuated, and Bengali filenames produce sensible provisional titles. |
-| [ ] 3.3 SHA-256 hashing | 2.6 | Compare streamed hashes with known digests. Measure memory for large PDFs and check unchanged files skip rehashing. |
-| [ ] 3.4 Duplicate detection | 3.3 | Group matching digests and keep separate records and paths. Verify review state persists. |
-| [ ] 3.5 Cover thumbnails | 3.1, 1.6 | Verify bundled PDF.js rendering and range transport in WebView2, cover caching, revision invalidation, and corrupt-file fallback. |
-| [ ] 3.6 Metadata review | 3.1, 3.2 | Test save, cancel, and bulk edit. Rescan and confirm manual fields survive. |
+| [x] 3.1 PDF metadata extraction | 2.6 | Extract the specified fields from real fixtures and preserve raw, missing, malformed, and encrypted metadata cases. |
+| [x] 3.2 Filename fallback | 3.1 | Verify empty, punctuated, and Bengali filenames produce sensible provisional titles. |
+| [x] 3.3 SHA-256 hashing | 2.6 | Compare streamed hashes with known digests. Verify the read buffer stays bounded on large PDFs and check unchanged files skip rehashing. |
+| [x] 3.4 Duplicate detection | 3.3 | Group matching digests and keep separate records and paths. Verify review state persists. |
+| [x] 3.5 Cover thumbnails | 3.1, 1.6 | Verify bundled PDF.js rendering and range transport in WebView2, cover caching, revision invalidation, and corrupt-file fallback. |
+| [x] 3.6 Metadata review | 3.1, 3.2 | Test save, cancel, and bulk edit. Rescan and confirm manual fields survive. |
 
 ## Phase 4 · Library management
 

@@ -108,10 +108,19 @@ fn opened_path(file: &File) -> io::Result<PathBuf> {
     }
 }
 
-fn open_checked(root: &Path, path: &Path) -> io::Result<File> {
+pub(crate) fn open_checked(root: &Path, path: &Path) -> io::Result<File> {
     if !check_path(root, path)?.is_file() {
         return Err(io::ErrorKind::InvalidInput.into());
     }
+    let file = open_regular_readonly(path)?;
+    #[cfg(windows)]
+    if opened_path(&file)? != path {
+        return Err(io::ErrorKind::InvalidInput.into());
+    }
+    Ok(file)
+}
+
+pub(crate) fn open_regular_readonly(path: &Path) -> io::Result<File> {
     let mut options = OpenOptions::new();
     options.read(true);
     #[cfg(windows)]
@@ -129,17 +138,24 @@ fn open_checked(root: &Path, path: &Path) -> io::Result<File> {
     if !metadata.is_file() || reparse(&metadata) {
         return Err(io::ErrorKind::InvalidInput.into());
     }
-    #[cfg(windows)]
-    if opened_path(&file)? != path {
-        return Err(io::ErrorKind::InvalidInput.into());
-    }
     Ok(file)
+}
+
+pub(crate) fn stamp(file: &File) -> io::Result<Stamp> {
+    let metadata = file.metadata()?;
+    let bytes = i64::try_from(metadata.len()).map_err(io::Error::other)?;
+    let modified = epoch_nanos(metadata.modified()?);
+    Ok(Stamp {
+        bytes,
+        modified_at: i64::try_from(modified.div_euclid(1_000_000)).map_err(io::Error::other)?,
+        token: modified.to_string(),
+    })
 }
 
 fn inspect(root: &Path, path: &Path) -> io::Result<Pdf> {
     let mut file = open_checked(root, path)?;
-    let metadata = file.metadata()?;
-    let bytes = i64::try_from(metadata.len()).map_err(io::Error::other)?;
+    let stamp = stamp(&file)?;
+    let bytes = stamp.bytes;
     let mut header = [0u8; 8];
     if let Err(error) = file.read_exact(&mut header) {
         if error.kind() == io::ErrorKind::UnexpectedEof {
@@ -154,12 +170,7 @@ fn inspect(root: &Path, path: &Path) -> io::Result<Pdf> {
     {
         return Ok(Pdf::Invalid(bytes));
     }
-    let modified = epoch_nanos(metadata.modified()?);
-    Ok(Pdf::Valid(Stamp {
-        bytes,
-        modified_at: i64::try_from(modified.div_euclid(1_000_000)).map_err(io::Error::other)?,
-        token: modified.to_string(),
-    }))
+    Ok(Pdf::Valid(stamp))
 }
 
 pub fn validate(root: &Path, path: &Path) -> Pdf {

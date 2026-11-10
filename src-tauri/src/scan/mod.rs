@@ -1,5 +1,5 @@
 pub mod commands;
-mod files;
+pub(crate) mod files;
 mod repository;
 #[cfg(test)]
 mod tests;

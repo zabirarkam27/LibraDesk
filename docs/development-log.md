@@ -38,4 +38,17 @@ Phase 1 commit `65312a7` contains this entry.
 | 2.6 Database import | Completed | Confirmation added two entries, including the Bengali file. A rescan classified both as existing. Tests covered repeated confirmation, overlap, batch rollback, changed files, and source preservation. |
 | 2.7 Scan history | Completed | The Windows app displayed the root, start and finish times, and a completed result of three found, two imported, and one failed. Verified the stored result after reopening. |
 
-Seven Rust tests, Clippy, the TypeScript and Vite build, and the standalone Windows debug build passed. Migration 0002 adds the catalog and scan tables. Phase 3 starts with PDF metadata extraction after owner approval.
+Seven Rust tests, Clippy, the TypeScript and Vite build, and the standalone Windows debug build passed. Migration 0002 adds the catalog and scan tables. Phase 2 commit `906cbe7` contains this entry.
+
+## 2026-11-11 · Phase 3
+
+| Task | Status | Work and verification |
+| --- | --- | --- |
+| 3.1 PDF metadata extraction | Completed | Preserved original title, author, subject, creator, producer, creation date, and page count. Verified Bengali metadata, safe fallback for a password-protected fixture, and PDF.js range extraction for a 34 MiB document. |
+| 3.2 Filename fallback | Completed | Verified a Bengali filename with hyphens, underscores, whitespace, and digits. Missing authors remain unset until edited. |
+| 3.3 SHA-256 hashing | Completed | Compared five persisted digests to independent SHA-256 values and measured a 128 KiB peak read buffer for a 34 MiB input. The Windows rescan refreshed only the changed fixture. |
+| 3.4 Duplicate detection | Completed | Verified two copies in one exact digest group, saved a keep decision, and confirmed the decision persisted after restart. |
+| 3.5 Cover thumbnails | Completed | Verified four first-page PNGs at 240 × 320 and a placeholder for a malformed PDF. Checked a new cover revision after rescan and corrected cache reads under Windows AppData redirection. |
+| 3.6 Metadata review | Completed | Verified missing-title and author review, cancellation of the single-book editor, and a two-book bulk author save. Manual values survived restart and rescan, and raw fields remained separate. |
+
+Eleven Rust tests, Clippy, the frontend build, and the standalone Windows debug build passed. SQLite integrity and foreign-key checks passed. Migration 0003 adds persistent metadata and analysis queues for existing and new PDFs. The cover renderer limits source size to 256 MiB. Larger files still receive a streamed SHA-256 digest and use the cover placeholder.

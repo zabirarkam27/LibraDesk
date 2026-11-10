@@ -1,14 +1,19 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Book, LibraryBig } from "lucide-react";
-import { useEffect, useState } from "react";
+import { LibraryBig } from "lucide-react";
+import { useCallback, useState } from "react";
 import { Link } from "react-router";
 import { desktop } from "@/shared/lib/preferences-client";
 import { formatBytes } from "@/shared/lib/file-size";
 import { Button } from "@/shared/ui/button";
 import { PageHeading } from "@/shared/ui/page-heading";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { BookCover } from "@/features/metadata/book-cover";
+import { useMetadataQuery } from "@/features/metadata/use-metadata-query";
 
-type Entry = { id: number; title: string; path: string; bytes: number };
+type Entry = {
+  id: number; title: string; path: string; bytes: number; fileId: number;
+  author: string | null; pages: number | null; coverRevision: number | null; duplicate: boolean;
+};
 
 function EmptyCatalog() {
   return (
@@ -25,29 +30,14 @@ function EmptyCatalog() {
 
 function DesktopCatalog() {
   const [before, setBefore] = useState<number | null>(null);
-  const [attempt, setAttempt] = useState(0);
-  const [entries, setEntries] = useState<Entry[] | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    void invoke<Entry[]>("list_imported_books", { before }).then(
-      (page) => { if (active) setEntries(page); },
-      () => { if (active) setError(true); },
-    );
-    return () => { active = false; };
-  }, [attempt, before]);
-
-  function page(cursor: number | null) {
-    setBefore(cursor);
-    setEntries(null);
-  }
+  const query = useCallback(() => invoke<Entry[]>("list_imported_books", { before }), [before]);
+  const { data: entries, error, retry } = useMetadataQuery(query);
 
   if (error) {
     return (
       <div role="alert" className="rounded-xl border bg-card p-5">
         <p className="mb-3 text-sm text-destructive">LibraDesk could not load the local catalog.</p>
-        <Button variant="outline" onClick={() => { setError(false); setAttempt((value) => value + 1); }}>Try again</Button>
+        <Button variant="outline" onClick={retry}>Try again</Button>
       </div>
     );
   }
@@ -59,10 +49,14 @@ function DesktopCatalog() {
       <ul className="divide-y">
         {entries.slice(0, 50).map((entry) => (
           <li key={entry.id} className="flex items-start gap-3 px-5 py-4">
-            <Book className="mt-1 size-4 shrink-0 text-muted-foreground" />
+            <BookCover fileId={entry.fileId} revision={entry.coverRevision} />
             <div className="min-w-0 flex-1">
               <p className="break-words text-sm font-semibold">{entry.title}</p>
+              {(entry.author || entry.pages) && <p className="mt-1 text-xs text-muted-foreground">
+                {[entry.author, entry.pages && `${entry.pages} ${entry.pages === 1 ? "page" : "pages"}`].filter(Boolean).join(" · ")}
+              </p>}
               <p className="mt-1 break-all text-xs text-muted-foreground">{entry.path}</p>
+              {entry.duplicate && <Link to="/metadata?view=duplicates" className="mt-1 inline-block text-xs text-primary underline">Exact duplicate</Link>}
             </div>
             <span className="shrink-0 text-xs text-muted-foreground">{formatBytes(entry.bytes)}</span>
           </li>
@@ -70,8 +64,8 @@ function DesktopCatalog() {
       </ul>
       {(before !== null || entries.length > 50) && (
         <div className="flex gap-2 border-t px-5 py-3">
-          {before !== null && <Button size="sm" variant="outline" onClick={() => page(null)}>Latest books</Button>}
-          {entries.length > 50 && <Button size="sm" variant="outline" onClick={() => page(entries[49].id)}>Older books</Button>}
+          {before !== null && <Button size="sm" variant="outline" onClick={() => setBefore(null)}>Latest books</Button>}
+          {entries.length > 50 && <Button size="sm" variant="outline" onClick={() => setBefore(entries[49].id)}>Older books</Button>}
         </div>
       )}
     </section>

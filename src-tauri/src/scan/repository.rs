@@ -55,6 +55,11 @@ pub struct Book {
     title: String,
     path: String,
     bytes: i64,
+    file_id: i64,
+    author: Option<String>,
+    pages: Option<i64>,
+    cover_revision: Option<i64>,
+    duplicate: bool,
 }
 
 #[derive(Clone, Copy, Deserialize)]
@@ -327,6 +332,7 @@ impl Database {
         if !owns_work(&tx, work, "running")? {
             return Ok(());
         }
+        crate::metadata::refresh_scanned_files(&tx, work.id)?;
         tx.execute(
             "UPDATE scan_candidates AS c SET classification='existing'
              WHERE job_id=?1 AND classification='new'
@@ -390,19 +396,14 @@ impl Database {
             let (state, file_id, error) = match (existing, stamp) {
                 (Some(id), _) => ("skipped", Some(id), None),
                 (None, Some(stamp)) => {
-                    let title = Path::new(&candidate.key)
-                        .file_stem()
-                        .and_then(|stem| stem.to_str())
-                        .map(str::trim)
-                        .filter(|title| !title.is_empty())
-                        .unwrap_or("Untitled PDF");
+                    let title = crate::metadata::filename_title(Path::new(&candidate.key));
                     tx.execute(&format!(
                         "INSERT INTO books(title,title_sort_key,created_at,updated_at) VALUES (?1,?2,{NOW},{NOW})"
                     ), params![title, title.to_lowercase()])?;
                     tx.execute(&format!(
-                        "INSERT INTO book_files(book_id,original_path,path_key,size_bytes,modified_at,last_verified_at)
-                         VALUES (?1,?2,?3,?4,?5,{NOW})"
-                    ), params![tx.last_insert_rowid(), files::display(&candidate.key), candidate.key, stamp.bytes, stamp.modified_at])?;
+                        "INSERT INTO book_files(book_id,original_path,path_key,size_bytes,modified_at,last_verified_at,source_token)
+                         VALUES (?1,?2,?3,?4,?5,{NOW},?6)"
+                    ), params![tx.last_insert_rowid(), files::display(&candidate.key), candidate.key, stamp.bytes, stamp.modified_at, stamp.token])?;
                     ("imported", Some(tx.last_insert_rowid()), None)
                 }
                 (None, None) => ("failed", None, Some("source_changed_or_unreadable")),
@@ -425,8 +426,11 @@ impl Database {
 
     pub fn list_imported(&self, before: Option<i64>) -> Result<Vec<Book>> {
         let mut statement = self.0.prepare(
-            "SELECT b.id,b.title,f.original_path,f.size_bytes FROM books b
+            "SELECT b.id,b.title,f.original_path,f.size_bytes,f.id,b.author,f.page_count,t.file_revision,
+                    EXISTS(SELECT 1 FROM book_files other WHERE other.sha256=f.sha256 AND other.id<>f.id)
+             FROM books b
              JOIN book_files f ON f.book_id=b.id AND f.is_primary=1
+             LEFT JOIN thumbnails t ON t.file_id=f.id AND t.file_revision=f.revision
              WHERE (?1 IS NULL OR b.id<?1) ORDER BY b.id DESC LIMIT 51",
         )?;
         let rows = statement
@@ -436,6 +440,11 @@ impl Database {
                     title: row.get(1)?,
                     path: row.get(2)?,
                     bytes: row.get(3)?,
+                    file_id: row.get(4)?,
+                    author: row.get(5)?,
+                    pages: row.get(6)?,
+                    cover_revision: row.get(7)?,
+                    duplicate: row.get(8)?,
                 })
             })?
             .collect();

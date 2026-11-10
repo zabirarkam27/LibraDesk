@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, type ReactNode } from "react";
 import { HashRouter } from "react-router";
 import { Toaster } from "sonner";
 import { usePreferences } from "@/features/settings/preferences-store";
+import { startCoverWorker } from "@/features/metadata/cover-worker";
 import { useResolvedTheme } from "@/shared/hooks/use-resolved-theme";
 import { TooltipProvider } from "@/shared/ui/tooltip";
 
@@ -11,6 +12,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void load();
+    startCoverWorker();
   }, [load]);
 
   useLayoutEffect(() => {

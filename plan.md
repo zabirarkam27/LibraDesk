@@ -732,6 +732,8 @@ Implement:
 
 ## Task 3.1 - PDF Metadata Extraction
 
+- [x] Completed on 2026-11-11. Extracted document info and page count with lopdf and verified the PDF.js fallback on a 34 MiB Windows fixture.
+
 Extract:
 
 - Title.
@@ -752,6 +754,8 @@ Do not invent missing information.
 
 ## Task 3.2 - Filename Fallback
 
+- [x] Completed on 2026-11-11. Verified separator cleanup, Unicode preservation, and a fallback for empty stems.
+
 Implement:
 
 - Extension removal.
@@ -769,6 +773,8 @@ Do not automatically guess author or publisher.
 
 ## Task 3.3 - SHA-256 Hashing
 
+- [x] Completed on 2026-11-11. Verified streamed hashes against independent values and rehashing only the changed fixture after rescan.
+
 Implement:
 
 - Streaming file hashing.
@@ -783,6 +789,8 @@ Do not load entire large PDF files into memory.
 
 ## Task 3.4 - Duplicate Detection
 
+- [x] Completed on 2026-11-11. Verified exact digest grouping and saved review decisions while preserving both copies.
+
 Implement:
 
 - Exact hash matching.
@@ -795,6 +803,8 @@ Do not automatically delete, merge or overwrite duplicate files.
 **Approval required before Task 3.5.**
 
 ## Task 3.5 - Cover Thumbnail Generation
+
+- [x] Completed on 2026-11-11. Verified local first-page PNGs, Windows cache reads, revision invalidation, and a malformed-PDF placeholder.
 
 Implement:
 
@@ -810,6 +820,8 @@ Use the PDF source version or file identity to avoid unnecessary regeneration.
 **Approval required before Task 3.6.**
 
 ## Task 3.6 - Metadata Review Queue
+
+- [x] Completed on 2026-11-11. Verified editor cancellation, bulk save, and persistence across restart and rescan. See the [Phase 3 log](docs/development-log.md).
 
 Implement:
 

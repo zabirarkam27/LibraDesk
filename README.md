@@ -15,6 +15,8 @@ Open **Settings** in the desktop window to verify the database connection and ch
 
 Open **Import**, choose **Add folders**, then select **Scan folder** beside an enabled root. The preview shows what LibraDesk found. Select **Review import** and confirm to add eligible paths to **Library**. The app reads the originals in place. An interrupted scan appears as **Paused** when the app reopens. A previously confirmed import resumes automatically.
 
+Imported PDFs receive metadata, a SHA-256 digest, and a first-page cover in the background. Open **Metadata** to review missing titles and authors, edit books individually or in bulk, and review groups of identical files. Manual edits affect the catalog and survive rescans.
+
 ## Build checks
 
 ```powershell

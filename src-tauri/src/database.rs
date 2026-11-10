@@ -10,6 +10,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
         "scan_import",
         include_str!("../migrations/0002_scan_import.sql"),
     ),
+    ("metadata", include_str!("../migrations/0003_metadata.sql")),
 ];
 const UPSERT_THEME: &str = "
     INSERT INTO settings(scope, key, value_json, updated_at)
@@ -291,7 +292,7 @@ mod tests {
             migrate(&mut connection, &[("different", MIGRATIONS[0].1)]),
             Err(Error::IncompatibleSchema)
         ));
-        connection.pragma_update(None, "user_version", 3).unwrap();
+        connection.pragma_update(None, "user_version", 4).unwrap();
         assert!(matches!(
             migrate(&mut connection, MIGRATIONS),
             Err(Error::IncompatibleSchema)

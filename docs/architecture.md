@@ -26,9 +26,9 @@ Keep original PDF locations and open source files read-only. Store the supplied 
 
 ## PDF pipeline
 
-Task 2.3 validates the signature and readability and records file attributes. Task 3.1 will select a Rust metadata parser using fixtures for malformed, encrypted, and large documents. Preserve extracted values separately from overrides. Task 3.5 introduces a small local PDF.js rendering adapter for covers. Task 5.1 extends it to the reader, and Task 6.1 reuses worker-based text extraction for background indexing.
+Rust hashes each queued source in 128 KiB chunks and uses lopdf to extract document info and page count from PDFs up to 32 MiB. Larger PDFs and files the native parser cannot read can use the local PDF.js worker for metadata. Extracted values stay separate from catalog overrides. Rescanning a changed source invalidates its old digest and cover and queues the new revision.
 
-Prototype a read-only Tauri custom protocol during cover integration. Rust issues a short-lived session token scoped to a registered file and version. The webview requests bytes by token, and Rust serves checked byte ranges with accurate lengths and status codes. Keep a bounded memory budget for large PDFs and release file handles when the session ends. Verify actual WebView2 range behavior with a packaged build before relying on this transport. Disable PDF scripting and automatic external navigation. Use PDF.js workers, lazy page rendering, cancellation, and deterministic cleanup on document change.
+The cover adapter uses PDF.js range transport over binary Tauri IPC. Rust checks the registered file and queued revision on each request and serves up to 256 KiB per IPC call. It validates the resulting PNG and writes it atomically to the thumbnail cache. The worker renders page one at up to 240 × 320 pixels and uses a placeholder when it cannot render. Source files larger than 256 MiB retain streamed hashes and use the placeholder. Tasks 5.1 and 6.1 will extend local PDF access for reading and indexing.
 
 ## SQLite, search, and recovery
 

@@ -8,7 +8,7 @@ use std::{
 
 use tauri::{AppHandle, Emitter};
 
-use crate::{commands::database_path, database::Database};
+use crate::{commands::database_path, database::Database, metadata};
 
 use super::{
     files::{self, Pdf},
@@ -57,7 +57,13 @@ pub fn start(app: AppHandle) {
                         let _ = app.emit(EVENT, ());
                         last_event.set(Instant::now());
                     }
-                    thread::sleep(Duration::from_millis(350));
+                    match metadata::process_next(&database) {
+                        Ok(true) => {
+                            let _ = app.emit(metadata::EVENT, ());
+                        }
+                        Ok(false) => thread::sleep(Duration::from_millis(350)),
+                        Err(_) => thread::sleep(Duration::from_secs(2)),
+                    }
                 }
                 Err(_) => thread::sleep(Duration::from_secs(2)),
             }

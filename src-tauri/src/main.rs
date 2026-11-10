@@ -2,6 +2,7 @@
 
 mod commands;
 mod database;
+mod metadata;
 mod scan;
 mod storage;
 
@@ -30,6 +31,14 @@ fn main() {
             scan::commands::start_scan,
             scan::commands::control_scan,
             scan::commands::list_imported_books,
+            metadata::commands::next_cover_task,
+            metadata::commands::read_cover_range,
+            metadata::commands::finish_cover,
+            metadata::commands::get_book_cover,
+            metadata::commands::metadata_review_page,
+            metadata::commands::save_book_metadata,
+            metadata::commands::list_duplicate_groups,
+            metadata::commands::set_duplicate_review,
         ])
         .run(tauri::generate_context!())
         .expect("failed to start LibraDesk");
