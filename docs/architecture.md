@@ -1,14 +1,14 @@
 # LibraDesk architecture
 
-LibraDesk runs as a single Windows desktop application. React renders the library in Tauri's WebView2 window. Rust owns local files, SQLite, and background jobs. The production frontend, fonts, translations, and PDF.js worker ship with the app and load locally. The current scaffold only opens the window and demonstrates a React-to-Rust call.
+LibraDesk runs as a single Windows desktop application. React renders the workspace in Tauri's WebView2 window. Rust owns AppData and SQLite, and will own native file operations and background jobs. The frontend is bundled in the executable. Future translation and PDF.js worker assets will also load locally.
 
 ## Frontend
 
-`src/app/` will own app startup, routing, providers, and the window shell. `src/features/` will group library, import, search, reader, and settings code by feature. `src/shared/` will contain the reusable UI, IPC client, and shared types. Components use Tailwind, shadcn/ui, Lucide, and Framer Motion as their approved tasks introduce them. Keep animations optional under reduced-motion preferences.
+`src/app/` owns startup, hash routing, providers, and the window shell. `src/features/` currently contains the library, reader preview, and settings. `src/shared/` contains reusable UI, the IPC client, and shared types. Components use Tailwind, shadcn/ui, Lucide, and Framer Motion. The overview animation respects reduced-motion preferences.
 
 Use React local state for component interactions and Zustand for shared UI state such as view, filters, and reader controls. Read durable state through typed Rust commands. Validate forms and IPC responses with Zod where runtime parsing is useful, and validate writes independently in Rust. Use TanStack Table for list behavior and virtualize large lists or grids. Request bounded result pages with stable ordering and an ID tie-breaker. Keep reader settings and app appearance separate. Provide English and Bengali labels and preserve Unicode in metadata and paths.
 
-Task 1.5 can persist the appearance preference in the webview until SQLite is available in Task 1.7. Import the saved preference once into typed app settings before switching reads and writes to Rust.
+The browser preview uses localStorage. The desktop app reads and writes SQLite through Rust and imports any valid bootstrap app preference in that webview only when a saved SQLite value is absent. App and reader themes are independent. The reader preview scopes its color tokens to its own surface.
 
 ## Native commands and background work
 
@@ -32,7 +32,7 @@ Prototype a read-only Tauri custom protocol during cover integration. Rust issue
 
 ## SQLite, search, and recovery
 
-Use the [database schema](database-schema.md) as the contract. Rust enables foreign keys on every connection and uses WAL for the live database on the local disk after verifying support. Keep writes transactional and batch background work. Treat FTS and thumbnails as rebuildable derivatives of saved records.
+Use the [database schema](database-schema.md) as the contract. The first preferences request prepares and validates AppData, opens SQLite on a blocking worker, applies migrations, and retains a serialized connection for subsequent commands. Rust enables foreign keys and verifies WAL and bundled FTS5 support. Keep writes transactional and batch background work. Treat FTS and thumbnails as rebuildable derivatives of saved records.
 
 Normalize search text consistently at indexing and query time. Match English and Bengali, including mixed-language queries, while preserving the original metadata. Keep metadata and page text in separate FTS5 indexes. Search by the current file revision and return page references for full-text hits. Validate Bengali tokenization with fixtures before accepting a tokenizer configuration.
 

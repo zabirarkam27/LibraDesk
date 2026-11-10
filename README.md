@@ -1,6 +1,6 @@
 # LibraDesk
 
-LibraDesk is a Windows desktop project for managing and reading a personal PDF library offline. The current scaffold uses Tauri 2, Rust, React, TypeScript, and Vite. See the [implementation roadmap](docs/plan.md) for task status and the [detailed plan](plan.md) for requirements.
+LibraDesk is a Windows desktop project for managing and reading a personal PDF library offline. The desktop foundation includes a navigable workspace, a reader appearance preview, and local SQLite preferences. See the [implementation roadmap](docs/plan.md) for task status and the [detailed plan](plan.md) for requirements.
 
 ## Local development
 
@@ -11,13 +11,14 @@ npm ci
 npm run tauri dev
 ```
 
-In the desktop window, select **Check desktop connection** to verify that React can invoke a Rust command. Run `npm run dev` for the browser preview.
+Open **Settings** in the desktop window to verify the database connection and change the app and reader themes. Both preferences are stored in `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Run `npm run dev` for the browser preview, which uses browser storage for appearance preferences.
 
 ## Build checks
 
 ```powershell
 npm run build
 cargo check --locked --manifest-path src-tauri/Cargo.toml
+cargo test --locked --manifest-path src-tauri/Cargo.toml
 npm run tauri build -- --debug --no-bundle
 ```
 

@@ -1,13 +1,16 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-#[tauri::command]
-fn check_connection() -> &'static str {
-    "Desktop connection is working."
-}
+mod commands;
+mod database;
+mod storage;
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![check_connection])
+        .manage(commands::State::default())
+        .invoke_handler(tauri::generate_handler![
+            commands::get_preferences,
+            commands::set_theme
+        ])
         .run(tauri::generate_context!())
         .expect("failed to start LibraDesk");
 }

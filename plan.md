@@ -412,6 +412,8 @@ Mark the current task status accurately.
 
 ## Task 1.1 - Initialize Tauri 2 Application
 
+- [x] Completed on 2026-11-10. Verified Windows startup, window bounds, and native IPC in the [Phase 1 log](docs/development-log.md).
+
 - Configure Tauri 2.
 - Verify React and Vite integration.
 - Verify Rust compilation.
@@ -428,6 +430,8 @@ Acceptance criteria:
 **Approval required before Task 1.2.**
 
 ## Task 1.2 - Frontend Architecture
+
+- [x] Completed on 2026-11-10. Added a strict TypeScript entry point, hash routes, shared providers, and feature modules.
 
 Create the approved feature-based structure.
 
@@ -453,6 +457,8 @@ Acceptance criteria:
 **Approval required before Task 1.3.**
 
 ## Task 1.3 - UI Design System
+
+- [x] Completed on 2026-11-10. Added Tailwind theme tokens, shadcn/ui controls, Lucide icons, toast feedback, and reduced-motion support.
 
 Implement:
 
@@ -481,6 +487,8 @@ Acceptance criteria:
 
 ## Task 1.4 - Application Layout
 
+- [x] Completed on 2026-11-10. Verified four workspace routes, the application menu, search placeholder, and compact sidebar.
+
 Implement:
 
 - Main application shell.
@@ -502,6 +510,8 @@ Acceptance criteria:
 
 ## Task 1.5 - Theme System
 
+- [x] Completed on 2026-11-10. Verified Light, Dark, and System modes and independent reader appearance across a restart.
+
 Implement:
 
 - Dark theme.
@@ -519,6 +529,8 @@ Acceptance criteria:
 **Approval required before Task 1.6.**
 
 ## Task 1.6 - AppData Storage Initialization
+
+- [x] Completed on 2026-11-10. Verified automatic creation of six local directories and tested unsuitable storage paths and temporary-file cleanup.
 
 Create the local application storage directories:
 
@@ -549,6 +561,8 @@ Acceptance criteria:
 **Approval required before Task 1.7.**
 
 ## Task 1.7 - SQLite Initialization
+
+- [x] Completed on 2026-11-10. Enabled bundled SQLite with WAL and foreign keys. Verified migration rollback, database integrity, and Bengali FTS5.
 
 Implement:
 

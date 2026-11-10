@@ -1,0 +1,120 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *):not(:where([data-theme="dark"] [data-theme="light"], [data-theme="dark"] [data-theme="light"] *)));
+
+@theme inline {
+  --font-sans: "Segoe UI", system-ui, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-sidebar: var(--sidebar);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--secondary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --background: #f7f7f2;
+  --foreground: #202821;
+  --card: #fffefa;
+  --sidebar: #efefe7;
+  --primary: #315343;
+  --primary-foreground: #fffdf6;
+  --secondary: #eceee5;
+  --muted-foreground: #535f54;
+  --accent: #dfe9da;
+  --accent-foreground: #254435;
+  --border: #d8ddd2;
+  --ring: #5e8067;
+  --destructive: #a12c31;
+  --book-edge: #f5f2db;
+  --book-warm: #b58156;
+  --radius: 0.65rem;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #171e1a;
+  --foreground: #e7ece1;
+  --card: #202a23;
+  --sidebar: #1a241e;
+  --primary: #b6d6b6;
+  --primary-foreground: #1a3023;
+  --secondary: #28352b;
+  --muted-foreground: #acb9ab;
+  --accent: #304637;
+  --accent-foreground: #d6ebd5;
+  --border: #394b3d;
+  --ring: #92b99b;
+  --destructive: #ff9a9d;
+  --book-edge: #c1c7a6;
+  --book-warm: #a47854;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-[10px] font-semibold tracking-[0.18em] text-muted-foreground uppercase;
+  }
+
+  .book-art {
+    position: absolute;
+    top: 50%;
+    right: 2rem;
+    width: 15rem;
+    height: 11rem;
+    translate: 0 -50%;
+    color: var(--ring);
+    background: repeating-radial-gradient(circle at center, transparent 0 21px, color-mix(in srgb, currentColor 18%, transparent) 22px, transparent 23px 32px);
+    border-radius: 50%;
+  }
+
+  .book {
+    position: absolute;
+    width: 9.4rem;
+    height: 2.1rem;
+    border: 2px solid currentColor;
+    border-right: 0;
+    border-radius: 0.5rem 0.15rem 0.15rem 0.5rem;
+    background: repeating-linear-gradient(0deg, var(--book-edge) 0 3px, color-mix(in srgb, currentColor 15%, var(--book-edge)) 3px 4px);
+    box-shadow: inset 0.75rem 0 currentColor;
+  }
+
+  .book-one { top: 6.7rem; left: 3rem; rotate: -4deg; }
+  .book-two { top: 4.9rem; left: 2.3rem; rotate: 5deg; color: var(--book-warm); }
+  .book-three { top: 3.15rem; left: 3.5rem; rotate: -9deg; color: var(--primary); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-state] {
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -10,4 +10,18 @@
 | 0.4 Database documentation | Completed | [Schema](database-schema.md) documents catalog, import, recovery, reader and search records. An in-memory SQLite 3.50.4 probe passed Bengali FTS5 queries, FK cascade and backup integrity. The app's bundled SQLite and actual migrations are verified in Task 1.7. |
 | 0.5 Implementation roadmap | Completed | [Roadmap](plan.md) covers all 62 tasks with dependencies and exit checks. Only the five Phase 0 tasks are marked complete. Checked task IDs, dependency ordering, document links, and status consistency. |
 
-The Phase 0 documentation commit contains this log. Phase 1 starts with Task 1.1 after owner approval.
+Phase 0 documentation commit `261fabf` contains this log.
+
+## 2026-11-10 · Phase 1
+
+| Task | Status | Work and verification |
+| --- | --- | --- |
+| 1.1 Tauri application | Completed | Ran the Vite-backed development app and the standalone Windows debug build. Settings reported a successful native database connection and schema version. |
+| 1.2 Frontend architecture | Completed | Strict TypeScript and Vite built the feature modules, hash router, providers, and typed preference client. Opened each workspace route. |
+| 1.3 UI design system | Completed | Integrated Tailwind, shadcn/ui, Lucide, Framer Motion, and toast feedback. Verified the disabled search field, dialog keyboard operation and focus return, dropdown and tooltip, and appearance controls. |
+| 1.4 Application layout | Completed | Verified sidebar and menu navigation, the Ctrl+K placeholder, and the layout at default and 640-pixel window widths. |
+| 1.5 Theme system | Completed | Changed app appearance through Light, Dark, and System. Verified an independent dark reader surface inside the light app and confirmed both settings persisted after closing and reopening. Restored the original System choices. |
+| 1.6 AppData initialization | Completed | Verified all six directories under Local AppData. Rust tests covered repeat initialization, existing-file preservation, unsuitable paths, and temporary-file cleanup. |
+| 1.7 SQLite initialization | Completed | Migration 0001 creates scoped settings and records its checksum and version. Rust tests passed for reopening, WAL, foreign keys, Bengali FTS5, failed migration rollback, version rejection, and integrity. Checked the live database read-only after saving preferences through the UI. |
+
+The Phase 1 commit contains this entry. Phase 2 starts with native folder selection after owner approval.

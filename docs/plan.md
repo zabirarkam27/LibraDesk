@@ -16,13 +16,13 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 
 | Task | Depends on | Exit check |
 | --- | --- | --- |
-| [ ] 1.1 Initialize Tauri 2 | 0.5 | Verify the scaffold's identifier and window settings, launch the Windows app, and exercise a real native command. |
-| [ ] 1.2 Frontend architecture | 1.1 | Build strict TypeScript, open each route through the app entry, and verify error handling and import boundaries. |
-| [ ] 1.3 UI design system | 1.2 | Check representative shared controls for focus, disabled and loading states, keyboard operation, and desktop widths. |
-| [ ] 1.4 Application layout | 1.2, 1.3 | Navigate every shell route and resize the window. Verify sidebar, header, and search placeholder. |
-| [ ] 1.5 Theme system | 1.3, 1.4 | Switch light, dark, and system modes. Restart to verify persistence and reader isolation. |
-| [ ] 1.6 AppData initialization | 1.1 | Verify first and repeated startup, all six local directories, and a denied path. |
-| [ ] 1.7 SQLite initialization | 1.6 | Create and reopen a database, verify FK and FTS5 support, and test a failed migration rollback and integrity checks. |
+| [x] 1.1 Initialize Tauri 2 | 0.5 | Verify the scaffold's identifier and window settings, launch the Windows app, and exercise a real native command. |
+| [x] 1.2 Frontend architecture | 1.1 | Build strict TypeScript, open each route through the app entry, and verify error handling and import boundaries. |
+| [x] 1.3 UI design system | 1.2 | Check representative shared controls for focus, disabled and loading states, keyboard operation, and desktop widths. |
+| [x] 1.4 Application layout | 1.2, 1.3 | Navigate every shell route and resize the window. Verify sidebar, header, and search placeholder. |
+| [x] 1.5 Theme system | 1.3, 1.4 | Switch light, dark, and system modes. Restart to verify persistence and reader isolation. |
+| [x] 1.6 AppData initialization | 1.1 | Verify first and repeated startup, all six local directories, and an unavailable storage path. |
+| [x] 1.7 SQLite initialization | 1.6 | Create and reopen a database, verify FK and FTS5 support, and test a failed migration rollback and integrity checks. |
 
 ## Phase 2 · PDF scanner and importer
 

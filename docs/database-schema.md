@@ -1,6 +1,6 @@
 # LibraDesk database schema
 
-This is the planned schema contract for the SQLite database under `%LOCALAPPDATA%\LibraDesk\database\`. Task 1.7 will implement the migration runner and introduce tables as their owning features are built.
+This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates `settings` alongside the migration history table. The remaining feature tables are introduced by their owning tasks.
 
 ## Conventions
 
