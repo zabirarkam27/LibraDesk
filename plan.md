@@ -319,6 +319,9 @@ The initial Tauri 2 and React/Vite scaffold was added on 2026-11-10 at the proje
 
 ## Task 0.2 - Development Environment Audit
 
+- [x] Completed on 2026-11-10. Recorded Windows, Node.js, npm, Rust, Cargo, WebView2, MSVC and SDK versions in the [environment audit](docs/environment-audit.md).
+- Frontend and locked Rust checks passed. The audit records network and sandbox cache warnings. Commit evidence is in the [development log](docs/development-log.md).
+
 Verify:
 
 - Windows version.
@@ -337,6 +340,9 @@ Do not install anything without approval.
 **Approval required before Task 0.3.**
 
 ## Task 0.3 - Architecture Documentation
+
+- [x] Completed on 2026-11-10. Published the [architecture](docs/architecture.md) and [decisions](docs/decisions.md) and reviewed them against the plan and scaffold.
+- The PDF range transport still needs a Windows prototype. See the [development log](docs/development-log.md).
 
 Create:
 
@@ -359,6 +365,9 @@ Document:
 
 ## Task 0.4 - Database Documentation
 
+- [x] Completed on 2026-11-10. Published the [database schema](docs/database-schema.md), including constraints, FTS5, migrations and recovery.
+- A local SQLite prototype passed Bengali FTS5, foreign key cascade and backup checks. App-specific verification is scheduled in Task 1.7. See the [development log](docs/development-log.md).
+
 Create:
 
 - docs/database-schema.md
@@ -378,6 +387,9 @@ Document:
 **Approval required before Task 0.5.**
 
 ## Task 0.5 - Implementation Roadmap
+
+- [x] Completed on 2026-11-10. Published the [roadmap](docs/plan.md) and [development log](docs/development-log.md).
+- Verified the task inventory, dependency order, document links, and Phase 0 statuses. Tasks in later phases are pending approval.
 
 Create:
 
@@ -892,6 +904,7 @@ Implement:
 - Add/remove books.
 - Collection sorting.
 - Collection details.
+- User-defined reading lists backed by collections.
 
 **Approval required before Task 4.8.**
 
@@ -1042,12 +1055,13 @@ Implement:
 - Auto resume.
 - Debounced persistence.
 - Reader close persistence.
+- Persist reading sessions for later analytics.
 
 Do not mark a book completed simply because its last page was opened.
 
 **Approval required before Task 5.7.**
 
-## Task 5.7 - Bookmarks
+## Task 5.7 - Bookmarks and Personal Notes
 
 Implement:
 
@@ -1055,6 +1069,8 @@ Implement:
 - Edit bookmark label.
 - Remove bookmark.
 - Navigate to bookmarked page.
+- Add, edit, and remove page-linked personal notes.
+- Navigate from a note to its page and verify notes persist after restart.
 
 **Approval required before Task 5.8.**
 
@@ -1389,6 +1405,7 @@ Maintain these documents throughout development:
 ```text
 docs/
 ├── plan.md
+├── environment-audit.md
 ├── architecture.md
 ├── database-schema.md
 ├── decisions.md
