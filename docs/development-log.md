@@ -60,3 +60,9 @@ Eleven Rust tests, Clippy, the frontend build, and the standalone Windows debug 
 | 4.1 Book repositories and services | Completed | Added revision-checked book CRUD, file and author repositories, metadata overrides, author relationships, and typed Tauri services. Fixture tests covered migration, persistence after reopen, ordered and same-name authors, rollback, stale revisions, file and book ID reuse prevention, and source PDF preservation. |
 
 Fourteen Rust tests, Clippy, and the TypeScript and Vite build passed.
+
+### Task 4.2 · All Books
+
+The Library page opens in Grid view and also offers List and Compact views. List shows the source path. Each page contains up to 50 books, and each view mounts only visible rows and up to two extra rows on either side.
+
+Headless Chromium verified all three views with a mocked Tauri catalog of 10,000 records. At 1140 × 760, the top and bottom of a full page mounted 7 to 18 cards across the tested modes. Checks also covered resize to 520 pixels, cursor pagination, cover and placeholder rendering, Bengali metadata, loading, empty catalog, error and retry, and browser preview. The TypeScript/Vite build and Windows debug build passed.

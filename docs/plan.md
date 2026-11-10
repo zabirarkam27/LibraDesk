@@ -52,7 +52,7 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 | Task | Depends on | Exit check |
 | --- | --- | --- |
 | [x] 4.1 Book repositories and services | 1.7, 2.6, 3.6 | Verify typed CRUD, transactions, and repository errors with fixture data. |
-| [ ] 4.2 All Books | 1.4, 3.5, 4.1 | Test grid, list, compact, loading, empty, and error states. Verify bounded rendering with a large library. |
+| [x] 4.2 All Books | 1.4, 3.5, 4.1 | Test grid, list, compact, loading, empty, and error states. Verify bounded rendering with a large library. |
 | [ ] 4.3 Book details | 4.1, 4.2 | Open real records, check file and metadata fields, save and reload edits, and handle missing records. |
 | [ ] 4.4 Categories | 4.1 | Verify nested CRUD, cycle prevention, multiple assignments, filtering, and book retention after category removal. |
 | [ ] 4.5 Tags | 4.1 | Verify tag CRUD, multiple assignments, and filtering. |

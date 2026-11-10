@@ -858,19 +858,12 @@ Do not put raw SQL inside UI components.
 
 ## Task 4.2 - All Books Page
 
-Implement:
+Completed on 2026-11-11. See the [development log](docs/development-log.md) for verification.
 
-- Grid view.
-- List view.
-- Compact view.
-- Book cards.
-- Cover display.
-- Metadata display.
-- Loading states.
-- Empty states.
-- Error states.
-
-Use virtualization for large collections.
+- [x] Grid, list, and compact views.
+- [x] Book cards with covers and metadata.
+- [x] Loading, empty, and retryable error states.
+- [x] Row virtualization and cursor pagination for large collections.
 
 **Approval required before Task 4.3.**
 
