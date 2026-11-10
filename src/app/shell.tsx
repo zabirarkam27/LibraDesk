@@ -1,4 +1,4 @@
-import { BookOpen, Ellipsis, LayoutGrid, LibraryBig, Settings2 } from "lucide-react";
+import { BookOpen, Ellipsis, FolderInput, LayoutGrid, LibraryBig, Settings2 } from "lucide-react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { usePreferences } from "@/features/settings/preferences-store";
 import { desktop } from "@/shared/lib/preferences-client";
@@ -11,6 +11,7 @@ import { SearchEntry } from "./search-entry";
 const navigation = [
   { to: "/", name: "Overview", icon: LayoutGrid },
   { to: "/library", name: "Library", icon: LibraryBig },
+  { to: "/import", name: "Import", icon: FolderInput },
   { to: "/reader", name: "Reader", icon: BookOpen },
   { to: "/settings", name: "Settings", icon: Settings2 },
 ];
@@ -80,6 +81,7 @@ export function Shell() {
                 <DropdownMenuLabel>LibraDesk</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link to="/library"><LibraryBig /> Open library</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/import"><FolderInput /> Import PDFs</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/settings"><Settings2 /> Settings</Link></DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

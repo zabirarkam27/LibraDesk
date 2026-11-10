@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, LibraryBig, Settings2 } from "lucide-react";
+import { ArrowRight, BookOpen, Settings2 } from "lucide-react";
 import { LazyMotion, useReducedMotion } from "framer-motion";
 import { section as MotionSection } from "framer-motion/m";
 import { Link } from "react-router";
@@ -30,7 +30,10 @@ export function OverviewPage() {
             <p className="eyebrow mb-4">Library workspace</p>
             <h2 id="workspace-heading" className="font-display text-3xl tracking-tight">Make room for good books.</h2>
             <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">Open your library workspace, visit the reader, or set the appearance for each.</p>
-            <Button asChild className="mt-5"><Link to="/library">Open library <ArrowRight /></Link></Button>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Button asChild><Link to="/import">Import PDFs <ArrowRight /></Link></Button>
+              <Button asChild variant="outline"><Link to="/library">Open library</Link></Button>
+            </div>
           </div>
         </MotionSection>
       </LazyMotion>
@@ -41,7 +44,6 @@ export function OverviewPage() {
     </>
   );
 }
-
 function WorkspaceLink({ to, title, description, icon: Icon }: { to: string; title: string; description: string; icon: typeof BookOpen }) {
   return (
     <Link to={to} className="group flex items-start gap-3 rounded-lg border bg-card p-4 hover:border-ring focus-visible:outline-2 focus-visible:outline-ring">
@@ -52,20 +54,5 @@ function WorkspaceLink({ to, title, description, icon: Icon }: { to: string; tit
       </span>
       <ArrowRight className="mt-2 size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
     </Link>
-  );
-}
-
-export function LibraryPage() {
-  return (
-    <>
-      <PageHeading label="Library" title="All books" description="Browse the PDFs registered in your local library." />
-      <section className="grid min-h-60 place-items-center rounded-xl border bg-card px-6 text-center">
-        <div>
-          <LibraryBig className="mx-auto mb-4 size-7 text-muted-foreground" />
-          <h2 className="font-display text-2xl">Your library is empty</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Books will appear here after folder scanning and import are available.</p>
-        </div>
-      </section>
-    </>
   );
 }

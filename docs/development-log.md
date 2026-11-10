@@ -24,4 +24,18 @@ Phase 0 documentation commit `261fabf` contains this log.
 | 1.6 AppData initialization | Completed | Verified all six directories under Local AppData. Rust tests covered repeat initialization, existing-file preservation, unsuitable paths, and temporary-file cleanup. |
 | 1.7 SQLite initialization | Completed | Migration 0001 creates scoped settings and records its checksum and version. Rust tests passed for reopening, WAL, foreign keys, Bengali FTS5, failed migration rollback, version rejection, and integrity. Checked the live database read-only after saving preferences through the UI. |
 
-The Phase 1 commit contains this entry. Phase 2 starts with native folder selection after owner approval.
+Phase 1 commit `65312a7` contains this entry.
+
+## 2026-11-11 · Phase 2
+
+| Task | Status | Work and verification |
+| --- | --- | --- |
+| 2.1 Native folder picker | Completed | Selected two roots in one Windows dialog. Cancellation left the list empty. Automated tests covered disabling and retiring roots while preserving books and history. |
+| 2.2 Recursive discovery | Completed | The Windows scan found a nested Bengali `.PDF` and skipped a junction pointing at an unselected folder. Automated tests rejected paths outside the root. |
+| 2.3 PDF validation | Completed | Read-only header validation flagged a plain-text `.pdf`. Tests covered unavailable roots and an import candidate changed after preview. |
+| 2.4 Scan jobs | Completed | Added persisted frontier and outcome checkpoints, throttled progress events, and pause, resume, and cancel controls. Tests covered a stale worker, duplicate start prevention, and interrupted scan and import recovery. |
+| 2.5 Import preview | Completed | The Windows preview reported three paths, two possible duplicates, and one invalid file. A read-only SQLite check found zero catalog entries before confirmation. Equal file size is advisory until hashing is implemented. |
+| 2.6 Database import | Completed | Confirmation added two entries, including the Bengali file. A rescan classified both as existing. Tests covered repeated confirmation, overlap, batch rollback, changed files, and source preservation. |
+| 2.7 Scan history | Completed | The Windows app displayed the root, start and finish times, and a completed result of three found, two imported, and one failed. Verified the stored result after reopening. |
+
+Seven Rust tests, Clippy, the TypeScript and Vite build, and the standalone Windows debug build passed. Migration 0002 adds the catalog and scan tables. Phase 3 starts with PDF metadata extraction after owner approval.

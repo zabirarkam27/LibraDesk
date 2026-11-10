@@ -1,6 +1,6 @@
 # LibraDesk architecture
 
-LibraDesk runs as a single Windows desktop application. React renders the workspace in Tauri's WebView2 window. Rust owns AppData and SQLite, and will own native file operations and background jobs. The frontend is bundled in the executable. Future translation and PDF.js worker assets will also load locally.
+LibraDesk runs as a single Windows desktop application. React renders the workspace in Tauri's WebView2 window. Rust owns AppData, SQLite, native folder selection, and the background scanner. The frontend is bundled in the executable. Future translation and PDF.js worker assets will also load locally.
 
 ## Frontend
 
@@ -16,7 +16,7 @@ Keep Tauri command handlers thin. They decode request DTOs, dispatch to domain s
 
 Use IDs for known books, files, scan roots, and jobs. A native picker supplies paths when adding roots or relinking. Return a stable error code and retryability alongside details suitable for the frontend. Map these codes to localized user messages. Keep paths and document contents out of ordinary logs. Distinguish missing files from denied access, corrupt PDFs, unsupported encryption, storage failures, and cancellation.
 
-Run scanning, hashing, and database work outside the UI thread. Use bounded queues for disk reads and worker processing. Persist job state and committed file or page checkpoints. Events report progress with a job ID and revision. The UI reads a fresh snapshot after reconnecting and discards events older than that snapshot. Recovery requeues interrupted work and retries idempotently. Workers commit results only if the file version still matches. Keep scan candidates separate from the library until the user confirms import.
+One background worker handles scans and imports on its own SQLite connection. The single-instance guard keeps a second window process from recovering active work. Discovery writes batches of up to 64 directory entries and resumes at pending directories. Confirmed imports revalidate and commit batches of up to 32 candidates. A job revision guards writes after pause, resume, or cancellation. Progress events prompt the UI to request a fresh snapshot. Recovery pauses interrupted discovery and resumes previously confirmed imports. Candidates remain separate from the library until confirmation.
 
 ## Windows storage and file identity
 
@@ -32,7 +32,7 @@ Prototype a read-only Tauri custom protocol during cover integration. Rust issue
 
 ## SQLite, search, and recovery
 
-Use the [database schema](database-schema.md) as the contract. The first preferences request prepares and validates AppData, opens SQLite on a blocking worker, applies migrations, and retains a serialized connection for subsequent commands. Rust enables foreign keys and verifies WAL and bundled FTS5 support. Keep writes transactional and batch background work. Treat FTS and thumbnails as rebuildable derivatives of saved records.
+Use the [database schema](database-schema.md) as the contract. Startup prepares and validates AppData and applies migrations off the UI thread. Commands share a serialized connection, and the scan worker has a dedicated connection. SQLite serializes their short write transactions. Rust enables foreign keys and verifies WAL and bundled FTS5 support. Treat FTS and thumbnails as rebuildable derivatives of saved records.
 
 Normalize search text consistently at indexing and query time. Match English and Bengali, including mixed-language queries, while preserving the original metadata. Keep metadata and page text in separate FTS5 indexes. Search by the current file revision and return page references for full-text hits. Validate Bengali tokenization with fixtures before accepting a tokenizer configuration.
 

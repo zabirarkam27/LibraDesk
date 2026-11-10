@@ -28,13 +28,13 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 
 | Task | Depends on | Exit check |
 | --- | --- | --- |
-| [ ] 2.1 Native folder picker | 1.4, 1.7 | Register multiple roots, cancel the picker, and disable or remove a root without losing its books. |
-| [ ] 2.2 Recursive PDF discovery | 2.1 | Discover nested and Bengali paths, handle denied locations, and skip reparse points and traversal attempts. |
-| [ ] 2.3 PDF validation | 2.2 | Classify valid, unreadable, missing, and renamed non-PDF fixtures. Record size and modification time. |
-| [ ] 2.4 Scan jobs | 2.3, 1.7 | Pause, resume, and cancel under load. Restart mid-scan and verify checkpoints and duplicate job prevention. |
-| [ ] 2.5 Import preview | 2.4 | Reconcile preview counts and byte totals with fixtures. Verify cancelling creates zero books. |
-| [ ] 2.6 Database import | 2.5 | Confirm twice and rescan overlapping roots. Inject a batch failure and verify safe recovery and unchanged PDF bytes. |
-| [ ] 2.7 Scan history | 2.6 | Compare persisted counts, root, times, and terminal statuses after restart. |
+| [x] 2.1 Native folder picker | 1.4, 1.7 | Register multiple roots, cancel the picker, and disable or remove a root without losing its books. |
+| [x] 2.2 Recursive PDF discovery | 2.1 | Discover nested and Bengali paths, handle unavailable locations, and skip reparse points and traversal attempts. |
+| [x] 2.3 PDF validation | 2.2 | Classify valid, unreadable, missing, and renamed non-PDF fixtures. Record size and modification time. |
+| [x] 2.4 Scan jobs | 2.3, 1.7 | Pause, resume, and cancel a scan. Restart mid-scan and verify checkpoints and duplicate job prevention. |
+| [x] 2.5 Import preview | 2.4 | Reconcile preview counts and byte totals with fixtures. Verify cancelling creates zero books. |
+| [x] 2.6 Database import | 2.5 | Confirm twice and rescan overlapping roots. Inject a batch failure and verify safe recovery and unchanged PDF bytes. |
+| [x] 2.7 Scan history | 2.6 | Compare persisted counts, root, times, and terminal statuses after restart. |
 
 ## Phase 3 · Metadata, hashing, and thumbnails
 

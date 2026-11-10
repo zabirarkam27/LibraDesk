@@ -1,6 +1,6 @@
 # LibraDesk
 
-LibraDesk is a Windows desktop project for managing and reading a personal PDF library offline. The desktop foundation includes a navigable workspace, a reader appearance preview, and local SQLite preferences. See the [implementation roadmap](docs/plan.md) for task status and the [detailed plan](plan.md) for requirements.
+LibraDesk is a Windows desktop project for managing and reading a personal PDF library offline. The desktop app can scan local folders and add PDFs to its SQLite catalog after you review the results. See the [implementation roadmap](docs/plan.md) for task status and the [detailed plan](plan.md) for requirements.
 
 ## Local development
 
@@ -12,6 +12,8 @@ npm run tauri dev
 ```
 
 Open **Settings** in the desktop window to verify the database connection and change the app and reader themes. Both preferences are stored in `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Run `npm run dev` for the browser preview, which uses browser storage for appearance preferences.
+
+Open **Import**, choose **Add folders**, then select **Scan folder** beside an enabled root. The preview shows what LibraDesk found. Select **Review import** and confirm to add eligible paths to **Library**. The app reads the originals in place. An interrupted scan appears as **Paused** when the app reopens. A previously confirmed import resumes automatically.
 
 ## Build checks
 

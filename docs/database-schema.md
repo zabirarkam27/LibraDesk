@@ -1,6 +1,6 @@
 # LibraDesk database schema
 
-This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates `settings` alongside the migration history table. The remaining feature tables are introduced by their owning tasks.
+This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates `settings` alongside the migration history table. Migration 0002 adds `books`, `book_files`, and the scan tables through `scan_candidates`. Later features introduce the remaining tables.
 
 ## Conventions
 
@@ -32,14 +32,14 @@ Create a distinct book and primary file per imported path unless an explicit wor
 | Table | Fields and relationships | Constraints and indexes |
 | --- | --- | --- |
 | `scan_roots` | `id` PK, `display_path`, `path_key`, `is_enabled`, `created_at`, optional `retired_at` | Unique path key. Retire roots to preserve scan history and leave their books intact. |
-| `scan_jobs` | `id` PK, `root_id` FK to scan_roots with restrict, `status`, `revision`, `created_at`, optional `started_at`, `finished_at`, `error_code`, `discovered_count`, `imported_count`, `failed_count` | One nonterminal job per root via a partial unique index. Statuses are queued, running, paused, awaiting_confirmation, importing, completed, cancelled, or failed. Index `(root_id, created_at, id)` for history. |
-| `scan_frontier` | PK `(job_id, directory_key)`, `job_id` FK to scan_jobs with cascade, `display_path`, `status` | States pending, in_progress, done, or inaccessible. Index `(job_id, status)`. Revisit incomplete directories after restart and upsert candidates by key. |
-| `scan_candidates` | PK `(job_id, path_key)`, `job_id` FK with cascade, `display_path`, `classification`, `import_state`, optional `size_bytes`, `modified_at`, `error_code`, `file_id` FK to book_files with set null | Classify new, existing, duplicate_candidate, invalid, or inaccessible. Record import outcomes as pending, imported, skipped, or failed. Index `(job_id, classification, import_state)`. Revalidate the confirmed file version at import time. |
+| `scan_jobs` | `id` PK, `root_id` FK to scan_roots with restrict, `status`, `revision`, `created_at`, optional `started_at`, `finished_at`, `error_code` | One nonterminal job per root via a partial unique index. Statuses are queued, running, paused, awaiting_confirmation, importing, completed, cancelled, or failed. History counts are derived from candidate and frontier outcomes. |
+| `scan_frontier` | PK `(job_id, directory_key)`, `job_id` FK to scan_jobs with cascade, `status` | States pending, done, or inaccessible. Index `(job_id, status, directory_key)`. Revisit incomplete directories after restart and upsert candidates by key. |
+| `scan_candidates` | PK `(job_id, path_key)`, `job_id` FK with cascade, `display_path`, `classification`, `import_state`, optional `size_bytes`, `modified_at`, `modified_token`, `error_code`, `file_id` FK to book_files with set null | Classify new, existing, duplicate_candidate, invalid, or inaccessible. Record import outcomes as pending, imported, skipped, or failed. Index `(job_id, import_state, classification, path_key)`. Revalidate size and the full-precision modification token at import time. |
 | `processing_jobs` | `id` PK, `file_id` FK to book_files with cascade, `file_revision`, `kind`, `status`, `attempt_count`, optional `last_completed_page`, `error_code`, `updated_at` | Unique `(file_id, file_revision, kind)`. Kinds include metadata, hash, cover, and page_text. Index `(status, kind, updated_at)`. Commit each page batch and its checkpoint together. |
 | `thumbnails` | `file_id` PK and FK to book_files with cascade, `file_revision`, `relative_path`, `width`, `height`, `size_bytes`, `created_at` | Positive dimensions, nonnegative size, and unique validated cache path. Use a versioned filename. Commit the pointer after the generated image has been promoted into place. |
 | `duplicate_reviews` | PK `(sha256, file_id)`, `file_id` FK to book_files with cascade, `decision`, `reviewed_at` | Groups are derived from current non-null hashes shared by at least two files. Decisions are keep or ignore. Use the current hash when applying decisions and discard obsolete reviews when a file changes. |
 
-Scan confirmation advances a persisted job revision before importing. Process a candidate and its outcome in the same transaction, with the file path unique key protecting retries and concurrent jobs. Keep history counters in sync with committed outcomes. Mark processed files only after their result has been committed. After a file changes, bump its revision and invalidate stale hash, metadata derivatives, covers, and indexed text. Leave original paths and user edits intact.
+Scan confirmation advances a persisted job revision before importing. The preview flags equal-size files as possible duplicates. Import keeps each eligible distinct path and uses its filename stem as a provisional title. Each candidate and its outcome commit in the same transaction, with the file path unique key protecting retries and overlapping roots. In the planned change-detection feature, bump the file revision and invalidate stale hash, metadata derivatives, covers, and indexed text when a file changes.
 
 ## Reader, settings, and analytics
 

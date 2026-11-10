@@ -4,8 +4,13 @@ use rusqlite::{Connection, OptionalExtension, TransactionBehavior};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-const MIGRATIONS: &[(&str, &str)] =
-    &[("settings", include_str!("../migrations/0001_settings.sql"))];
+const MIGRATIONS: &[(&str, &str)] = &[
+    ("settings", include_str!("../migrations/0001_settings.sql")),
+    (
+        "scan_import",
+        include_str!("../migrations/0002_scan_import.sql"),
+    ),
+];
 const UPSERT_THEME: &str = "
     INSERT INTO settings(scope, key, value_json, updated_at)
     VALUES (?1, 'theme', ?2, CAST(unixepoch('subsec') * 1000 AS INTEGER))
@@ -141,7 +146,7 @@ fn migrate(connection: &mut Connection, migrations: &[(&str, &str)]) -> Result<(
     }
 }
 
-pub struct Database(Connection);
+pub struct Database(pub(crate) Connection);
 
 impl Database {
     pub fn open(path: &Path) -> Result<Self, Error> {
@@ -228,7 +233,7 @@ mod tests {
         let preferences = db.preferences(Some(Theme::System)).unwrap();
         assert_eq!(preferences.app, Theme::Dark);
         assert_eq!(preferences.reader, Theme::Light);
-        assert_eq!(preferences.schema_version, 1);
+        assert_eq!(preferences.schema_version, MIGRATIONS.len());
         assert_eq!(
             db.0.pragma_query_value(None, "journal_mode", |row| row.get::<_, String>(0))
                 .unwrap(),
@@ -260,7 +265,7 @@ mod tests {
     #[test]
     fn failed_migration_rolls_back_and_incompatible_history_is_rejected() {
         let mut connection = Connection::open_in_memory().unwrap();
-        migrate(&mut connection, MIGRATIONS).unwrap();
+        migrate(&mut connection, &MIGRATIONS[..1]).unwrap();
         let migrations = [
             MIGRATIONS[0],
             ("broken", "CREATE TABLE temporary_change(id); INVALID SQL;"),
@@ -286,7 +291,7 @@ mod tests {
             migrate(&mut connection, &[("different", MIGRATIONS[0].1)]),
             Err(Error::IncompatibleSchema)
         ));
-        connection.pragma_update(None, "user_version", 2).unwrap();
+        connection.pragma_update(None, "user_version", 3).unwrap();
         assert!(matches!(
             migrate(&mut connection, MIGRATIONS),
             Err(Error::IncompatibleSchema)

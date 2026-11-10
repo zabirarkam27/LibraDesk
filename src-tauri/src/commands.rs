@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::{path::PathBuf, sync::Mutex};
 
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
@@ -13,9 +13,9 @@ pub struct State(Mutex<Option<Database>>);
 
 #[derive(Serialize)]
 pub struct CommandError {
-    code: &'static str,
-    message: &'static str,
-    retryable: bool,
+    pub(crate) code: &'static str,
+    pub(crate) message: &'static str,
+    pub(crate) retryable: bool,
 }
 
 fn database_error(error: database::Error) -> CommandError {
@@ -34,7 +34,7 @@ fn database_error(error: database::Error) -> CommandError {
     }
 }
 
-async fn with_database<T: Send + 'static>(
+pub(crate) async fn with_database<T: Send + 'static>(
     app: AppHandle,
     operation: impl FnOnce(&Database) -> Result<T, database::Error> + Send + 'static,
 ) -> Result<T, CommandError> {
@@ -42,12 +42,7 @@ async fn with_database<T: Send + 'static>(
         let state = app.state::<State>();
         let mut database = state.0.lock().map_err(|_| unavailable())?;
         if database.is_none() {
-            let path = app
-                .path()
-                .local_data_dir()
-                .map_err(|_| storage_unavailable())?;
-            let file =
-                storage::initialize(&path.join("LibraDesk")).map_err(|_| storage_unavailable())?;
+            let file = database_path(&app)?;
             *database = Some(Database::open(&file).map_err(database_error)?);
         }
         operation(database.as_ref().ok_or_else(unavailable)?).map_err(database_error)
@@ -56,7 +51,15 @@ async fn with_database<T: Send + 'static>(
     .map_err(|_| unavailable())?
 }
 
-fn unavailable() -> CommandError {
+pub(crate) fn database_path(app: &AppHandle) -> Result<PathBuf, CommandError> {
+    let path = app
+        .path()
+        .local_data_dir()
+        .map_err(|_| storage_unavailable())?;
+    storage::initialize(&path.join("LibraDesk")).map_err(|_| storage_unavailable())
+}
+
+pub(crate) fn unavailable() -> CommandError {
     CommandError {
         code: "unavailable",
         message: "LibraDesk storage is temporarily unavailable. Try restarting the app.",

@@ -1,5 +1,7 @@
 import { Link, Route, Routes } from "react-router";
-import { LibraryPage, OverviewPage } from "@/features/library/library-pages";
+import { ImportPage } from "@/features/import/import-page";
+import { OverviewPage } from "@/features/library/library-pages";
+import { LibraryPage } from "@/features/library/catalog-page";
 import { ReaderPage } from "@/features/reader/reader-page";
 import { SettingsPage } from "@/features/settings/settings-page";
 import { Button } from "@/shared/ui/button";
@@ -21,6 +23,7 @@ export function App() {
       <Route element={<Shell />}>
         <Route index element={<OverviewPage />} />
         <Route path="library" element={<LibraryPage />} />
+        <Route path="import" element={<ImportPage />} />
         <Route path="reader" element={<ReaderPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFound />} />

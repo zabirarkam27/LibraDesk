@@ -591,6 +591,8 @@ Acceptance criteria:
 
 ## Task 2.1 - Native Folder Picker
 
+- [x] Completed on 2026-11-11. Registered two folders from one Windows dialog and verified that cancelling the picker leaves the list empty. Tested disabling and retiring roots without altering catalog records.
+
 Implement:
 
 - Native Windows folder picker.
@@ -605,6 +607,8 @@ Important: Removing a root must never delete its books or files.
 **Approval required before Task 2.2.**
 
 ## Task 2.2 - Recursive PDF Discovery
+
+- [x] Completed on 2026-11-11. Verified nested Bengali paths, case-insensitive PDF extensions, and exclusion of a Windows junction.
 
 Implement:
 
@@ -626,6 +630,8 @@ Acceptance criteria:
 
 ## Task 2.3 - PDF Validation
 
+- [x] Completed on 2026-11-11. Verified read-only PDF header and metadata checks, invalid-file classification, and inaccessible paths.
+
 Implement:
 
 - File existence checks.
@@ -640,6 +646,8 @@ Do not assume every file ending in `.pdf` is a valid PDF.
 **Approval required before Task 2.4.**
 
 ## Task 2.4 - Scan Job System
+
+- [x] Completed on 2026-11-11. Added background processing, progress updates, persisted checkpoints, pause, resume, and cancellation. Tested restart recovery and duplicate-job prevention.
 
 Implement:
 
@@ -662,6 +670,8 @@ Acceptance criteria:
 
 ## Task 2.5 - Import Preview
 
+- [x] Completed on 2026-11-11. Verified preview counts and no catalog writes before confirmation. Equal file size flags a possible duplicate.
+
 Display:
 
 - Total PDFs found.
@@ -677,6 +687,8 @@ Require user confirmation before importing new records.
 **Approval required before Task 2.6.**
 
 ## Task 2.6 - Database Import
+
+- [x] Completed on 2026-11-11. Verified transactional batches, idempotent path registration, source revalidation, rollback, and import recovery.
 
 Implement:
 
@@ -696,6 +708,8 @@ Acceptance criteria:
 **Approval required before Task 2.7.**
 
 ## Task 2.7 - Scan History
+
+- [x] Completed on 2026-11-11. Verified persisted results and timestamps. See the [Phase 2 log](docs/development-log.md) for the Windows smoke test and automated checks.
 
 Implement:
 
