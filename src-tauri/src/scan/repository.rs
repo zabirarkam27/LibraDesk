@@ -3,7 +3,10 @@ use std::path::Path;
 use rusqlite::{params, OptionalExtension, Transaction, TransactionBehavior};
 use serde::{Deserialize, Serialize};
 
-use crate::database::Database;
+use crate::{
+    catalog::repository::{insert_book, insert_file},
+    database::Database,
+};
 
 use super::files::{self, Pdf, Stamp};
 
@@ -46,20 +49,6 @@ pub struct Job {
 pub struct Snapshot {
     pub(super) roots: Vec<Root>,
     pub(super) jobs: Vec<Job>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Book {
-    id: i64,
-    title: String,
-    path: String,
-    bytes: i64,
-    file_id: i64,
-    author: Option<String>,
-    pages: Option<i64>,
-    cover_revision: Option<i64>,
-    duplicate: bool,
 }
 
 #[derive(Clone, Copy, Deserialize)]
@@ -397,14 +386,9 @@ impl Database {
                 (Some(id), _) => ("skipped", Some(id), None),
                 (None, Some(stamp)) => {
                     let title = crate::metadata::filename_title(Path::new(&candidate.key));
-                    tx.execute(&format!(
-                        "INSERT INTO books(title,title_sort_key,created_at,updated_at) VALUES (?1,?2,{NOW},{NOW})"
-                    ), params![title, title.to_lowercase()])?;
-                    tx.execute(&format!(
-                        "INSERT INTO book_files(book_id,original_path,path_key,size_bytes,modified_at,last_verified_at,source_token)
-                         VALUES (?1,?2,?3,?4,?5,{NOW},?6)"
-                    ), params![tx.last_insert_rowid(), files::display(&candidate.key), candidate.key, stamp.bytes, stamp.modified_at, stamp.token])?;
-                    ("imported", Some(tx.last_insert_rowid()), None)
+                    let book_id = insert_book(&tx, &title)?;
+                    let file_id = insert_file(&tx, book_id, &candidate.key, &stamp)?;
+                    ("imported", Some(file_id), None)
                 }
                 (None, None) => ("failed", None, Some("source_changed_or_unreadable")),
             };
@@ -422,32 +406,5 @@ impl Database {
              WHERE id=?1 AND revision=?2 AND status IN ('running','importing')"
         ), params![work.id, work.revision, reason])?;
         Ok(())
-    }
-
-    pub fn list_imported(&self, before: Option<i64>) -> Result<Vec<Book>> {
-        let mut statement = self.0.prepare(
-            "SELECT b.id,b.title,f.original_path,f.size_bytes,f.id,b.author,f.page_count,t.file_revision,
-                    EXISTS(SELECT 1 FROM book_files other WHERE other.sha256=f.sha256 AND other.id<>f.id)
-             FROM books b
-             JOIN book_files f ON f.book_id=b.id AND f.is_primary=1
-             LEFT JOIN thumbnails t ON t.file_id=f.id AND t.file_revision=f.revision
-             WHERE (?1 IS NULL OR b.id<?1) ORDER BY b.id DESC LIMIT 51",
-        )?;
-        let rows = statement
-            .query_map([before], |row| {
-                Ok(Book {
-                    id: row.get(0)?,
-                    title: row.get(1)?,
-                    path: row.get(2)?,
-                    bytes: row.get(3)?,
-                    file_id: row.get(4)?,
-                    author: row.get(5)?,
-                    pages: row.get(6)?,
-                    cover_revision: row.get(7)?,
-                    duplicate: row.get(8)?,
-                })
-            })?
-            .collect();
-        rows
     }
 }

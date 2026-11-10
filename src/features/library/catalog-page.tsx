@@ -1,4 +1,3 @@
-import { invoke } from "@tauri-apps/api/core";
 import { LibraryBig } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
@@ -9,11 +8,7 @@ import { PageHeading } from "@/shared/ui/page-heading";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { BookCover } from "@/features/metadata/book-cover";
 import { useMetadataQuery } from "@/features/metadata/use-metadata-query";
-
-type Entry = {
-  id: number; title: string; path: string; bytes: number; fileId: number;
-  author: string | null; pages: number | null; coverRevision: number | null; duplicate: boolean;
-};
+import { listBooks } from "./catalog-client";
 
 function EmptyCatalog() {
   return (
@@ -30,7 +25,7 @@ function EmptyCatalog() {
 
 function DesktopCatalog() {
   const [before, setBefore] = useState<number | null>(null);
-  const query = useCallback(() => invoke<Entry[]>("list_imported_books", { before }), [before]);
+  const query = useCallback(() => listBooks(before), [before]);
   const { data: entries, error, retry } = useMetadataQuery(query);
 
   if (error) {
@@ -45,7 +40,7 @@ function DesktopCatalog() {
   if (!entries.length && before === null) return <EmptyCatalog />;
 
   return (
-    <section aria-label="Imported books" className="rounded-xl border bg-card">
+    <section aria-label="Catalog books" className="rounded-xl border bg-card">
       <ul className="divide-y">
         {entries.slice(0, 50).map((entry) => (
           <li key={entry.id} className="flex items-start gap-3 px-5 py-4">
@@ -55,10 +50,10 @@ function DesktopCatalog() {
               {(entry.author || entry.pages) && <p className="mt-1 text-xs text-muted-foreground">
                 {[entry.author, entry.pages && `${entry.pages} ${entry.pages === 1 ? "page" : "pages"}`].filter(Boolean).join(" · ")}
               </p>}
-              <p className="mt-1 break-all text-xs text-muted-foreground">{entry.path}</p>
+              {entry.path !== null && <p className="mt-1 break-all text-xs text-muted-foreground">{entry.path}</p>}
               {entry.duplicate && <Link to="/metadata?view=duplicates" className="mt-1 inline-block text-xs text-primary underline">Exact duplicate</Link>}
             </div>
-            <span className="shrink-0 text-xs text-muted-foreground">{formatBytes(entry.bytes)}</span>
+            {entry.bytes !== null && <span className="shrink-0 text-xs text-muted-foreground">{formatBytes(entry.bytes)}</span>}
           </li>
         ))}
       </ul>

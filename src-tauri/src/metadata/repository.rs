@@ -3,7 +3,10 @@ use std::path::Path;
 use rusqlite::{params, OptionalExtension, Row, Transaction, TransactionBehavior};
 use serde::{Deserialize, Serialize};
 
-use crate::database::Database;
+use crate::{
+    catalog::repository::{save_override, set_author_text},
+    database::Database,
+};
 
 use super::pdf::{filename_title, Analysis, RawMetadata, Source};
 
@@ -56,16 +59,26 @@ fn effective(raw: Option<&String>) -> Option<&str> {
 fn update_catalog(tx: &Transaction<'_>, source: &Source, raw: Option<&RawMetadata>) -> Result<()> {
     let fallback = filename_title(Path::new(&source.path));
     let title = effective(raw.and_then(|raw| raw.title.as_ref())).unwrap_or(&fallback);
-    tx.execute(&format!(
+    let book_id = tx.query_row(&format!(
         "UPDATE books AS b SET
          title=CASE WHEN EXISTS(SELECT 1 FROM metadata_overrides WHERE book_id=b.id AND field='title') THEN title ELSE ?2 END,
          title_sort_key=CASE WHEN EXISTS(SELECT 1 FROM metadata_overrides WHERE book_id=b.id AND field='title') THEN title_sort_key ELSE ?3 END,
-         author=CASE WHEN EXISTS(SELECT 1 FROM metadata_overrides WHERE book_id=b.id AND field='author') THEN author ELSE ?4 END,
-         subject=CASE WHEN EXISTS(SELECT 1 FROM metadata_overrides WHERE book_id=b.id AND field='subject') THEN subject ELSE ?5 END,
+         subject=CASE WHEN EXISTS(SELECT 1 FROM metadata_overrides WHERE book_id=b.id AND field='subject') THEN subject ELSE ?4 END,
          revision=revision+1,updated_at={NOW}
-         WHERE b.id=(SELECT book_id FROM book_files WHERE id=?1 AND is_primary=1)"
+         WHERE b.id=(SELECT book_id FROM book_files WHERE id=?1 AND is_primary=1)
+         RETURNING id"
     ), params![source.id, title, title.to_lowercase(),
-               effective(raw.and_then(|raw| raw.author.as_ref())), effective(raw.and_then(|raw| raw.subject.as_ref()))])?;
+               effective(raw.and_then(|raw| raw.subject.as_ref()))], |row| row.get::<_, i64>(0)).optional()?;
+    if let Some(id) = book_id {
+        let overridden: bool = tx.query_row(
+            "SELECT EXISTS(SELECT 1 FROM metadata_overrides WHERE book_id=?1 AND field='author')",
+            [id],
+            |row| row.get(0),
+        )?;
+        if !overridden {
+            set_author_text(tx, id, effective(raw.and_then(|raw| raw.author.as_ref())))?;
+        }
+    }
     Ok(())
 }
 
@@ -379,18 +392,17 @@ impl Database {
                 let field = edit.field.key();
                 let value = edit.value.trim();
                 let value = (!value.is_empty()).then_some(value);
-                tx.execute(&format!(
-                    "INSERT INTO metadata_overrides(book_id,field,value,updated_at) VALUES (?1,?2,?3,{NOW})
-                     ON CONFLICT(book_id,field) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at"
-                ), params![id,field,value])?;
+                save_override(&tx, *id, field, value)?;
                 if edit.field == Field::Title {
                     tx.execute(
                         "UPDATE books SET title=?2,title_sort_key=?3 WHERE id=?1",
                         params![id, value, value.map(str::to_lowercase)],
                     )?;
+                } else if edit.field == Field::Author {
+                    set_author_text(&tx, *id, value)?;
                 } else {
                     tx.execute(
-                        &format!("UPDATE books SET {field}=?2 WHERE id=?1"),
+                        "UPDATE books SET subject=?2 WHERE id=?1",
                         params![id, value],
                     )?;
                 }

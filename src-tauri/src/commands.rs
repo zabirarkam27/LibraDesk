@@ -19,18 +19,40 @@ pub struct CommandError {
 }
 
 fn database_error(error: database::Error) -> CommandError {
-    eprintln!("LibraDesk database error: {error}");
     match error {
+        database::Error::InvalidCatalogInput => CommandError {
+            code: "invalid_catalog_input",
+            message: "Check the book metadata or author details and try again.",
+            retryable: false,
+        },
+        database::Error::CatalogNotFound => CommandError {
+            code: "catalog_not_found",
+            message: "This catalog record no longer exists.",
+            retryable: false,
+        },
+        database::Error::CatalogConflict => CommandError {
+            code: "catalog_conflict",
+            message: "This book has changed. Reload it before making more changes.",
+            retryable: false,
+        },
+        database::Error::UnknownAuthor => CommandError {
+            code: "unknown_author",
+            message: "An assigned author no longer exists.",
+            retryable: false,
+        },
         database::Error::IncompatibleSchema => CommandError {
             code: "incompatible_schema",
             message: "This library database was created by a different version of LibraDesk.",
             retryable: false,
         },
-        _ => CommandError {
-            code: "database_unavailable",
-            message: "LibraDesk could not open or update its library database.",
-            retryable: true,
-        },
+        _ => {
+            eprintln!("LibraDesk database error: {error}");
+            CommandError {
+                code: "database_unavailable",
+                message: "LibraDesk could not open or update its library database.",
+                retryable: true,
+            }
+        }
     }
 }
 

@@ -11,6 +11,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
         include_str!("../migrations/0002_scan_import.sql"),
     ),
     ("metadata", include_str!("../migrations/0003_metadata.sql")),
+    ("catalog", include_str!("../migrations/0004_catalog.sql")),
 ];
 const UPSERT_THEME: &str = "
     INSERT INTO settings(scope, key, value_json, updated_at)
@@ -57,6 +58,10 @@ pub enum Error {
     Json(serde_json::Error),
     IncompatibleSchema,
     UnsupportedFeatures,
+    InvalidCatalogInput,
+    CatalogNotFound,
+    CatalogConflict,
+    UnknownAuthor,
 }
 
 impl From<rusqlite::Error> for Error {
@@ -82,6 +87,10 @@ impl std::fmt::Display for Error {
             Self::UnsupportedFeatures => {
                 formatter.write_str("SQLite requires foreign keys, WAL, and FTS5")
             }
+            Self::InvalidCatalogInput => formatter.write_str("Invalid catalog input"),
+            Self::CatalogNotFound => formatter.write_str("Catalog record not found"),
+            Self::CatalogConflict => formatter.write_str("Catalog record has changed"),
+            Self::UnknownAuthor => formatter.write_str("Author record not found"),
         }
     }
 }
@@ -264,6 +273,40 @@ mod tests {
     }
 
     #[test]
+    fn catalog_migration_backfills_legacy_author_text_without_merging_names() {
+        let mut connection = Connection::open_in_memory().unwrap();
+        connection
+            .pragma_update(None, "foreign_keys", true)
+            .unwrap();
+        migrate(&mut connection, &MIGRATIONS[..3]).unwrap();
+        connection
+            .execute_batch(
+                "INSERT INTO books(id,title,title_sort_key,author,created_at,updated_at) VALUES
+             (4,'First','first','লেখক, আরেকজন',0,0),
+             (5,'Second','second','লেখক, আরেকজন',0,0),
+             (6,'Third','third',NULL,0,0);
+             INSERT INTO metadata_overrides VALUES (4,'author','লেখক, আরেকজন',0);",
+            )
+            .unwrap();
+        migrate(&mut connection, MIGRATIONS).unwrap();
+        let db = Database(connection);
+        let first = db.get_book(4).unwrap();
+        let second = db.get_book(5).unwrap();
+        assert_eq!(first.authors[0].display_name, "লেখক, আরেকজন");
+        assert_eq!(second.authors[0].display_name, "লেখক, আরেকজন");
+        assert_ne!(first.authors[0].id, second.authors[0].id);
+        assert!(db.get_book(6).unwrap().authors.is_empty());
+        let override_value: String =
+            db.0.query_row(
+                "SELECT value FROM metadata_overrides WHERE book_id=4 AND field='author'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(override_value, "লেখক, আরেকজন");
+    }
+
+    #[test]
     fn failed_migration_rolls_back_and_incompatible_history_is_rejected() {
         let mut connection = Connection::open_in_memory().unwrap();
         migrate(&mut connection, &MIGRATIONS[..1]).unwrap();
@@ -292,7 +335,9 @@ mod tests {
             migrate(&mut connection, &[("different", MIGRATIONS[0].1)]),
             Err(Error::IncompatibleSchema)
         ));
-        connection.pragma_update(None, "user_version", 4).unwrap();
+        connection
+            .pragma_update(None, "user_version", MIGRATIONS.len() as i64 + 1)
+            .unwrap();
         assert!(matches!(
             migrate(&mut connection, MIGRATIONS),
             Err(Error::IncompatibleSchema)

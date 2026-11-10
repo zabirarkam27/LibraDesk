@@ -1,6 +1,6 @@
 # LibraDesk database schema
 
-This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates settings, migration 0002 adds the catalog and scanner, and migration 0003 adds PDF metadata, processing jobs, covers, and duplicate reviews. Later features introduce the remaining tables.
+This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates settings, migration 0002 adds the catalog and scanner, migration 0003 adds PDF metadata, processing jobs, covers, and duplicate reviews, and migration 0004 adds author relationships and catalog ID sequences. Later features introduce the remaining tables.
 
 ## Conventions
 
@@ -12,12 +12,13 @@ Foreign keys below are enforced on every connection. Cascade only through depend
 
 | Table | Fields and relationships | Constraints and indexes |
 | --- | --- | --- |
-| `books` | `id` PK, `title`, optional `author`, `subject`, `publisher`, `isbn`, `publication_year`, `language`, `is_favorite`, `reading_status`, `created_at`, `updated_at`, `revision`, `title_sort_key` | Nonblank title. Status is unread, reading, completed, or on_hold. Index `(title_sort_key, id)` and `(created_at, id)`. Phase 4 introduces author relationships and additional catalog filters. |
+| `books` | `id` PK, `title`, optional `author`, `subject`, `publisher`, `isbn`, `publication_year`, `language`, `is_favorite`, `reading_status`, `created_at`, `updated_at`, `revision`, `title_sort_key` | Nonblank title. Status is unread, reading, completed, or on_hold. Index `(title_sort_key, id)` and `(created_at, id)`. The effective `author` text is a display value for the ordered author relationships. |
 | `book_files` | `id` PK, `book_id` FK to books with cascade, `original_path`, `path_key`, `size_bytes`, `modified_at`, optional `windows_file_id`, `source_token`, `last_verified_at`, `sha256`, `page_count`, `availability`, `revision`, `is_primary` | Unique path key based on resolved Windows identity and case semantics. At most one primary file per book via a partial unique index. Nonnegative size and positive known page count. The full-precision modification token and size identify unchanged sources on rescan. A 32-byte digest belongs to the current revision. |
 | `pdf_metadata` | `file_id` PK and FK to book_files with cascade, `file_revision`, optional extracted `title`, `author`, `subject`, `creator`, `producer`, `creation_date_raw`, `page_count`, `extracted_at` | One raw extraction per current file revision. Retain the original PDF date string and nullable fields. |
 | `metadata_overrides` | PK `(book_id, field)`, FK to books with cascade, nullable `value`, `updated_at` | Records explicit edits to title, author, and subject. A null author or subject records an intentional clear. Update effective catalog fields and overrides in the same transaction. |
 | `authors` | `id` PK, `display_name`, `name_sort_key` | Nonblank display name. Index `(name_sort_key, id)`. Permit distinct people with identical names. |
 | `book_authors` | PK `(book_id, author_id)`, FKs to books and authors with cascade, `position` | Nonnegative position and unique `(book_id, position)`. Index `(author_id, book_id)`. |
+| `catalog_sequences` | `kind` PK, `last_id` | Tracks book and file IDs across deletions. Scanner imports and catalog writes allocate IDs inside their write transactions. |
 | `categories` | `id` PK, nullable `parent_id` FK to categories with restrict, `name`, `name_key` | Partial unique indexes for root names and sibling names. Reject cycles in the service transaction. Move or delete descendants explicitly before deleting a parent. |
 | `book_categories` | PK `(book_id, category_id)`, FKs to books and categories with cascade | Index `(category_id, book_id)` for filtering. |
 | `tags` | `id` PK, `name`, `name_key` | Unique normalized name key. |
@@ -26,6 +27,10 @@ Foreign keys below are enforced on every connection. Cascade only through depend
 | `collection_books` | PK `(collection_id, book_id)`, FKs to collections and books with cascade, `position`, `added_at` | Unique `(collection_id, position)` for manual order. Index `(book_id, collection_id)`. |
 
 Create a distinct book and primary file per imported path unless an explicit workflow attaches it to an existing record. Hash equality identifies duplicate candidates and does not merge records. A relink updates the existing file row after confirmation, preserving the book ID and its user data. Keep alternate path spellings as display input where useful, and update path keys only after validation.
+
+Migration 0004 links each existing nonblank author string as one name. The PDF extractor and the free-text metadata editor use the same convention. Assign author IDs through the catalog service to represent separate contributors or reuse a known identity.
+
+Catalog creation supports books without a source file. Catalog updates replace editable metadata and require the current revision. Omitting optional scalar fields clears them. Omitting author IDs preserves the current links, and an empty list clears them. Deletion also requires the current revision and removes dependent database rows through foreign keys.
 
 ## Import, processing, and recovery
 

@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod catalog;
 mod commands;
 mod database;
 mod metadata;
@@ -31,6 +32,14 @@ fn main() {
             scan::commands::start_scan,
             scan::commands::control_scan,
             scan::commands::list_imported_books,
+            catalog::commands::list_books,
+            catalog::commands::get_book,
+            catalog::commands::create_book,
+            catalog::commands::update_book,
+            catalog::commands::delete_book,
+            catalog::commands::get_book_file,
+            catalog::commands::create_author,
+            catalog::commands::list_authors,
             metadata::commands::next_cover_task,
             metadata::commands::read_cover_range,
             metadata::commands::finish_cover,

@@ -52,3 +52,11 @@ Seven Rust tests, Clippy, the TypeScript and Vite build, and the standalone Wind
 | 3.6 Metadata review | Completed | Verified missing-title and author review, cancellation of the single-book editor, and a two-book bulk author save. Manual values survived restart and rescan, and raw fields remained separate. |
 
 Eleven Rust tests, Clippy, the frontend build, and the standalone Windows debug build passed. SQLite integrity and foreign-key checks passed. Migration 0003 adds persistent metadata and analysis queues for existing and new PDFs. The cover renderer limits source size to 256 MiB. Larger files still receive a streamed SHA-256 digest and use the cover placeholder.
+
+## 2026-11-11 · Phase 4
+
+| Task | Status | Work and verification |
+| --- | --- | --- |
+| 4.1 Book repositories and services | Completed | Added revision-checked book CRUD, file and author repositories, metadata overrides, author relationships, and typed Tauri services. Fixture tests covered migration, persistence after reopen, ordered and same-name authors, rollback, stale revisions, file and book ID reuse prevention, and source PDF preservation. |
+
+Fourteen Rust tests, Clippy, and the TypeScript and Vite build passed.

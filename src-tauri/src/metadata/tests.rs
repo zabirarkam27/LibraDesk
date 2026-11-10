@@ -84,6 +84,10 @@ fn extracts_metadata_groups_exact_duplicates_and_preserves_overrides_after_refre
     let rows = db.review_page(None, false).unwrap();
     assert_eq!(rows[0].title, "বাংলা বই");
     assert_eq!(rows[0].author.as_deref(), Some("মূল লেখক"));
+    assert_eq!(
+        db.get_book(first).unwrap().authors[0].display_name,
+        "মূল লেখক"
+    );
     assert_eq!(rows[0].raw.author.as_deref(), Some("  মূল লেখক  "));
     assert_eq!(rows[0].raw.page_count, Some(1));
     assert_eq!(rows[0].raw.creator.as_deref(), Some("Fixture"));
@@ -124,6 +128,10 @@ fn extracts_metadata_groups_exact_duplicates_and_preserves_overrides_after_refre
         .find(|row| row.id == first)
         .unwrap();
     assert_eq!(row.author.as_deref(), Some("Edited"));
+    assert_eq!(
+        db.get_book(first).unwrap().authors[0].display_name,
+        "Edited"
+    );
     assert_eq!(row.raw.author.as_deref(), Some("  মূল লেখক  "));
     assert_eq!(fs::read(file).unwrap(), changed);
     assert_eq!(fs::read(copy).unwrap(), original);

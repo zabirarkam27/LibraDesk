@@ -1,12 +1,13 @@
 use tauri::{AppHandle, Emitter, WebviewWindow};
 use tauri_plugin_dialog::DialogExt;
 
+use crate::catalog::repository::BookSummary;
 use crate::commands::{unavailable, with_database, CommandError};
 use crate::database::Database;
 
 use super::{
     files,
-    repository::{Action, Book, Snapshot},
+    repository::{Action, Snapshot},
     worker::EVENT,
 };
 
@@ -97,6 +98,6 @@ pub async fn control_scan(app: AppHandle, id: i64, action: Action) -> Result<(),
 pub async fn list_imported_books(
     app: AppHandle,
     before: Option<i64>,
-) -> Result<Vec<Book>, CommandError> {
-    with_database(app, move |db| Ok(db.list_imported(before)?)).await
+) -> Result<Vec<BookSummary>, CommandError> {
+    with_database(app, move |db| Ok(db.list_books(before, false)?)).await
 }

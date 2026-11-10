@@ -843,14 +843,14 @@ A new scan must not overwrite manually corrected metadata without explicit appro
 
 ## Task 4.1 - Book Repository and Services
 
-Implement:
+Completed on 2026-11-11. See the [development log](docs/development-log.md) for verification.
 
-- Book CRUD.
-- File repository.
-- Author repository.
-- Metadata persistence.
-- Database transaction handling.
-- Typed frontend services.
+- [x] Book CRUD.
+- [x] File repository.
+- [x] Author repository.
+- [x] Metadata persistence.
+- [x] Database transaction handling.
+- [x] Typed frontend services.
 
 Do not put raw SQL inside UI components.
 

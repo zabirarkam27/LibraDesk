@@ -51,10 +51,10 @@ fn previews_then_imports_once_and_retiring_root_preserves_catalog_and_history() 
     let job = &snapshot.jobs[0];
     assert_eq!(job.status, "awaiting_confirmation");
     assert_eq!((job.found, job.invalid, job.duplicates), (3, 1, 2));
-    assert!(db.list_imported(None).unwrap().is_empty());
+    assert!(db.list_books(None, false).unwrap().is_empty());
     assert!(db.control_job(job.id, Action::Cancel).unwrap());
     drain(&db);
-    assert!(db.list_imported(None).unwrap().is_empty());
+    assert!(db.list_books(None, false).unwrap().is_empty());
     assert!(db.queue_scan(root_id).unwrap());
     drain(&db);
     let snapshot = db.scan_snapshot(None).unwrap();
@@ -68,10 +68,10 @@ fn previews_then_imports_once_and_retiring_root_preserves_catalog_and_history() 
     .unwrap();
     let importing = db.next_work().unwrap().unwrap();
     assert!(step(&db, &importing, || {}).is_err());
-    assert!(db.list_imported(None).unwrap().is_empty());
+    assert!(db.list_books(None, false).unwrap().is_empty());
     db.0.execute_batch("DROP TRIGGER reject_fixture").unwrap();
     drain(&db);
-    assert_eq!(db.list_imported(None).unwrap().len(), 2);
+    assert_eq!(db.list_books(None, false).unwrap().len(), 2);
     assert_eq!(fs::read(&original).unwrap(), b"%PDF-1.7\n%%EOF\n");
 
     let overlap = files::root_key(&nested)
@@ -96,7 +96,7 @@ fn previews_then_imports_once_and_retiring_root_preserves_catalog_and_history() 
     assert!(db.update_root(root_id, None).unwrap());
     assert_eq!(db.scan_snapshot(None).unwrap().roots.len(), 1);
     assert_eq!(db.scan_snapshot(None).unwrap().jobs[1].imported, 2);
-    assert_eq!(db.list_imported(None).unwrap().len(), 2);
+    assert_eq!(db.list_books(None, false).unwrap().len(), 2);
     assert_eq!(
         db.0.pragma_query_value(None, "integrity_check", |row| row.get::<_, String>(0))
             .unwrap(),
@@ -157,7 +157,7 @@ fn interrupted_scan_resumes_from_frontier_and_changed_pdf_is_rejected() {
         (job.status.as_str(), job.imported, job.failed),
         ("completed", 33, 1)
     );
-    assert_eq!(db.list_imported(None).unwrap().len(), 33);
+    assert_eq!(db.list_books(None, false).unwrap().len(), 33);
 }
 
 #[test]
