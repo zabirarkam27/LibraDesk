@@ -35,7 +35,10 @@ function Details({ id }: { id: number }) {
       {error && <p role="alert" className="mb-3 text-sm text-destructive">The latest book data could not be loaded. Close the editor and reload before saving.</p>}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline"><Link to="/library">Back to library</Link></Button>
-        <Button onClick={() => setEditing(true)}>Edit book</Button>
+        <div className="flex gap-2">
+          {primary && <Button asChild><Link to={`/reader?book=${book.id}&file=${primary.id}`}>Read</Link></Button>}
+          <Button variant="outline" onClick={() => setEditing(true)}>Edit book</Button>
+        </div>
       </div>
       <section className="grid gap-6 rounded-xl border bg-card p-5 sm:grid-cols-[10rem_minmax(0,1fr)]">
         <BookCover fileId={primary?.id ?? null} revision={primary?.coverRevision ?? null} className="h-52 w-40" />

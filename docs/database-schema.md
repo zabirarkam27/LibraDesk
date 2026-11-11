@@ -1,6 +1,6 @@
 # LibraDesk database schema
 
-This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates settings, migration 0002 adds the catalog and scanner, migration 0003 adds PDF metadata, processing jobs, covers, and duplicate reviews, migration 0004 adds author relationships and catalog ID sequences, and migration 0005 adds organization, metadata search, and the reading-progress storage used by dashboard queries. Later features introduce the remaining tables.
+This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates settings, migration 0002 adds the catalog and scanner, migration 0003 adds PDF metadata, processing jobs, covers, and duplicate reviews, migration 0004 adds author relationships and catalog ID sequences, migration 0005 adds organization, metadata search, and reading-progress storage, and migration 0006 adds reading sessions, bookmarks, notes, and progress ordering. Later features introduce the remaining tables.
 
 ## Conventions
 
@@ -52,13 +52,18 @@ Scan confirmation advances a persisted job revision before importing. The previe
 
 | Table | Fields and relationships | Constraints and indexes |
 | --- | --- | --- |
-| `reading_progress` | `book_id` PK and FK to books with cascade, optional `file_id` FK to book_files with set null, `file_revision`, `page_number`, optional `total_pages`, `last_read_at` | Page numbers are 1-based and bounded by total pages when known. Index `(last_read_at, book_id)`. Derive percentage from the stored counts. |
-| `bookmarks` | `id` PK, `book_id` FK to books with cascade, optional `file_id` FK to book_files with set null, `file_revision`, `page_number`, `label`, `created_at`, `updated_at` | Positive page number and index `(book_id, page_number, id)`. |
-| `notes` | `id` PK, `book_id` FK to books with cascade, optional `file_id` FK to book_files with set null, `file_revision`, `page_number`, `body`, `created_at`, `updated_at` | Positive page and nonblank note. Index `(book_id, page_number, id)`. |
-| `reading_sessions` | `id` PK, `book_id` FK to books with cascade, `started_at`, optional `ended_at`, `active_ms`, `pages_read` | Nonnegative active time and page count. Index start time and `(book_id, started_at)`. Count recorded reading activity using a documented session rule, independent of the saved page. |
+| `reading_progress` | `book_id` PK and FK to books with cascade, optional `file_id` FK to book_files with set null, `file_revision`, `page_number`, optional `total_pages`, `last_read_at`, optional `session_id` FK to reading_sessions with set null | Page numbers are 1-based and bounded by total pages when known. Index `(last_read_at, book_id)`. Derive percentage from the stored counts. |
+| `bookmarks` | `id` PK, `book_id` FK to books with cascade, optional `file_id` FK to book_files with set null, `file_revision`, `page_number`, `label`, `client_key`, `revision`, `created_at`, `updated_at` | Positive page number, unique creation key, and index `(book_id, page_number, id)`. |
+| `notes` | `id` PK, `book_id` FK to books with cascade, optional `file_id` FK to book_files with set null, `file_revision`, `page_number`, `body`, `client_key`, `revision`, `created_at`, `updated_at` | Positive page, nonblank note, and unique creation key. Index `(book_id, page_number, id)`. |
+| `reading_sessions` | `id` PK, `book_id` FK to books with cascade, optional `file_id` FK with set null, `file_revision`, `started_at`, optional `ended_at`, `last_checkpoint_at`, `active_ms`, `pages_read`, `sequence`, optional `total_pages` | Nonnegative active time, sequence, and page count. Index `(started_at, book_id)`. IDs use AUTOINCREMENT. |
+| `reader_session_pages` | PK `(session_id, page_number)`, FK to reading_sessions with cascade | Tracks distinct saved page positions within a session. |
 | `settings` | PK `(scope, key)`, `value_json`, `updated_at` | Separate app and reader scopes. Validate each key and payload before writing. Reject unknown keys at the command boundary and use defaults for absent values. |
 
 Require reader file references to belong to the same book in the service transaction. Preserve anchors after relinking or source revision changes. Warn about stale anchors and avoid navigating beyond the replacement's page count. Persist reading status independently of progress.
+
+Migration 0006 adds reader state. Checkpoints reject stale sequences and file revisions, bound the current page by the loaded page count, and update progress and session statistics together. A newer session owns the saved position. Opening a reader closes earlier interrupted sessions at their last checkpoint. Active milliseconds count ready, visible, focused reading time. Session page counts use distinct checkpointed positions. Annotation creation keys make retries idempotent, and revisions protect edits and deletion.
+
+Reader zoom, layout, fullscreen, and shortcut preferences use the `reader/viewer` settings key. Reader theme uses the existing `reader/theme` key. These settings are independent of app appearance.
 
 ## Search indexes
 

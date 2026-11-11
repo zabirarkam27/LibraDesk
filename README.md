@@ -17,6 +17,10 @@ Open **Import**, choose **Add folders**, then select **Scan folder** beside an e
 
 Imported PDFs receive metadata, a SHA-256 digest, and a first-page cover in the background. Open **Metadata** to review missing titles and authors, edit books individually or in bulk, and review groups of identical files. Manual edits affect the catalog and survive rescans.
 
+Open a book in **Library** and select **Read**. The reader supports page navigation, fit and custom zoom, fullscreen, contents, lazy thumbnails, and searching embedded PDF text. Use the right sidebar for bookmarks, page-linked notes, and reader settings. Page position resumes after reopening. Reader appearance and layout are saved separately from app appearance.
+
+Use the arrow keys or Page Up/Down to change pages, Home/End for the first/last page, +/− to zoom, Ctrl+F to find text, and F11 for fullscreen. Escape exits fullscreen. Reading status can be changed in the book editor.
+
 ## Build checks
 
 ```powershell

@@ -20,6 +20,11 @@ pub struct CommandError {
 
 fn database_error(error: database::Error) -> CommandError {
     match error {
+        database::Error::ReaderSourceUnavailable => CommandError {
+            code: "reader_source_unavailable",
+            message: "The PDF is missing, inaccessible, or changed. Check its drive and rescan the folder before reopening.",
+            retryable: true,
+        },
         database::Error::OrganizationConflict => CommandError {
             code: "organization_conflict",
             message:

@@ -54,6 +54,21 @@ pub struct Source {
 }
 
 impl Source {
+    pub fn read_range(&self, offset: i64, length: i64) -> io::Result<Vec<u8>> {
+        if offset < 0
+            || !(1..=256 * 1024).contains(&length)
+            || offset
+                .checked_add(length)
+                .is_none_or(|end| end > self.bytes)
+        {
+            return Err(io::ErrorKind::InvalidInput.into());
+        }
+        let (mut file, _) = self.open()?;
+        file.seek(SeekFrom::Start(offset as u64))?;
+        let mut bytes = vec![0; length as usize];
+        file.read_exact(&mut bytes)?;
+        Ok(bytes)
+    }
     pub fn open(&self) -> io::Result<(File, Stamp)> {
         let path = Path::new(&self.path);
         let parent = path.parent().ok_or(io::ErrorKind::InvalidInput)?;

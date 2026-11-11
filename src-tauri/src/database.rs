@@ -13,6 +13,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("metadata", include_str!("../migrations/0003_metadata.sql")),
     ("catalog", include_str!("../migrations/0004_catalog.sql")),
     ("library", include_str!("../migrations/0005_library.sql")),
+    ("reader", include_str!("../migrations/0006_reader.sql")),
 ];
 const UPSERT_THEME: &str = "
     INSERT INTO settings(scope, key, value_json, updated_at)
@@ -65,6 +66,7 @@ pub enum Error {
     UnknownAuthor,
     OrganizationConflict,
     CategoryHasChildren,
+    ReaderSourceUnavailable,
 }
 
 impl From<rusqlite::Error> for Error {
@@ -94,6 +96,9 @@ impl std::fmt::Display for Error {
             Self::CatalogNotFound => formatter.write_str("Catalog record not found"),
             Self::CatalogConflict => formatter.write_str("Catalog record has changed"),
             Self::UnknownAuthor => formatter.write_str("Author record not found"),
+            Self::ReaderSourceUnavailable => {
+                formatter.write_str("Reader source is missing, inaccessible, or changed")
+            }
             Self::OrganizationConflict => {
                 formatter.write_str("Name already exists or category parent is invalid")
             }

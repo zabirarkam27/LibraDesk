@@ -1,6 +1,6 @@
 use std::{
     fs,
-    io::{self, Cursor, Read, Seek, SeekFrom, Write},
+    io::{self, Cursor, Read, Write},
     path::{Path, PathBuf},
 };
 
@@ -9,24 +9,13 @@ use crate::scan::files::reparse;
 use super::{pdf::Source, repository::CachedCover};
 
 pub const MAX_IMAGE_BYTES: usize = 512 * 1024;
-const MAX_RANGE: i64 = 256 * 1024;
 pub const MAX_COVER_SOURCE: i64 = 256 * 1024 * 1024;
 
 pub fn read_range(source: &Source, offset: i64, length: i64) -> io::Result<Vec<u8>> {
-    if source.bytes > MAX_COVER_SOURCE
-        || offset < 0
-        || !(1..=MAX_RANGE).contains(&length)
-        || offset
-            .checked_add(length)
-            .is_none_or(|end| end > source.bytes)
-    {
+    if source.bytes > MAX_COVER_SOURCE {
         return Err(io::ErrorKind::InvalidInput.into());
     }
-    let (mut file, _) = source.open()?;
-    file.seek(SeekFrom::Start(offset as u64))?;
-    let mut bytes = vec![0; length as usize];
-    file.read_exact(&mut bytes)?;
-    Ok(bytes)
+    source.read_range(offset, length)
 }
 
 pub fn cache_path(root: &Path, id: i64, revision: i64) -> io::Result<PathBuf> {

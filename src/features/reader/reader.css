@@ -1,0 +1,15 @@
+.reader-workspace:fullscreen {
+  width: 100vw;
+  height: 100dvh;
+  border-radius: 0;
+}
+.reader-workspace[data-theme="dark"] .reader-pages .canvasWrapper {
+  filter: invert(0.9) hue-rotate(180deg);
+}
+.reader-pages .pdfViewer {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.reader-pages .pdfViewer .page {
+  border-color: transparent;
+}

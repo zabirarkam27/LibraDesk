@@ -1028,7 +1028,9 @@ No mock statistics in production.
 
 ## Task 5.1 - PDF.js Integration
 
-Implement:
+- [x] Completed on 2026-11-11. Bundled PDF.js, its worker, fonts, CMaps, and decoders. Verified read-only range IPC in the production-protocol Windows build.
+
+Implemented:
 
 - PDF.js installation.
 - Worker configuration.
@@ -1042,7 +1044,9 @@ Verify compatibility with Tauri's production build.
 
 ## Task 5.2 - Reader Layout
 
-Implement:
+- [x] Completed on 2026-11-11. Added the reader toolbar, page canvas/text layer, sidebars, and responsive desktop layout.
+
+Implemented:
 
 - Reader toolbar.
 - Main page canvas.
@@ -1055,7 +1059,9 @@ Implement:
 
 ## Task 5.3 - PDF Navigation
 
-Implement:
+- [x] Completed on 2026-11-11. Verified bounded page navigation, direct entry, zoom, fit modes, fullscreen, and keyboard controls.
+
+Implemented:
 
 - Previous page.
 - Next page.
@@ -1071,7 +1077,9 @@ Implement:
 
 ## Task 5.4 - Table of Contents and Thumbnails
 
-Implement:
+- [x] Completed on 2026-11-11. Added lazy nested outline navigation and virtualized thumbnail rendering.
+
+Implemented:
 
 - PDF outline extraction.
 - Table of contents navigation.
@@ -1083,7 +1091,9 @@ Implement:
 
 ## Task 5.5 - PDF Text Search
 
-Implement:
+- [x] Completed on 2026-11-11. Verified English and Bengali text search, next/previous matches, counts, and highlights.
+
+Implemented:
 
 - Search current PDF.
 - Next match.
@@ -1095,7 +1105,9 @@ Implement:
 
 ## Task 5.6 - Reading Progress
 
-Implement:
+- [x] Completed on 2026-11-11. Added debounced progress, auto resume, close-time persistence, session checkpoints, and dashboard integration.
+
+Implemented:
 
 - Current page.
 - Total pages.
@@ -1112,7 +1124,9 @@ Do not mark a book completed simply because its last page was opened.
 
 ## Task 5.7 - Bookmarks and Personal Notes
 
-Implement:
+- [x] Completed on 2026-11-11. Added bookmark and page-linked note CRUD, navigation, stale-anchor warnings, and persistence checks.
+
+Implemented:
 
 - Add bookmark.
 - Edit bookmark label.
@@ -1125,7 +1139,9 @@ Implement:
 
 ## Task 5.8 - Reader Preferences
 
-Implement:
+- [x] Completed on 2026-11-11. Persisted reader appearance, zoom, layout, fullscreen, and shortcut preferences independently of app appearance.
+
+Implemented:
 
 - Reader dark mode.
 - Reader light mode.
@@ -1140,7 +1156,9 @@ Reader preferences must be persisted separately from application theme.
 
 ## Task 5.9 - Reader Performance
 
-Test:
+- [x] Completed on 2026-11-11. Verified 2,000 pages, a source larger than 300 MiB, rapid navigation, merged image ranges, book switching, worker cleanup, and Windows shutdown. See the [development log](docs/development-log.md).
+
+Tested:
 
 - Large PDFs.
 - Long documents.

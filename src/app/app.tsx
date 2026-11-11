@@ -4,7 +4,6 @@ import { ImportPage } from "@/features/import/import-page";
 import { OverviewPage } from "@/features/library/dashboard-page";
 import { LibraryPage } from "@/features/library/catalog-page";
 import { MetadataPage } from "@/features/metadata/metadata-page";
-import { ReaderPage } from "@/features/reader/reader-page";
 import { SettingsPage } from "@/features/settings/settings-page";
 import { Button } from "@/shared/ui/button";
 import { PageHeading } from "@/shared/ui/page-heading";
@@ -13,6 +12,7 @@ import { Shell } from "./shell";
 const BookDetailsPage = lazy(() => import("@/features/library/book-details-page").then((module) => ({ default: module.BookDetailsPage })));
 const OrganizationPage = lazy(() => import("@/features/library/organization-page").then((module) => ({ default: module.OrganizationPage })));
 const CollectionPage = lazy(() => import("@/features/library/collection-page").then((module) => ({ default: module.CollectionPage })));
+const ReaderPage = lazy(() => import("@/features/reader/reader-page").then((module) => ({ default: module.ReaderPage })));
 
 function NotFound() {
   return (

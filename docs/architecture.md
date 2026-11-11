@@ -1,14 +1,14 @@
 # LibraDesk architecture
 
-LibraDesk runs as a single Windows desktop application. React renders the workspace in Tauri's WebView2 window. Rust owns AppData, SQLite, native folder selection, and the background scanner. The frontend is bundled in the executable. Future translation and PDF.js worker assets will also load locally.
+LibraDesk runs as a single Windows desktop application. React renders the workspace in Tauri's WebView2 window. Rust owns AppData, SQLite, native folder selection, and the background scanner. The frontend, PDF.js worker, fonts, CMaps, and decoders are bundled in the executable.
 
 ## Frontend
 
-`src/app/` owns startup, hash routing, providers, and the window shell. `src/features/` contains the catalog, book details, organization, collections, dashboard, scanner, metadata tools, reader preview, and settings. `src/shared/` contains reusable UI, the IPC client, and shared types. Components use Tailwind, shadcn/ui, and Lucide. Book details, organization, and collection pages load as separate local chunks.
+`src/app/` owns startup, hash routing, providers, and the window shell. `src/features/` contains the catalog, book details, organization, collections, dashboard, scanner, metadata tools, reader, and settings. `src/shared/` contains reusable UI, the IPC client, and shared types. Components use Tailwind, shadcn/ui, and Lucide. Book details, organization, collections, and the reader load as separate local chunks.
 
 Use React local state for component interactions and Zustand for shared UI state such as view, filters, and reader controls. Read durable state through typed Rust commands. Validate forms and IPC responses with Zod where runtime parsing is useful, and validate writes independently in Rust. Use TanStack Table for list behavior and virtualize large lists or grids. Request bounded result pages with stable ordering and an ID tie-breaker. Keep reader settings and app appearance separate. Provide English and Bengali labels and preserve Unicode in metadata and paths.
 
-The browser preview uses localStorage. The desktop app reads and writes SQLite through Rust and imports any valid bootstrap app preference in that webview only when a saved SQLite value is absent. App and reader themes are independent. The reader preview scopes its color tokens to its own surface.
+The browser preview uses localStorage. The desktop app reads and writes SQLite through Rust and imports any valid bootstrap app preference in that webview only when a saved SQLite value is absent. App and reader themes are independent. Reader appearance is scoped to its surface.
 
 Catalog search, filters, sorting, and page selection live in the URL. A counted query returns at most 50 books from one SQLite snapshot, and the grid, list, and compact views render only visible rows with overscan. Library mutations emit a catalog event that refreshes active queries. Editors retain their original revision and reject concurrent changes.
 
@@ -30,7 +30,11 @@ Keep original PDF locations and open source files read-only. Store the supplied 
 
 Rust hashes each queued source in 128 KiB chunks and uses lopdf to extract document info and page count from PDFs up to 32 MiB. Larger PDFs and files the native parser cannot read can use the local PDF.js worker for metadata. Extracted values stay separate from catalog overrides. Rescanning a changed source invalidates its old digest and cover and queues the new revision.
 
-The cover adapter uses PDF.js range transport over binary Tauri IPC. Rust checks the registered file and queued revision on each request and serves up to 256 KiB per IPC call. It validates the resulting PNG and writes it atomically to the thumbnail cache. The worker renders page one at up to 240 × 320 pixels and uses a placeholder when it cannot render. Source files larger than 256 MiB retain streamed hashes and use the placeholder. Tasks 5.1 and 6.1 will extend local PDF access for reading and indexing.
+The cover adapter uses PDF.js range transport over binary Tauri IPC. Rust checks the registered file and queued revision on each request and serves up to 256 KiB per IPC call. It validates the resulting PNG and writes it atomically to the thumbnail cache. The worker renders page one at up to 240 × 320 pixels and uses a placeholder when it cannot render. Source files larger than 256 MiB retain streamed hashes and use the placeholder.
+
+The reader opens a session tied to a registered book, file, and revision. Range requests resolve that session in Rust and reuse the source identity checks. The frontend assembles each requested PDF.js range from IPC chunks of at most 256 KiB. PDFViewer manages visible page rendering and its canvas cache, while a separate serialized queue renders virtualized sidebar thumbnails. PDF.js text layers and the find controller handle selection, search, and highlights. Outline navigation ignores late asynchronous destinations. Cleanup aborts observers and range requests, cancels rendering, and destroys the PDF worker.
+
+PDF fonts, CMaps, and decoders are emitted by the Vite resource plugin and served locally. The production CSP permits bundled WebAssembly decoders. PDFViewer runs with scripting and external PDF links disabled. Source handles use read-only access.
 
 ## SQLite, search, and recovery
 
@@ -38,7 +42,9 @@ Use the [database schema](database-schema.md) as the contract. Startup prepares 
 
 Normalize search text consistently at indexing and query time. Match English and Bengali, including mixed-language queries, while preserving the original metadata. Keep metadata and page text in separate FTS5 indexes. Search by the current file revision and return page references for full-text hits. Validate Bengali tokenization with fixtures before accepting a tokenizer configuration.
 
-Phase 4 implements the metadata index with a normalized projection and triggers for books and tags. Rust registers NFC/lowercase normalization on each connection before migrations. Literal prefix terms use FTS5 and weighted BM25, and literal substring matching supplies partial results. Reader progress has storage and read queries for the dashboard and sorting. The reader will write it in Task 5.6.
+Phase 4 implements the metadata index with a normalized projection and triggers for books and tags. Rust registers NFC/lowercase normalization on each connection before migrations. Literal prefix terms use FTS5 and weighted BM25, and literal substring matching supplies partial results. Reader checkpoints populate progress used by the dashboard and catalog sorting.
+
+Reader writes carry a session ID and increasing sequence. Progress saves after a 700 ms navigation debounce, on ten-second checkpoints, and when the reader or window closes. Opening and closing readers share a frontend queue. Window close awaits a final save and remains available for retry if storage fails. Active session time counts ready, focused, visible reading. Distinct saved page positions determine the session page count. Reading status remains an independent user choice.
 
 Back up through SQLite's backup API, with a versioned manifest and optional thumbnails. Restore through a staged integrity check, an explicit confirmation, and a safety snapshot. Preserve links to the original PDFs and rebuild indexes if required by the backup or schema version.
 

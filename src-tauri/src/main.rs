@@ -4,6 +4,7 @@ mod catalog;
 mod commands;
 mod database;
 mod metadata;
+mod reader;
 mod scan;
 mod storage;
 
@@ -25,6 +26,14 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_preferences,
+            reader::commands::open_reader,
+            reader::commands::read_reader_range,
+            reader::commands::save_reader_progress,
+            reader::commands::close_reader,
+            reader::commands::save_reader_preferences,
+            reader::commands::reader_annotations,
+            reader::commands::save_reader_annotation,
+            reader::commands::delete_reader_annotation,
             commands::set_theme,
             scan::commands::pick_scan_roots,
             scan::commands::scan_snapshot,

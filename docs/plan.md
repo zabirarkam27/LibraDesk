@@ -66,15 +66,15 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 
 | Task | Depends on | Exit check |
 | --- | --- | --- |
-| [ ] 5.1 PDF.js integration | 3.5, 4.3 | Open a real local PDF in the packaged app offline. Verify worker lifecycle, errors, and cleanup. |
-| [ ] 5.2 Reader layout | 5.1 | Check canvas, toolbar, sidebars, and resizing at supported desktop dimensions. |
-| [ ] 5.3 PDF navigation | 5.2 | Verify page limits, direct navigation, zoom, fit modes, and fullscreen. |
-| [ ] 5.4 Contents and thumbnails | 5.2, 5.3 | Navigate nested outline entries and confirm visible thumbnails load lazily. |
-| [ ] 5.5 Reader text search | 5.1, 5.3 | Find, navigate, and highlight hits across pages, including mixed-language text and zero matches. |
-| [ ] 5.6 Reading progress | 4.6, 5.3 | Close and restart to verify resume and debounced persistence. Recheck dashboard and sorting. Opening the last page preserves manual reading status. |
-| [ ] 5.7 Bookmarks and notes | 5.3, 5.6 | Create, edit, delete, and navigate bookmarks and personal notes. Verify persistence after restart. |
-| [ ] 5.8 Reader preferences | 1.5, 5.3 | Persist reader theme, zoom, layout, and shortcuts separately. Check keyboard conflicts. |
-| [ ] 5.9 Reader performance | 5.1–5.8 | Measure large-document load, rapid paging, book switching, memory cleanup, and shutdown. |
+| [x] 5.1 PDF.js integration | 3.5, 4.3 | Open a real local PDF in the packaged app offline. Verify worker lifecycle, errors, and cleanup. |
+| [x] 5.2 Reader layout | 5.1 | Check canvas, toolbar, sidebars, and resizing at supported desktop dimensions. |
+| [x] 5.3 PDF navigation | 5.2 | Verify page limits, direct navigation, zoom, fit modes, and fullscreen. |
+| [x] 5.4 Contents and thumbnails | 5.2, 5.3 | Navigate nested outline entries and confirm visible thumbnails load lazily. |
+| [x] 5.5 Reader text search | 5.1, 5.3 | Find, navigate, and highlight hits across pages, including mixed-language text and zero matches. |
+| [x] 5.6 Reading progress | 4.6, 5.3 | Close and restart to verify resume and debounced persistence. Recheck dashboard and sorting. Opening the last page preserves manual reading status. |
+| [x] 5.7 Bookmarks and notes | 5.3, 5.6 | Create, edit, delete, and navigate bookmarks and personal notes. Verify persistence after restart. |
+| [x] 5.8 Reader preferences | 1.5, 5.3 | Persist reader theme, zoom, layout, and shortcuts separately. Check keyboard conflicts. |
+| [x] 5.9 Reader performance | 5.1–5.8 | Measure large-document load, rapid paging, book switching, memory cleanup, and shutdown. |
 
 ## Phase 6 · Advanced search and file recovery
 

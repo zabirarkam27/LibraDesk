@@ -83,3 +83,25 @@ The owner approved all remaining Phase 4 tasks together.
 | 4.10 Dashboard | Completed | Added SQLite-backed book, storage, known-page, favorite, and reading totals, recent and favorite lists, and category distribution. Saved-progress fixtures verified recently read and progress order. The reader will produce this data in Task 5.6. |
 
 Eighteen Rust tests, Clippy, strict TypeScript/Vite, and the standalone Windows debug build passed. A database fixture verified bounded pages and ranked search with 10,000 books. Headless Chromium exercised all catalog views, pagination, responsive layout, editing, organization, collection movement and removal, combined filters, favorites, Ctrl+K search, error recovery, missing records, and empty states through a mocked Tauri bridge. Native Windows verification opened the existing library of 1,817 records, read a real book, and returned a real Bengali title through search.
+
+## 2026-11-11 · Phase 5
+
+The owner approved all Phase 5 tasks together.
+
+| Task | Status | Work and verification |
+| --- | --- | --- |
+| 5.1 PDF.js integration | Completed | Added session-bound binary range IPC, bundled worker/font/CMap/decoder assets, password handling, source error recovery, and document cleanup. Verified actual PDF rendering in the production-protocol Windows executable. |
+| 5.2 Reader layout | Completed | Added a toolbar, PDF canvas and text layers, independent reader appearance, navigation sidebar, annotation/settings sidebar, and responsive layout. Checked a 680-pixel browser viewport. |
+| 5.3 Navigation | Completed | Verified first, previous, next, last, direct page entry, custom and fit zoom, fullscreen, and keyboard navigation. Page limits follow the loaded PDF. |
+| 5.4 Contents and thumbnails | Completed | Added lazy nested contents and virtualized, serialized thumbnail rendering. Rapid outline navigation ignores older asynchronous destinations. |
+| 5.5 Text search | Completed | PDF.js find controller searches embedded English and Bengali text, highlights matches, reports counts, and moves between matches. Verified zero results and corrected duplicate form submission from next/previous buttons. |
+| 5.6 Progress | Completed | Added 700 ms debounce, ten-second activity checkpoints, resume, final reader/window-close flush, and session history. Tests rejected stale sequences and source revisions and preserved manual status on the last page. Native close persisted page 2/167 and an ended session. Database integrity and foreign-key checks passed. |
+| 5.7 Bookmarks and notes | Completed | Added creation, editing, confirmed deletion, navigation, idempotent creation keys, revision checks, and retained anchors after a file revision changes. Storage fixtures verified persistence after reopening. |
+| 5.8 Preferences | Completed | Added independent reader light/dark/system appearance, default zoom, continuous/single-page layout, remembered fullscreen, and configurable keyboard shortcuts. Fullscreen uses the full reader surface. |
+| 5.9 Performance | Completed | Checked a 2,000-page PDF, rapid paging, book switching, a source larger than 300 MiB, a multi-megabyte embedded image, worker cleanup, and Windows shutdown. Corrected merged-range delivery after testing a real PDF. |
+
+Twenty Rust tests, Clippy, strict TypeScript/Vite, and the standard Windows debug build passed. Browser checks used real locally generated PDFs over a mocked Tauri persistence/range bridge. The 300+ MiB sparse fixture opened with 212,733 range bytes in the measured run. Main-page canvases stayed below 20 and mounted sidebar thumbnails below 12 in the long-document check. Leaving the reader removed all PDF workers. After garbage collection, the measured main-thread heap was 6,712,716 bytes. These measurements describe the test fixtures and viewport.
+
+Rendering caps each page canvas at 12 million pixels and each source image at 32 million pixels. Reader data ranges use IPC chunks of at most 256 KiB and assemble the complete requested range before notifying PDF.js. Original PDF bytes remain under read-only handles. Tests covered password retry, unavailable sources, and recoverable progress-save failures during window close.
+
+The standard executable at `src-tauri/target/debug/libradesk.exe` now contains the reader, replacing the earlier debug version. User data, PDF fixtures, browser profiles, and screenshots are excluded from the commit.
