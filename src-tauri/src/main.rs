@@ -3,6 +3,7 @@
 mod catalog;
 mod commands;
 mod database;
+mod extraction;
 mod metadata;
 mod reader;
 mod scan;
@@ -26,6 +27,14 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_preferences,
+            extraction::commands::claim_text_extraction,
+            extraction::commands::read_extraction_range,
+            extraction::commands::renew_text_extraction,
+            extraction::commands::commit_page_text,
+            extraction::commands::release_text_extraction,
+            extraction::commands::fail_text_extraction,
+            extraction::commands::retry_text_extraction,
+            extraction::commands::text_extraction_status,
             reader::commands::open_reader,
             reader::commands::read_reader_range,
             reader::commands::save_reader_progress,

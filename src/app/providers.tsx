@@ -3,6 +3,7 @@ import { HashRouter } from "react-router";
 import { Toaster } from "sonner";
 import { usePreferences } from "@/features/settings/preferences-store";
 import { startCoverWorker } from "@/features/metadata/cover-worker";
+import { startTextExtractionWorker } from "@/features/extraction/worker";
 import { useResolvedTheme } from "@/shared/hooks/use-resolved-theme";
 import { TooltipProvider } from "@/shared/ui/tooltip";
 import { desktop } from "@/shared/lib/preferences-client";
@@ -15,6 +16,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   useEffect(() => {
     void load();
     startCoverWorker();
+    startTextExtractionWorker();
     if (!desktop) return;
     const listening = guardReaderWindowClose().catch(() => null);
     return () => { void listening.then((remove) => remove?.()); };

@@ -105,3 +105,20 @@ Twenty Rust tests, Clippy, strict TypeScript/Vite, and the standard Windows debu
 Rendering caps each page canvas at 12 million pixels and each source image at 32 million pixels. Reader data ranges use IPC chunks of at most 256 KiB and assemble the complete requested range before notifying PDF.js. Original PDF bytes remain under read-only handles. Tests covered password retry, unavailable sources, and recoverable progress-save failures during window close.
 
 The standard executable at `src-tauri/target/debug/libradesk.exe` now contains the reader, replacing the earlier debug version. User data, PDF fixtures, browser profiles, and screenshots are excluded from the commit.
+
+
+## 2026-11-11 · Task 6.1 · Background PDF text extraction
+
+The owner approved Task 6.1. Added a serial background PDF.js coordinator, revision-bound binary range IPC, migration 0007, per-page raw and normalized text, transactional checkpoints, lease recovery, and per-file progress and retry on Book details. The worker runs while the app is visible and the reader is closed. It yields between streamed text chunks/pages and releases work after up to 32 pages or about ten seconds between pages. Native source access stays read-only.
+
+Each transaction stores at most four contiguous pages and advances the checkpoint atomically. Text is bounded to 256 KiB UTF-8 per page and 1 MiB per batch. Repeating a committed batch cannot duplicate rows; an expired or replaced lease cannot advance the checkpoint. File revision changes clear derived text, reset the checkpoint, and queue the new source. Failures retain a reason and the committed position for manual retry. A 120-second lease, 15-second heartbeat, and 90-second task deadline cover interrupted or stalled workers.
+
+Verification:
+
+- All 24 Rust tests passed, including migration from schema 6 with existing available/missing files, migration replay, checkpoint persistence after reopen, expired lease recovery, stale-owner rejection, idempotent batches, atomic invalid-batch rejection, Unicode normalization, empty-page retention, physical source changes, retry, revision invalidation, and cascading deletion.
+- Strict TypeScript/Vite, Clippy with warnings denied, and the standard production-protocol Windows debug build passed.
+- Headless Chrome loaded actual local PDF fixtures over a mocked Tauri persistence/range bridge. A 30-page English/Bengali PDF produced ordered text rows and complete UI status. A 2,000-page fixture saved eight pages, reloaded, and resumed at page nine with exactly 32 new pages. Foreground reading and hidden-window checks paused extraction, reader navigation remained responsive, and idle extraction resumed.
+- Blank pages persisted as empty rows. Encrypted, corrupt, and oversized-text fixtures produced explicit failures, including manual retry for encryption and no silent truncation. These checks exposed a PDF.js queued-stream cancellation race; task-owned worker destruction fixed it, and the final browser run had zero unhandled errors.
+- The real bundled Windows app upgraded the existing 1,817-book library to schema 7. A read-only SQLite observation during extraction found 37 completed jobs, 472 pages in completed jobs, 8,192 checkpointed pages in queued jobs, and no duplicate page keys. Book details displayed the native extraction status. These are an observation during ongoing background processing, not a claim that the entire library has finished.
+
+Background extraction does not request or retain passwords. Password-protected sources require an unencrypted copy for this worker. Image-only PDFs produce empty text; OCR is excluded. Page-content FTS, snippets, and cross-book search remain unchecked for Task 6.2. User data, PDFs, generated browser profiles/harnesses, build products, and screenshots stay outside the commit.

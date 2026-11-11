@@ -1178,6 +1178,8 @@ Tested:
 
 ## Task 6.1 - PDF Text Extraction
 
+- [x] Completed on 2026-11-11. Added bounded background page extraction, transactional checkpoints, lease-based resume, per-file status, and manual failure retry. Verified Bengali/English PDFs, restart recovery, revision invalidation, and the native pipeline. See the [development log](docs/development-log.md).
+
 Implement:
 
 - Background page text extraction.

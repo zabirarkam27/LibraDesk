@@ -34,6 +34,7 @@ export function readerLifecycle<T>(operation: () => Promise<T>): Promise<T> {
   return next;
 }
 let shutdown: (() => Promise<void>) | null = null;
+export const isReaderActive = () => shutdown !== null;
 export function registerReaderShutdown(operation: () => Promise<void>) {
   shutdown = operation;
   return () => { if (shutdown === operation) shutdown = null; };

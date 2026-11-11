@@ -36,6 +36,10 @@ The reader opens a session tied to a registered book, file, and revision. Range 
 
 PDF fonts, CMaps, and decoders are emitted by the Vite resource plugin and served locally. The production CSP permits bundled WebAssembly decoders. PDFViewer runs with scripting and external PDF links disabled. Source handles use read-only access.
 
+Task 6.1 adds a separate background text coordinator in `src/features/extraction/`. It loads one PDF.js worker and streams one page at a time over the shared, bounded range transport. Rust claims a revision-bound extraction lease for 120 seconds, renewed every 15 seconds. At most four contiguous pages and their next-page checkpoint commit together. Raw text and NFC/lowercase/whitespace-normalized text remain separate. Each page is limited to 256 KiB of UTF-8 text; oversized pages fail explicitly rather than being truncated.
+
+The coordinator yields between chunks and pages, pauses while the reader is active or the window is hidden, and releases a job after at most 32 pages or roughly ten seconds between pages. A 90-second task deadline handles stalled extraction. Cleanup destroys the PDF worker, including interrupted text streams. Expired leases recover the saved checkpoint after restart. A new file revision clears old page text and queues fresh work; old lease holders cannot write to it. Book details show progress, failure reasons, and manual retry. Empty pages are saved, including image-only pages. OCR and password entry for background extraction are excluded; encrypted PDFs report a password-required failure. Page-content FTS and result navigation remain Task 6.2.
+
 ## SQLite, search, and recovery
 
 Use the [database schema](database-schema.md) as the contract. Startup prepares and validates AppData and applies migrations off the UI thread. Commands share a serialized connection, and the scan worker has a dedicated connection. SQLite serializes their short write transactions. Rust enables foreign keys and verifies WAL and bundled FTS5 support. Treat FTS and thumbnails as rebuildable derivatives of saved records.

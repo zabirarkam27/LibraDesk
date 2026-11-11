@@ -14,6 +14,10 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("catalog", include_str!("../migrations/0004_catalog.sql")),
     ("library", include_str!("../migrations/0005_library.sql")),
     ("reader", include_str!("../migrations/0006_reader.sql")),
+    (
+        "text_extraction",
+        include_str!("../migrations/0007_text_extraction.sql"),
+    ),
 ];
 const UPSERT_THEME: &str = "
     INSERT INTO settings(scope, key, value_json, updated_at)
@@ -328,6 +332,54 @@ mod tests {
             )
             .unwrap();
         assert_eq!(override_value, "লেখক, আরেকজন");
+    }
+
+    #[test]
+    fn text_extraction_migration_queues_existing_files_without_changing_catalog() {
+        use crate::catalog::repository::{insert_book, insert_file};
+        let fixture = tempfile::tempdir().unwrap();
+        let path = fixture.path().join("source.pdf");
+        std::fs::write(&path, b"%PDF-1.7\nfixture").unwrap();
+        let stamp = crate::scan::files::stamp(&std::fs::File::open(&path).unwrap()).unwrap();
+        let mut connection = Connection::open_in_memory().unwrap();
+        connection
+            .pragma_update(None, "foreign_keys", true)
+            .unwrap();
+        migrate(&mut connection, &MIGRATIONS[..6]).unwrap();
+        let tx = connection.unchecked_transaction().unwrap();
+        let book = insert_book(&tx, "Existing book").unwrap();
+        let first = insert_file(&tx, book, path.to_str().unwrap(), &stamp).unwrap();
+        let other_book = insert_book(&tx, "Unavailable book").unwrap();
+        let second = insert_file(
+            &tx,
+            other_book,
+            fixture.path().join("missing.pdf").to_str().unwrap(),
+            &stamp,
+        )
+        .unwrap();
+        tx.execute(
+            "UPDATE book_files SET availability='missing' WHERE id=?1",
+            [second],
+        )
+        .unwrap();
+        tx.commit().unwrap();
+        migrate(&mut connection, MIGRATIONS).unwrap();
+        let mut db = Database(connection);
+        assert_eq!(
+            db.text_extraction_status(first).unwrap().unwrap().status,
+            "queued"
+        );
+        assert_eq!(
+            db.text_extraction_status(second)
+                .unwrap()
+                .unwrap()
+                .error
+                .as_deref(),
+            Some("source_unavailable")
+        );
+        assert_eq!(db.get_book(book).unwrap().files.len(), 1);
+        assert_eq!(db.get_book(other_book).unwrap().files.len(), 1);
+        migrate(&mut db.0, MIGRATIONS).unwrap();
     }
 
     #[test]
