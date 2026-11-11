@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { BookCard, type CatalogView } from "./book-card";
 import type { BookSummary } from "./catalog-client";
 
-const rowHeights = { grid: 288, list: 108, compact: 54 };
+const rowHeights = { grid: 312, list: 132, compact: 54 };
 const minimumCardWidth = 168;
 const columnGap = 12;
 const overscan = 2;

@@ -53,14 +53,14 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 | --- | --- | --- |
 | [x] 4.1 Book repositories and services | 1.7, 2.6, 3.6 | Verify typed CRUD, transactions, and repository errors with fixture data. |
 | [x] 4.2 All Books | 1.4, 3.5, 4.1 | Test grid, list, compact, loading, empty, and error states. Verify bounded rendering with a large library. |
-| [ ] 4.3 Book details | 4.1, 4.2 | Open real records, check file and metadata fields, save and reload edits, and handle missing records. |
-| [ ] 4.4 Categories | 4.1 | Verify nested CRUD, cycle prevention, multiple assignments, filtering, and book retention after category removal. |
-| [ ] 4.5 Tags | 4.1 | Verify tag CRUD, multiple assignments, and filtering. |
-| [ ] 4.6 Favorites and reading status | 4.1, 4.3 | Toggle favorites and each status, then reopen the app to verify persistence. |
-| [ ] 4.7 Collections | 4.1 | Create collections and reading lists. Verify membership, manual or configured sorting, and book retention after removal. |
-| [ ] 4.8 Sorting and filtering | 4.2, 4.4–4.7 | Combine filters and compare stable ordering across pages, including missing values. Verify progress ordering again in 5.6. |
-| [ ] 4.9 Bilingual metadata search | 4.1, 4.8 | Exercise English, Bengali, mixed queries, combining marks, punctuation, partial matches, ranking, and filters. Verify updates and deletions reach the index. |
-| [ ] 4.10 Dashboard | 4.1, 4.4, 4.6 | Reconcile displayed statistics against persisted fixtures and empty states. Recheck recently read data in 5.6. |
+| [x] 4.3 Book details | 4.1, 4.2 | Open real records, check file and metadata fields, save and reload edits, and handle missing records. |
+| [x] 4.4 Categories | 4.1 | Verify nested CRUD, cycle prevention, multiple assignments, filtering, and book retention after category removal. |
+| [x] 4.5 Tags | 4.1 | Verify tag CRUD, multiple assignments, and filtering. |
+| [x] 4.6 Favorites and reading status | 4.1, 4.3 | Toggle favorites and each status, then reopen the app to verify persistence. |
+| [x] 4.7 Collections | 4.1 | Create collections and reading lists. Verify membership, manual or configured sorting, and book retention after removal. |
+| [x] 4.8 Sorting and filtering | 4.2, 4.4–4.7 | Combine filters and compare stable ordering across pages, including missing values. Verify progress ordering again in 5.6. |
+| [x] 4.9 Bilingual metadata search | 4.1, 4.8 | Exercise English, Bengali, mixed queries, combining marks, punctuation, partial matches, ranking, and filters. Verify updates and deletions reach the index. |
+| [x] 4.10 Dashboard | 4.1, 4.4, 4.6 | Reconcile displayed statistics against persisted fixtures and empty states. Recheck recently read data in 5.6. |
 
 ## Phase 5 · Built-in PDF reader
 

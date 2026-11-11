@@ -10,12 +10,39 @@ use crate::{
 
 type Result<T> = std::result::Result<T, Error>;
 const NOW: &str = "CAST(unixepoch('subsec') * 1000 AS INTEGER)";
-const FILE_COLUMNS: &str = "id,book_id,original_path,size_bytes,modified_at,last_verified_at,page_count,availability,revision,is_primary";
+const FILE_COLUMNS: &str = "id,book_id,original_path,size_bytes,modified_at,last_verified_at,page_count,availability,revision,is_primary,
+ (SELECT file_revision FROM thumbnails WHERE file_id=book_files.id AND file_revision=book_files.revision)";
+
+pub(super) const SUMMARY_COLUMNS: &str =
+    "b.id,b.title,f.original_path,f.size_bytes,f.id,b.author,f.page_count,t.file_revision,
+     EXISTS(SELECT 1 FROM book_files other WHERE other.sha256=f.sha256 AND other.id<>f.id),
+     b.is_favorite,b.reading_status,b.revision,b.language,b.publication_year";
+pub(super) const SUMMARY_JOINS: &str = "LEFT JOIN book_files f ON f.book_id=b.id AND f.is_primary=1
+     LEFT JOIN thumbnails t ON t.file_id=f.id AND t.file_revision=f.revision";
+
+pub(super) fn summary_row(row: &Row<'_>) -> rusqlite::Result<BookSummary> {
+    Ok(BookSummary {
+        id: row.get(0)?,
+        title: row.get(1)?,
+        path: row.get(2)?,
+        bytes: row.get(3)?,
+        file_id: row.get(4)?,
+        author: row.get(5)?,
+        pages: row.get(6)?,
+        cover_revision: row.get(7)?,
+        duplicate: row.get(8)?,
+        is_favorite: row.get(9)?,
+        reading_status: row.get(10)?,
+        revision: row.get(11)?,
+        language: row.get(12)?,
+        publication_year: row.get(13)?,
+    })
+}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BookSummary {
-    id: i64,
+    pub id: i64,
     title: String,
     path: Option<String>,
     bytes: Option<i64>,
@@ -24,6 +51,11 @@ pub struct BookSummary {
     pages: Option<i64>,
     cover_revision: Option<i64>,
     duplicate: bool,
+    is_favorite: bool,
+    reading_status: String,
+    revision: i64,
+    language: Option<String>,
+    publication_year: Option<i64>,
 }
 
 #[derive(Debug, Serialize)]
@@ -40,6 +72,11 @@ pub struct BookDetails {
     pub revision: i64,
     pub authors: Vec<Author>,
     pub files: Vec<BookFile>,
+    pub is_favorite: bool,
+    pub reading_status: String,
+    pub category_ids: Vec<i64>,
+    pub tag_ids: Vec<i64>,
+    pub collection_ids: Vec<i64>,
 }
 
 #[derive(Debug, Serialize)]
@@ -55,6 +92,7 @@ pub struct BookFile {
     availability: String,
     revision: i64,
     is_primary: bool,
+    pub cover_revision: Option<i64>,
 }
 
 #[derive(Debug, Serialize)]
@@ -74,6 +112,31 @@ pub struct BookInput {
     pub publication_year: Option<i64>,
     pub language: Option<String>,
     pub author_ids: Option<Vec<i64>>,
+    pub author_names: Option<Vec<String>>,
+    pub is_favorite: Option<bool>,
+    pub reading_status: Option<ReadingStatus>,
+    pub category_ids: Option<Vec<i64>>,
+    pub tag_ids: Option<Vec<i64>>,
+    pub collection_ids: Option<Vec<i64>>,
+}
+
+#[derive(Clone, Copy, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReadingStatus {
+    Unread,
+    Reading,
+    Completed,
+    OnHold,
+}
+impl ReadingStatus {
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::Unread => "unread",
+            Self::Reading => "reading",
+            Self::Completed => "completed",
+            Self::OnHold => "on_hold",
+        }
+    }
 }
 
 fn trimmed(value: &str) -> Option<&str> {
@@ -107,6 +170,16 @@ impl BookInput {
                 return Err(Error::InvalidCatalogInput);
             }
         }
+        if let Some(names) = &self.author_names {
+            if self.author_ids.is_some()
+                || names.len() > 100
+                || names
+                    .iter()
+                    .any(|name| trimmed(name).is_none() || name.len() > 4096 || name.contains('\0'))
+            {
+                return Err(Error::InvalidCatalogInput);
+            }
+        }
         Ok(title)
     }
 }
@@ -122,7 +195,7 @@ pub(crate) fn insert_book(tx: &Transaction<'_>, title: &str) -> rusqlite::Result
     let id = reserve_book_id(tx)?;
     tx.execute(&format!(
         "INSERT INTO books(id,title,title_sort_key,created_at,updated_at) VALUES (?1,?2,?3,{NOW},{NOW})"
-    ), params![id, title, title.to_lowercase()])?;
+    ), params![id, title, super::search::normalize(title)])?;
     Ok(id)
 }
 
@@ -158,7 +231,7 @@ pub(crate) fn save_override(
 
 fn insert_author(connection: &Connection, name: &str) -> rusqlite::Result<Author> {
     connection.query_row(
-        "INSERT INTO authors(display_name,name_sort_key) VALUES (?1,lower(?1))
+        "INSERT INTO authors(display_name,name_sort_key) VALUES (?1,catalog_normalize(?1))
          RETURNING id,display_name",
         [name],
         author_row,
@@ -184,6 +257,7 @@ fn file_row(row: &Row<'_>) -> rusqlite::Result<BookFile> {
         availability: row.get(7)?,
         revision: row.get(8)?,
         is_primary: row.get(9)?,
+        cover_revision: row.get(10)?,
     })
 }
 
@@ -197,7 +271,7 @@ fn book_files(connection: &Connection, id: i64) -> rusqlite::Result<Vec<BookFile
 
 fn book_details(connection: &Connection, id: i64) -> Result<BookDetails> {
     let mut book = connection.query_row(
-        "SELECT id,title,author,subject,publisher,isbn,publication_year,language,revision FROM books WHERE id=?1",
+        "SELECT id,title,author,subject,publisher,isbn,publication_year,language,revision,is_favorite,reading_status FROM books WHERE id=?1",
         [id], |row| Ok(BookDetails {
             id: row.get(0)?,
             title: row.get(1)?,
@@ -210,6 +284,11 @@ fn book_details(connection: &Connection, id: i64) -> Result<BookDetails> {
             revision: row.get(8)?,
             authors: Vec::new(),
             files: Vec::new(),
+            is_favorite: row.get(9)?,
+            reading_status: row.get(10)?,
+            category_ids: Vec::new(),
+            tag_ids: Vec::new(),
+            collection_ids: Vec::new(),
         }),
     ).optional()?.ok_or(Error::CatalogNotFound)?;
     let mut query = connection.prepare(
@@ -220,6 +299,10 @@ fn book_details(connection: &Connection, id: i64) -> Result<BookDetails> {
         .query_map([id], author_row)?
         .collect::<rusqlite::Result<_>>()?;
     book.files = book_files(connection, id)?;
+    use super::organization::{group_ids, GroupKind};
+    book.category_ids = group_ids(connection, GroupKind::Category, id)?;
+    book.tag_ids = group_ids(connection, GroupKind::Tag, id)?;
+    book.collection_ids = group_ids(connection, GroupKind::Collection, id)?;
     Ok(book)
 }
 
@@ -277,7 +360,7 @@ fn persist_metadata(tx: &Transaction<'_>, id: i64, input: &BookInput, title: &st
     tx.execute(
         "UPDATE books SET title=?2,title_sort_key=?3,subject=?4,publisher=?5,isbn=?6,publication_year=?7,language=?8
          WHERE id=?1",
-        params![id, title, title.to_lowercase(), subject, input.publisher.as_deref().and_then(trimmed),
+        params![id, title, super::search::normalize(title), subject, input.publisher.as_deref().and_then(trimmed),
                 input.isbn.as_deref().and_then(trimmed), input.publication_year, input.language.as_deref().and_then(trimmed)],
     )?;
     save_override(tx, id, "title", Some(title))?;
@@ -298,38 +381,90 @@ fn persist_metadata(tx: &Transaction<'_>, id: i64, input: &BookInput, title: &st
         replace_authors(tx, id, ids, display.as_deref())?;
         save_override(tx, id, "author", display.as_deref())?;
     }
+    if let Some(names) = &input.author_names {
+        let current = {
+            let mut query = tx.prepare(
+                "SELECT a.id,a.display_name FROM book_authors ba JOIN authors a ON a.id=ba.author_id
+                 WHERE ba.book_id=?1 ORDER BY ba.position",
+            )?;
+            let rows = query.query_map([id], author_row)?;
+            rows.collect::<rusqlite::Result<Vec<_>>>()?
+        };
+        let authors = names
+            .iter()
+            .enumerate()
+            .map(|(position, name)| {
+                let name = name.trim();
+                match current
+                    .get(position)
+                    .filter(|author| author.display_name == name)
+                {
+                    Some(author) => Ok(author.id),
+                    None => insert_author(tx, name).map(|author| author.id),
+                }
+            })
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        let display = (!names.is_empty()).then(|| {
+            names
+                .iter()
+                .map(|name| name.trim())
+                .collect::<Vec<_>>()
+                .join(", ")
+        });
+        replace_authors(tx, id, &authors, display.as_deref())?;
+        save_override(tx, id, "author", display.as_deref())?;
+    }
+    use super::organization::{assign_groups, GroupKind};
+    for (kind, ids) in [
+        (GroupKind::Category, &input.category_ids),
+        (GroupKind::Tag, &input.tag_ids),
+        (GroupKind::Collection, &input.collection_ids),
+    ] {
+        if let Some(ids) = ids {
+            assign_groups(tx, kind, id, ids)?;
+        }
+    }
+    tx.execute(
+        "UPDATE books SET is_favorite=coalesce(?2,is_favorite),reading_status=coalesce(?3,reading_status) WHERE id=?1",
+        params![id,input.is_favorite,input.reading_status.map(ReadingStatus::key)],
+    )?;
     Ok(())
 }
 
 impl Database {
+    pub fn set_book_flags(
+        &self,
+        id: i64,
+        revision: i64,
+        favorite: Option<bool>,
+        status: Option<ReadingStatus>,
+    ) -> Result<()> {
+        if favorite.is_none() && status.is_none() {
+            return Err(Error::InvalidCatalogInput);
+        }
+        let tx = Transaction::new_unchecked(&self.0, TransactionBehavior::Immediate)?;
+        check_revision(&tx, id, revision)?;
+        tx.execute(&format!(
+            "UPDATE books SET is_favorite=coalesce(?2,is_favorite),reading_status=coalesce(?3,reading_status),
+             revision=revision+1,updated_at={NOW} WHERE id=?1"
+        ),params![id,favorite,status.map(ReadingStatus::key)])?;
+        tx.commit()?;
+        Ok(())
+    }
     pub fn list_books(
         &self,
         before: Option<i64>,
         include_fileless: bool,
     ) -> rusqlite::Result<Vec<BookSummary>> {
-        let mut query = self.0.prepare(
-            "SELECT b.id,b.title,f.original_path,f.size_bytes,f.id,b.author,f.page_count,t.file_revision,
-                    EXISTS(SELECT 1 FROM book_files other WHERE other.sha256=f.sha256 AND other.id<>f.id)
+        let mut query = self.0.prepare(&format!(
+            "SELECT {SUMMARY_COLUMNS}
              FROM books b
-             LEFT JOIN book_files f ON f.book_id=b.id AND f.is_primary=1
-             LEFT JOIN thumbnails t ON t.file_id=f.id AND t.file_revision=f.revision
+             {SUMMARY_JOINS}
              WHERE b.id<=coalesce(?1,9223372036854775807) AND b.id IS NOT ?1
                AND (?2 OR f.id IS NOT NULL)
-             ORDER BY b.id DESC LIMIT 51",
-        )?;
-        let rows = query.query_map(params![before, include_fileless], |row| {
-            Ok(BookSummary {
-                id: row.get(0)?,
-                title: row.get(1)?,
-                path: row.get(2)?,
-                bytes: row.get(3)?,
-                file_id: row.get(4)?,
-                author: row.get(5)?,
-                pages: row.get(6)?,
-                cover_revision: row.get(7)?,
-                duplicate: row.get(8)?,
-            })
-        })?;
+             ORDER BY b.id DESC LIMIT 51"
+        ))?;
+        let rows = query.query_map(params![before, include_fileless], summary_row)?;
         rows.collect()
     }
 
@@ -367,6 +502,13 @@ impl Database {
     pub fn delete_book(&self, id: i64, expected: i64) -> Result<()> {
         let tx = Transaction::new_unchecked(&self.0, TransactionBehavior::Immediate)?;
         check_revision(&tx, id, expected)?;
+        tx.execute(
+            &format!(
+                "UPDATE collections SET revision=revision+1,updated_at={NOW}
+             WHERE id IN (SELECT collection_id FROM collection_books WHERE book_id=?1)"
+            ),
+            [id],
+        )?;
         tx.execute("DELETE FROM books WHERE id=?1", [id])?;
         tx.commit()?;
         Ok(())

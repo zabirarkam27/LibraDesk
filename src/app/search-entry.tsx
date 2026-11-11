@@ -3,9 +3,11 @@ import { Search } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
+import { useNavigate } from "react-router";
 
 export function SearchEntry() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
@@ -30,9 +32,17 @@ export function SearchEntry() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Search library</DialogTitle>
-          <DialogDescription>Library search will be available when catalog indexing is added.</DialogDescription>
+          <DialogDescription>Find a title, author, or tag in বাংলা or English.</DialogDescription>
         </DialogHeader>
-        <Input aria-label="Title, author, or tag" placeholder="Title, author, or tag" disabled />
+        <form className="flex gap-2" onSubmit={(event) => {
+          event.preventDefault();
+          const query = String(new FormData(event.currentTarget).get("search") ?? "").trim();
+          navigate("/library?" + new URLSearchParams({ q: query }));
+          setOpen(false);
+        }}>
+          <Input name="search" aria-label="Title, author, or tag" placeholder="Title, author, or tag" maxLength={256} />
+          <Button>Search</Button>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import type { ReadingStatus } from "./library-client";
 
 export type Author = { id: number; displayName: string };
 
@@ -13,6 +14,7 @@ export type BookFile = {
   availability: "available" | "missing" | "inaccessible" | "invalid";
   revision: number;
   isPrimary: boolean;
+  coverRevision: number | null;
 };
 
 export type BookSummary = {
@@ -25,6 +27,11 @@ export type BookSummary = {
   pages: number | null;
   coverRevision: number | null;
   duplicate: boolean;
+  isFavorite: boolean;
+  readingStatus: ReadingStatus;
+  revision: number;
+  language: string | null;
+  publicationYear: number | null;
 };
 
 export type BookInput = {
@@ -36,6 +43,12 @@ export type BookInput = {
   language?: string | null;
   // Omit on update to preserve the current authors. Pass [] to clear them.
   authorIds?: number[];
+  authorNames?: string[];
+  isFavorite?: boolean;
+  readingStatus?: ReadingStatus;
+  categoryIds?: number[];
+  tagIds?: number[];
+  collectionIds?: number[];
 };
 
 export type BookDetails = {
@@ -50,6 +63,11 @@ export type BookDetails = {
   revision: number;
   authors: Author[];
   files: BookFile[];
+  isFavorite: boolean;
+  readingStatus: ReadingStatus;
+  categoryIds: number[];
+  tagIds: number[];
+  collectionIds: number[];
 };
 
 export const listBooks = (before: number | null = null) =>

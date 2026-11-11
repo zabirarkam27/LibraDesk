@@ -67,7 +67,7 @@ fn update_catalog(tx: &Transaction<'_>, source: &Source, raw: Option<&RawMetadat
          revision=revision+1,updated_at={NOW}
          WHERE b.id=(SELECT book_id FROM book_files WHERE id=?1 AND is_primary=1)
          RETURNING id"
-    ), params![source.id, title, title.to_lowercase(),
+    ), params![source.id, title, crate::catalog::search::normalize(title),
                effective(raw.and_then(|raw| raw.subject.as_ref()))], |row| row.get::<_, i64>(0)).optional()?;
     if let Some(id) = book_id {
         let overridden: bool = tx.query_row(
@@ -396,7 +396,7 @@ impl Database {
                 if edit.field == Field::Title {
                     tx.execute(
                         "UPDATE books SET title=?2,title_sort_key=?3 WHERE id=?1",
-                        params![id, value, value.map(str::to_lowercase)],
+                        params![id, value, value.map(crate::catalog::search::normalize)],
                     )?;
                 } else if edit.field == Field::Author {
                     set_author_text(&tx, *id, value)?;

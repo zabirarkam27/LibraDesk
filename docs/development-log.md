@@ -66,3 +66,20 @@ Fourteen Rust tests, Clippy, and the TypeScript and Vite build passed.
 The Library page opens in Grid view and also offers List and Compact views. List shows the source path. Each page contains up to 50 books, and each view mounts only visible rows and up to two extra rows on either side.
 
 Headless Chromium verified all three views with a mocked Tauri catalog of 10,000 records. At 1140 × 760, the top and bottom of a full page mounted 7 to 18 cards across the tested modes. Checks also covered resize to 520 pixels, cursor pagination, cover and placeholder rendering, Bengali metadata, loading, empty catalog, error and retry, and browser preview. The TypeScript/Vite build and Windows debug build passed.
+
+### Tasks 4.3–4.10 · Phase 4 completion
+
+The owner approved all remaining Phase 4 tasks together.
+
+| Task | Status | Work and verification |
+| --- | --- | --- |
+| 4.3 Book details | Completed | Added book routes, cover or placeholder, bibliographic metadata, source files, organization, and a transactional editor with stale-write detection. Browser checks saved and cancelled edits, and the Windows app opened a real record. |
+| 4.4 Categories | Completed | Added nested CRUD, parent selection, cycle rejection, multiple assignments, descendant filtering, and deletion with book retention. A parent with children must have its children moved or removed first. |
+| 4.5 Tags | Completed | Added CRUD, multiple assignments, filters, and transactional search refresh after rename or removal. |
+| 4.6 Favorites and reading status | Completed | Added card favorite toggles and persisted Unread, Reading, Completed, and On Hold settings in the editor. Fixtures verified storage after reopen and rejection of stale revisions. |
+| 4.7 Collections | Completed | Added descriptions, collection details, membership, reading lists, manual movement, and title or added-date order. Removal preserves books. |
+| 4.8 Sorting and filtering | Completed | Added title, author, added date, file size, year, and saved-progress sorts with an ID tie-breaker, plus category, tag, collection, language, status, and favorite filters. The UI now requests counted pages of at most 50 books and retains row virtualization. |
+| 4.9 Bilingual metadata search | Completed | Migration 0005 backfills an external-content FTS5 index and transactional projection triggers. Rust normalizes derived text with NFC and lowercase. Fixtures covered English, Bengali, mixed scripts, vowel signs, যুক্তাক্ষর, canonical equivalence, punctuation, literal substrings, title-weighted ranking, metadata edits, tag renames, and deletion. Ctrl+K now opens working search. |
+| 4.10 Dashboard | Completed | Added SQLite-backed book, storage, known-page, favorite, and reading totals, recent and favorite lists, and category distribution. Saved-progress fixtures verified recently read and progress order. The reader will produce this data in Task 5.6. |
+
+Eighteen Rust tests, Clippy, strict TypeScript/Vite, and the standalone Windows debug build passed. A database fixture verified bounded pages and ranked search with 10,000 books. Headless Chromium exercised all catalog views, pagination, responsive layout, editing, organization, collection movement and removal, combined filters, favorites, Ctrl+K search, error recovery, missing records, and empty states through a mocked Tauri bridge. Native Windows verification opened the existing library of 1,817 records, read a real book, and returned a real Bengali title through search.

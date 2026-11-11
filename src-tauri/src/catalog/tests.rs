@@ -33,6 +33,7 @@ fn creates_updates_and_removes_books_without_touching_source_files() {
             publication_year: Some(2026),
             language: Some("bn".into()),
             author_ids: Some(vec![second.id, first.id]),
+            ..BookInput::default()
         })
         .unwrap();
     assert_eq!(created.title, "বই");
@@ -46,6 +47,12 @@ fn creates_updates_and_removes_books_without_touching_source_files() {
     let tx = Transaction::new_unchecked(&db.0, TransactionBehavior::Immediate).unwrap();
     let file_id = insert_file(&tx, created.id, path, &stamp).unwrap();
     tx.commit().unwrap();
+    db.0.execute("UPDATE book_files SET page_count=12 WHERE id=?1", [file_id])
+        .unwrap();
+    let dashboard = serde_json::to_value(db.dashboard().unwrap()).unwrap();
+    assert_eq!(dashboard["totalBooks"], 1);
+    assert_eq!(dashboard["totalStorage"], original.len());
+    assert_eq!(dashboard["totalPages"], 12);
     drop(db);
     let db = Database::open(&database).unwrap();
     let book = db.get_book(created.id).unwrap();

@@ -1,4 +1,4 @@
-import { BookOpen, Ellipsis, FileCheck2, FolderInput, LayoutGrid, LibraryBig, Settings2 } from "lucide-react";
+import { BookOpen, Ellipsis, FileCheck2, FolderInput, FolderTree, LayoutGrid, LibraryBig, Settings2 } from "lucide-react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { usePreferences } from "@/features/settings/preferences-store";
 import { desktop } from "@/shared/lib/preferences-client";
@@ -7,10 +7,13 @@ import { Button } from "@/shared/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
 import { SearchEntry } from "./search-entry";
+import { Suspense, useLayoutEffect, useRef } from "react";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 const navigation = [
   { to: "/", name: "Overview", icon: LayoutGrid },
   { to: "/library", name: "Library", icon: LibraryBig },
+  { to: "/organize", name: "Organize", icon: FolderTree },
   { to: "/import", name: "Import", icon: FolderInput },
   { to: "/metadata", name: "Metadata", icon: FileCheck2 },
   { to: "/reader", name: "Reader", icon: BookOpen },
@@ -55,8 +58,10 @@ function Sidebar() {
 }
 
 export function Shell() {
-  const { pathname } = useLocation();
-  const title = navigation.find((item) => item.to === pathname)?.name ?? "Workspace";
+  const { pathname, search } = useLocation();
+  const main = useRef<HTMLElement>(null);
+  useLayoutEffect(() => { main.current?.scrollTo({ top: 0 }); }, [pathname, search]);
+  const title = navigation.find((item) => item.to === pathname || item.to !== "/" && pathname.startsWith(item.to + "/"))?.name ?? "Workspace";
 
   return (
     <div className="grid h-dvh grid-cols-[3.75rem_minmax(0,1fr)] overflow-hidden md:grid-cols-[13rem_minmax(0,1fr)]">
@@ -88,9 +93,11 @@ export function Shell() {
             </DropdownMenu>
           </div>
         </header>
-        <main id="main-content" tabIndex={-1} className="overflow-y-auto focus:outline-none">
+        <main ref={main} id="main-content" tabIndex={-1} className="overflow-y-auto focus:outline-none">
           <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-            <Outlet />
+            <Suspense fallback={<Skeleton className="h-64" role="status" aria-label="Loading page" />}>
+              <Outlet />
+            </Suspense>
           </div>
         </main>
       </div>

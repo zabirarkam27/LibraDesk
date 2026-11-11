@@ -32,7 +32,7 @@ export function useMetadataQuery<T>(query: () => Promise<T>) {
     }
 
     schedule();
-    const subscriptions = [metadataEvent, "scan-updated"].map((event) =>
+    const subscriptions = [metadataEvent, "scan-updated", "catalog-updated"].map((event) =>
       listen(event, schedule).catch(() => undefined));
     return () => {
       disposed = true;

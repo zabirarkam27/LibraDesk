@@ -4,11 +4,13 @@ LibraDesk runs as a single Windows desktop application. React renders the worksp
 
 ## Frontend
 
-`src/app/` owns startup, hash routing, providers, and the window shell. `src/features/` currently contains the library, reader preview, and settings. `src/shared/` contains reusable UI, the IPC client, and shared types. Components use Tailwind, shadcn/ui, Lucide, and Framer Motion. The overview animation respects reduced-motion preferences.
+`src/app/` owns startup, hash routing, providers, and the window shell. `src/features/` contains the catalog, book details, organization, collections, dashboard, scanner, metadata tools, reader preview, and settings. `src/shared/` contains reusable UI, the IPC client, and shared types. Components use Tailwind, shadcn/ui, and Lucide. Book details, organization, and collection pages load as separate local chunks.
 
 Use React local state for component interactions and Zustand for shared UI state such as view, filters, and reader controls. Read durable state through typed Rust commands. Validate forms and IPC responses with Zod where runtime parsing is useful, and validate writes independently in Rust. Use TanStack Table for list behavior and virtualize large lists or grids. Request bounded result pages with stable ordering and an ID tie-breaker. Keep reader settings and app appearance separate. Provide English and Bengali labels and preserve Unicode in metadata and paths.
 
 The browser preview uses localStorage. The desktop app reads and writes SQLite through Rust and imports any valid bootstrap app preference in that webview only when a saved SQLite value is absent. App and reader themes are independent. The reader preview scopes its color tokens to its own surface.
+
+Catalog search, filters, sorting, and page selection live in the URL. A counted query returns at most 50 books from one SQLite snapshot, and the grid, list, and compact views render only visible rows with overscan. Library mutations emit a catalog event that refreshes active queries. Editors retain their original revision and reject concurrent changes.
 
 ## Native commands and background work
 
@@ -35,6 +37,8 @@ The cover adapter uses PDF.js range transport over binary Tauri IPC. Rust checks
 Use the [database schema](database-schema.md) as the contract. Startup prepares and validates AppData and applies migrations off the UI thread. Commands share a serialized connection, and the scan worker has a dedicated connection. SQLite serializes their short write transactions. Rust enables foreign keys and verifies WAL and bundled FTS5 support. Treat FTS and thumbnails as rebuildable derivatives of saved records.
 
 Normalize search text consistently at indexing and query time. Match English and Bengali, including mixed-language queries, while preserving the original metadata. Keep metadata and page text in separate FTS5 indexes. Search by the current file revision and return page references for full-text hits. Validate Bengali tokenization with fixtures before accepting a tokenizer configuration.
+
+Phase 4 implements the metadata index with a normalized projection and triggers for books and tags. Rust registers NFC/lowercase normalization on each connection before migrations. Literal prefix terms use FTS5 and weighted BM25, and literal substring matching supplies partial results. Reader progress has storage and read queries for the dashboard and sorting. The reader will write it in Task 5.6.
 
 Back up through SQLite's backup API, with a versioned manifest and optional thumbnails. Restore through a staged integrity check, an explicit confirmation, and a safety snapshot. Preserve links to the original PDFs and rebuild indexes if required by the backup or schema version.
 

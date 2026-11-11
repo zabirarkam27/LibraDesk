@@ -1,6 +1,6 @@
 # LibraDesk database schema
 
-This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates settings, migration 0002 adds the catalog and scanner, migration 0003 adds PDF metadata, processing jobs, covers, and duplicate reviews, and migration 0004 adds author relationships and catalog ID sequences. Later features introduce the remaining tables.
+This is the schema contract for `%LOCALAPPDATA%\LibraDesk\database\library.sqlite3`. Migration 0001 creates settings, migration 0002 adds the catalog and scanner, migration 0003 adds PDF metadata, processing jobs, covers, and duplicate reviews, migration 0004 adds author relationships and catalog ID sequences, and migration 0005 adds organization, metadata search, and the reading-progress storage used by dashboard queries. Later features introduce the remaining tables.
 
 ## Conventions
 
@@ -31,6 +31,8 @@ Create a distinct book and primary file per imported path unless an explicit wor
 Migration 0004 links each existing nonblank author string as one name. The PDF extractor and the free-text metadata editor use the same convention. Assign author IDs through the catalog service to represent separate contributors or reuse a known identity.
 
 Catalog creation supports books without a source file. Catalog updates replace editable metadata and require the current revision. Omitting optional scalar fields clears them. Omitting author IDs preserves the current links, and an empty list clears them. Deletion also requires the current revision and removes dependent database rows through foreign keys.
+
+The Phase 4 editor can supply ordered author names instead of IDs. Existing identities at unchanged positions are retained. Favorite, status, category, tag, and collection inputs are optional and preserve their stored values when omitted. Assignment changes share the metadata transaction. Organization records have revisions, and category, tag, and collection IDs use AUTOINCREMENT. A category with children requires moving or deleting those children before removal. Collection positions can have gaps after membership removal.
 
 ## Import, processing, and recovery
 
@@ -64,6 +66,8 @@ Require reader file references to belong to the same book in the service transac
 - `page_text` uses `id` as PK, references `book_files` with cascade, and has unique `(file_id, file_revision, page_number)`. Store positive page numbers and extracted normalized text. `page_text_fts` is an FTS5 external-content index keyed by `page_text.id`. Scope matches to the current file revision and return the book, file, page, and snippet.
 - Use insert, update, and delete triggers on each projection/content table to keep its FTS index synchronized in the same transaction. Rebuild after adding an index over existing content, or if integrity checks require it. Check FTS integrity separately from SQLite's database checks.
 - Start with NFC normalization and the tested tokenizer configuration, `unicode61 remove_diacritics 2 categories 'L* N* Co M*'`. Use bound query values with literal terms safely quoted, controlled prefix matching, and BM25 with title and author weights for catalog results. For a bounded catalog fallback, escape wildcard characters before matching normalized text. Verify Bengali vowel signs, যুক্তাক্ষর, equivalent spellings under Unicode normalization, mixed scripts, punctuation, and empty queries. Keep stored display titles unchanged.
+
+Migration 0005 implements the metadata projection, including ISBN in its subject text. Each application connection registers deterministic normalization and literal substring functions before migration. Quoted prefix terms use FTS5, and unmatched literal substrings use the normalized projection. Search and catalog filters share a read transaction for counts and data. The query returns at most 50 rows, places missing sort values last, and uses book ID to break ties. Metadata and tag triggers update the projection and index atomically. Dashboard storage sums all registered files, while known pages sum primary files.
 
 ## Migrations and recovery
 

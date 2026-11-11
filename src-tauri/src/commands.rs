@@ -20,6 +20,17 @@ pub struct CommandError {
 
 fn database_error(error: database::Error) -> CommandError {
     match error {
+        database::Error::OrganizationConflict => CommandError {
+            code: "organization_conflict",
+            message:
+                "This name already exists, or the selected category parent would create a cycle.",
+            retryable: false,
+        },
+        database::Error::CategoryHasChildren => CommandError {
+            code: "category_has_children",
+            message: "Move or remove child categories before deleting this category.",
+            retryable: false,
+        },
         database::Error::InvalidCatalogInput => CommandError {
             code: "invalid_catalog_input",
             message: "Check the book metadata or author details and try again.",
@@ -32,7 +43,7 @@ fn database_error(error: database::Error) -> CommandError {
         },
         database::Error::CatalogConflict => CommandError {
             code: "catalog_conflict",
-            message: "This book has changed. Reload it before making more changes.",
+            message: "This record has changed. Reload it before making more changes.",
             retryable: false,
         },
         database::Error::UnknownAuthor => CommandError {

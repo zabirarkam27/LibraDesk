@@ -869,7 +869,9 @@ Completed on 2026-11-11. See the [development log](docs/development-log.md) for 
 
 ## Task 4.3 - Book Details Page
 
-Implement:
+- [x] Completed on 2026-11-11. Implementation and verification are recorded in [the development log](docs/development-log.md).
+
+Implemented:
 
 - Cover.
 - Title.
@@ -888,7 +890,9 @@ Implement:
 
 ## Task 4.4 - Category Management
 
-Implement:
+- [x] Completed on 2026-11-11. Nested categories, assignments, filtering, and deletion checks are verified.
+
+Implemented:
 
 - Create category.
 - Edit category.
@@ -904,7 +908,9 @@ Deleting a category must not delete its books.
 
 ## Task 4.5 - Tag Management
 
-Implement:
+- [x] Completed on 2026-11-11. Tag CRUD, assignments, filtering, and search synchronization are verified.
+
+Implemented:
 
 - Create tags.
 - Rename tags.
@@ -916,7 +922,9 @@ Implement:
 
 ## Task 4.6 - Favorites and Reading Status
 
-Implement:
+- [x] Completed on 2026-11-11. Favorites and reading statuses persist in SQLite and reject stale writes.
+
+Implemented:
 
 - Favorites.
 - Unread.
@@ -930,7 +938,9 @@ All status changes must persist.
 
 ## Task 4.7 - Collections
 
-Implement:
+- [x] Completed on 2026-11-11. Collections, reading lists, membership, descriptions, and ordering are verified.
+
+Implemented:
 
 - Custom collections.
 - Collection descriptions.
@@ -943,7 +953,9 @@ Implement:
 
 ## Task 4.8 - Sorting and Filtering
 
-Implement:
+- [x] Completed on 2026-11-11. Combined filters, stable sorting, and bounded pages are verified. Reader-generated progress will be rechecked in Task 5.6.
+
+Implemented:
 
 - Title.
 - Author.
@@ -960,7 +972,9 @@ Implement:
 
 ## Task 4.9 - Bilingual Metadata Search
 
-Implement:
+- [x] Completed on 2026-11-11. FTS5, NFC normalization, ranking, literal partial matching, and Bengali fixtures are verified.
+
+Implemented:
 
 - English search.
 - Bengali search.
@@ -989,7 +1003,9 @@ Never modify original titles merely to improve search.
 
 ## Task 4.10 - Dashboard
 
-Implement real database-driven statistics:
+- [x] Completed on 2026-11-11. SQLite totals and lists are verified. Recently read uses saved progress, which the reader will populate in Task 5.6.
+
+Implemented real database-driven statistics:
 
 - Total books.
 - Total storage.

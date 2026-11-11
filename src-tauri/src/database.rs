@@ -12,6 +12,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ),
     ("metadata", include_str!("../migrations/0003_metadata.sql")),
     ("catalog", include_str!("../migrations/0004_catalog.sql")),
+    ("library", include_str!("../migrations/0005_library.sql")),
 ];
 const UPSERT_THEME: &str = "
     INSERT INTO settings(scope, key, value_json, updated_at)
@@ -62,6 +63,8 @@ pub enum Error {
     CatalogNotFound,
     CatalogConflict,
     UnknownAuthor,
+    OrganizationConflict,
+    CategoryHasChildren,
 }
 
 impl From<rusqlite::Error> for Error {
@@ -91,11 +94,18 @@ impl std::fmt::Display for Error {
             Self::CatalogNotFound => formatter.write_str("Catalog record not found"),
             Self::CatalogConflict => formatter.write_str("Catalog record has changed"),
             Self::UnknownAuthor => formatter.write_str("Author record not found"),
+            Self::OrganizationConflict => {
+                formatter.write_str("Name already exists or category parent is invalid")
+            }
+            Self::CategoryHasChildren => {
+                formatter.write_str("Move or remove child categories before deleting this category")
+            }
         }
     }
 }
 
 fn migrate(connection: &mut Connection, migrations: &[(&str, &str)]) -> Result<(), Error> {
+    crate::catalog::search::register_normalization(connection)?;
     // Hash normalized line endings so the same migration matches across Git checkouts.
     let checksums: Vec<_> = migrations
         .iter()
@@ -296,6 +306,15 @@ mod tests {
         assert_eq!(second.authors[0].display_name, "লেখক, আরেকজন");
         assert_ne!(first.authors[0].id, second.authors[0].id);
         assert!(db.get_book(6).unwrap().authors.is_empty());
+        assert_eq!(
+            db.query_catalog(&crate::catalog::search::CatalogQuery {
+                text: "লেখক".into(),
+                ..Default::default()
+            })
+            .unwrap()
+            .total,
+            2
+        );
         let override_value: String =
             db.0.query_row(
                 "SELECT value FROM metadata_overrides WHERE book_id=4 AND field='author'",
