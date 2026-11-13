@@ -12,6 +12,13 @@ pub(crate) use pdf::{analyze, hash, Analysis};
 pub(crate) use repository::refresh_scanned_files;
 
 pub const EVENT: &str = "metadata-updated";
+pub(crate) fn backup_thumbnail(
+    root: &std::path::Path,
+    id: i64,
+    revision: i64,
+) -> std::io::Result<Vec<u8>> {
+    cover::load_png(root, id, revision)
+}
 
 pub fn process_next(db: &crate::database::Database) -> rusqlite::Result<bool> {
     let Some(source) = db.next_analysis()? else {

@@ -1312,6 +1312,8 @@ Never delete database records when clearing cache.
 
 ## Task 7.3 - Backup Creation
 
+- [x] Completed on 2026-11-13. Added live SQLite snapshots, versioned folder manifests, SHA-256/integrity/schema validation, optional verified thumbnails, destination selection and cancellation. Originals are excluded. Tests and builds passed; see the [development log](docs/development-log.md).
+
 Implement:
 
 - Database backup.

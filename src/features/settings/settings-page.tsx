@@ -9,6 +9,7 @@ import { fieldClass } from "@/features/library/query-feedback";
 import { usePreferences } from "./preferences-store";
 import { useWorkspaceSettings,type WorkspacePreferences } from "./workspace-store";
 import { ThemeOptions } from "./theme-options";
+import { BackupSettings } from "./backup-settings";
 import { StorageSettings } from "./storage-settings";
 import { ReaderSettings } from "./reader-settings";
 
@@ -45,10 +46,7 @@ function Panel({section}:{section:Section}) {
     </div>;
     case "reader":return <ReaderSettings/>;
     case "storage":return <StorageSettings/>;
-    case "backup":return <div className="space-y-4 text-sm">
-      <p className="font-medium">Backup creation and restore are not available in this build.</p>
-      <p className="text-muted-foreground">There are no automatic backups yet. Planned backups include library metadata, settings, notes, bookmarks, and reading history. Original PDF files are kept separately.</p>
-    </div>;
+    case "backup":return <BackupSettings/>;
     case "privacy":return <div className="space-y-4 text-sm">
       <p className="font-medium">Your library is local to this device.</p>
       <p className="text-muted-foreground">Core library features work offline. No cloud account or synchronization is configured.</p>

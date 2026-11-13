@@ -80,6 +80,8 @@ Page search accepts up to 1,024 UTF-8 bytes and 32 whitespace-separated terms, q
 
 ## Migrations and recovery
 
+Backup format 1 is a directory containing `manifest.json`, `library.sqlite3`, and optional generated thumbnail PNGs. The manifest records schema/application versions, counts, sizes and SHA-256 digests. Snapshot validation compares migration history and schema definitions with the supported migrations, checks SQLite integrity/foreign keys, and rejects unsafe or unlisted entries. SQLite's online backup API reads one consistent transaction; completed bundles contain no live WAL/SHM files. Sources and unrelated cache files are excluded.
+
 Migration 0009 adds `file_health` (cascading file ID, last check result/time, optional last content-change time), singleton `verification_state` (running/completed, cursor, upper file ID, checked count, start/finish), expiring `relink_drafts`, and `duplicate_preferences` (SHA-256 and preferred file ID). An availability index supports recovery listings. File revision changes invalidate pending relink drafts and preferred-copy decisions.
 
 Verification snapshots the maximum file ID and checkpoints one inspected file at a time on a dedicated SQLite connection and native thread. It preserves the last known hash when a path is missing or inaccessible. Unchanged size/time skips hashing. Changed stamps trigger a streamed hash; identical bytes update the stamp without advancing revision, while different/unknown bytes advance revision and invalidate old extraction/cover work through existing triggers. Registered identity and hash are compared again in the write transaction to reject stale observations. The read handle remains open through commit on Windows.

@@ -249,6 +249,86 @@ impl Database {
     }
 }
 
+pub(crate) fn schema_version() -> usize {
+    MIGRATIONS.len()
+}
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct SnapshotInfo {
+    pub schema_version: u32,
+    pub books: i64,
+    pub notes: i64,
+    pub bookmarks: i64,
+    pub reading_sessions: i64,
+}
+type SchemaObject = (String, String, String, Option<String>);
+fn schema_objects(connection: &Connection) -> rusqlite::Result<Vec<SchemaObject>> {
+    let mut statement=connection.prepare("SELECT type,name,tbl_name,sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%' ORDER BY type,name")?;
+    let rows = statement.query_map([], |row| {
+        Ok((
+            row.get(0)?,
+            row.get(1)?,
+            row.get(2)?,
+            row.get::<_, Option<String>>(3)?
+                .map(|sql| sql.replace("\r\n", "\n")),
+        ))
+    })?;
+    rows.collect()
+}
+pub(crate) fn validate_snapshot(path: &Path) -> Result<SnapshotInfo, Error> {
+    let connection = Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)?;
+    crate::catalog::search::register_normalization(&connection)?;
+    connection.pragma_update(None, "foreign_keys", true)?;
+    let version: i64 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
+    let version = usize::try_from(version).map_err(|_| Error::IncompatibleSchema)?;
+    if version == 0 || version > MIGRATIONS.len() {
+        return Err(Error::IncompatibleSchema);
+    }
+    let integrity: String = connection.query_row("PRAGMA integrity_check", [], |row| row.get(0))?;
+    if integrity != "ok" {
+        return Err(Error::IncompatibleSchema);
+    }
+    {
+        let mut check = connection.prepare("PRAGMA foreign_key_check")?;
+        if check.query([])?.next()?.is_some() {
+            return Err(Error::IncompatibleSchema);
+        }
+    }
+    let mut expected = Connection::open_in_memory()?;
+    migrate(&mut expected, &MIGRATIONS[..version])?;
+    if schema_objects(&connection)? != schema_objects(&expected)? {
+        return Err(Error::IncompatibleSchema);
+    }
+    let history = |db: &Connection| -> rusqlite::Result<Vec<(i64, String, String)>> {
+        let mut query =
+            db.prepare("SELECT version,name,checksum FROM schema_migrations ORDER BY version")?;
+        let rows = query.query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?;
+        rows.collect()
+    };
+    if history(&connection)? != history(&expected)? {
+        return Err(Error::IncompatibleSchema);
+    }
+    let count = |table: &str| -> rusqlite::Result<i64> {
+        let exists: bool = connection.query_row(
+            "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name=?1)",
+            [table],
+            |r| r.get(0),
+        )?;
+        if exists {
+            connection.query_row(&format!("SELECT count(*) FROM {table}"), [], |r| r.get(0))
+        } else {
+            Ok(0)
+        }
+    };
+    Ok(SnapshotInfo {
+        schema_version: version as u32,
+        books: count("books")?,
+        notes: count("notes")?,
+        bookmarks: count("bookmarks")?,
+        reading_sessions: count("reading_sessions")?,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
