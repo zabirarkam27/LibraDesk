@@ -91,7 +91,7 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 
 | Task | Depends on | Exit check |
 | --- | --- | --- |
-| [ ] 7.1 Settings | 1.5, 5.8 | Open each settings area and verify applicable preferences persist. |
+| [x] 7.1 Settings | 1.5, 5.8 | Open each settings area and verify applicable preferences persist. |
 | [ ] 7.2 Storage management | 1.6, 3.5, 7.1 | Reconcile storage totals and clear only validated cache entries. Verify records remain intact. |
 | [ ] 7.3 Backup creation | 1.7, 7.1 | Validate a live database snapshot and versioned manifest, with and without thumbnails. Verify PDFs stay outside the default backup. |
 | [ ] 7.4 Backup restore | 6.2, 7.3 | Test corrupt and incompatible backups, cancellation, failed promotion, rollback, and successful restore with derived index rebuild. |

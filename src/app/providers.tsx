@@ -8,6 +8,8 @@ import { useResolvedTheme } from "@/shared/hooks/use-resolved-theme";
 import { TooltipProvider } from "@/shared/ui/tooltip";
 import { desktop } from "@/shared/lib/preferences-client";
 import { guardReaderWindowClose } from "@/features/reader/window-close";
+import { useWorkspaceSettings } from "@/features/settings/workspace-store";
+import { StartupRoute } from "@/features/settings/startup-route";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const load = usePreferences((state) => state.load);
@@ -15,6 +17,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void load();
+    void useWorkspaceSettings.getState().load();
     startCoverWorker();
     startTextExtractionWorker();
     if (!desktop) return;
@@ -28,6 +31,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <HashRouter>
+      <StartupRoute />
       <TooltipProvider delayDuration={300}>
         {children}
         <Toaster theme={theme} position="bottom-right" closeButton />

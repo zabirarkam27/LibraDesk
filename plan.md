@@ -1278,6 +1278,8 @@ Removing a record must not remove the original PDF.
 
 ## Task 7.1 - Settings Page
 
+- [x] Completed on 2026-11-13. Added all seven settings areas, persisted startup/library defaults, existing reader preference editing, independent appearance controls, data location/status, and clear backup/storage availability. Verified persistence, routing, errors and builds. See the [development log](docs/development-log.md).
+
 Implement:
 
 - General.

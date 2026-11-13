@@ -151,3 +151,20 @@ The real Windows executable upgraded the existing library to schema 9. A read-on
 New files: migration 0009; native recovery commands, probe, repositories, worker and fixtures; frontend recovery client, listing, relink dialog and duplicate reviewer. Updated entry/router/sidebar, book details, metadata review/query subscriptions, README, architecture, schema and both roadmaps. Personal PDFs, SQLite databases, generated harnesses and profiles, screenshots, build products and the existing .vscode directory remain excluded from the commit.
 
 Limits: verification is periodic/manual rather than a filesystem watcher. Stamp-stable content changes are not routinely rehashed; explicit relink confirmation and duplicate removal always rehash the selected candidate/kept copy. Replacement metadata parsing is bounded to 32 MiB, with signature/EOF and streamed-hash validation for larger sources. Different-content replacements retain old page anchors with stale revisions. OCR remains excluded. Phase 7 has not been started.
+
+
+## 2026-11-13 · Task 7.1 · Settings page
+
+The owner approved starting Phase 7. Implemented its first task, 7.1, following the individual-task approval boundary before 7.2. Settings now contains General, Appearance, Library, Reader, Storage, Backup and Privacy sections selected through the URL.
+
+General persists an Overview/Library startup page. Library persists a Grid/List/Compact default and links to existing scan-folder, organization and recovery tools. The default applies on new library opens, while in-page view buttons retain their local override. Startup routing applies only to the initial root entry; deep links, normal Home navigation and user navigation during a delayed preference read remain intact. Appearance reuses independent app/reader themes. Reader edits existing zoom, layout, fullscreen and shortcut defaults with explicit save and 25–400% integer zoom validation. Settings refreshes after reader-side changes.
+
+Storage displays the connected schema and resolved AppData folder. Backup clearly states that creation, restore and automatic backups are unavailable in this build. Privacy describes local data and the PDF reader's existing scripting/link restrictions. Storage size/cleanup and backup operations remain Tasks 7.2–7.4.
+
+New native settings commands read a typed snapshot and save enum-validated workspace preferences under the existing app/workspace JSON key. No schema migration is needed; reader/viewer and theme keys are reused. The frontend store prevents overlapping writes and rolls back failed saves. Browser preview saves workspace/appearance preferences locally and disables native reader-default saves.
+
+Verification: all 35 Rust tests passed, including real database reopen, safe defaults, JSON/enum validation, saved workspace/reader values and theme isolation. Strict TypeScript/Vite, formatting, Clippy with warnings denied and the standard production-protocol Windows debug build passed. An isolated browser suite opened all seven sections and checked save rollback, reload persistence, per-page library overrides, real PDF defaults/page links, reader-side refresh, root-only startup routing, delayed-navigation protection, load error/retry, invalid zoom and compact widths. It reported zero unhandled browser errors. The browser bridge mocks native persistence; Rust fixtures cover the actual SQLite writes.
+
+Native Windows verification opened the new Settings page against the existing library, displayed all seven areas and application version, read the user's existing reader defaults, and showed schema 9 with the resolved local AppData path. No preference changes were saved in the personal library during this check.
+
+Created native settings.rs and frontend workspace-store, startup-route, reader-settings and theme-options modules. Updated the app provider/command registration, reader type exports, library view initialization, settings page, README, architecture, schema contract and both roadmaps. Existing .vscode, personal data, generated browser fixtures/profiles and build products remain excluded from Git.

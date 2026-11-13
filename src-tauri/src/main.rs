@@ -8,6 +8,7 @@ mod metadata;
 mod reader;
 mod recovery;
 mod scan;
+mod settings;
 mod storage;
 
 use tauri::Manager;
@@ -29,6 +30,8 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_preferences,
+            settings::get_settings_snapshot,
+            settings::save_workspace_preferences,
             recovery::commands::recovery_snapshot,
             recovery::commands::recovery_files,
             recovery::commands::start_file_verification,

@@ -10,6 +10,8 @@ Use React local state for component interactions and Zustand for shared UI state
 
 The browser preview uses localStorage. The desktop app reads and writes SQLite through Rust and imports any valid bootstrap app preference in that webview only when a saved SQLite value is absent. App and reader themes are independent. Reader appearance is scoped to its surface.
 
+Task 7.1 organizes Settings into General, Appearance, Library, Reader, Storage, Backup, and Privacy, with the section in the URL. A typed settings snapshot loads workspace and reader defaults. Workspace preferences use `app/workspace`; reader and appearance controls reuse their existing keys. The store disables overlapping saves and rolls back failed writes. Settings refreshes its snapshot on entry to pick up reader-side changes. Startup preferences apply only to the initial root entry; deep links and navigation while loading take precedence. Library pages use the saved view until a local view button overrides that page. Storage/backup areas report their current availability; size reporting, cleanup and backup tools remain later tasks.
+
 Catalog search, filters, sorting, and page selection live in the URL. A counted query returns at most 50 books from one SQLite snapshot, and the grid, list, and compact views render only visible rows with overscan. Library mutations emit a catalog event that refreshes active queries. Editors retain their original revision and reject concurrent changes.
 
 ## Native commands and background work

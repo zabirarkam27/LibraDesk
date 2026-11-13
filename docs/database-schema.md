@@ -65,6 +65,8 @@ Migration 0006 adds reader state. Checkpoints reject stale sequences and file re
 
 Reader zoom, layout, fullscreen, and shortcut preferences use the `reader/viewer` settings key. Reader theme uses the existing `reader/theme` key. These settings are independent of app appearance.
 
+Task 7.1 adds `app/workspace` JSON using the existing settings table, without a schema migration. It stores `startPage` (overview or library) and `libraryView` (grid, list, or compact), defaulting to overview/grid. Native enum validation rejects unknown fields and values; missing or invalid stored shapes use safe defaults. The settings snapshot combines these values, existing reader defaults, application version, and the resolved local data path. Reader saves reuse the existing validated `reader/viewer` command.
+
 ## Search indexes
 
 - `book_search_text` uses `book_id` as PK and FK with cascade. It stores normalized title, author, subject, publisher, and tag text derived from current catalog rows. `book_search_fts` is an FTS5 external-content index keyed by `book_id`. Recompute the projection after relevant metadata or link changes.

@@ -1,103 +1,90 @@
-import { Database, Monitor, Moon, Sun } from "lucide-react";
+import { useEffect } from "react";
+import { Link,useSearchParams } from "react-router";
 import { toast } from "sonner";
-import { desktop, errorMessage } from "@/shared/lib/preferences-client";
-import { themes, type ThemeScope } from "@/shared/types/preferences";
+import { desktop,errorMessage } from "@/shared/lib/preferences-client";
 import { Button } from "@/shared/ui/button";
 import { PageHeading } from "@/shared/ui/page-heading";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { fieldClass } from "@/features/library/query-feedback";
 import { usePreferences } from "./preferences-store";
+import { useWorkspaceSettings,type WorkspacePreferences } from "./workspace-store";
+import { ThemeOptions } from "./theme-options";
+import { ReaderSettings } from "./reader-settings";
 
-const themeOptions = {
-  light: { label: "Light", icon: Sun },
-  dark: { label: "Dark", icon: Moon },
-  system: { label: "System", icon: Monitor },
-};
-
-function ThemeOptions({ scope, label, description }: { scope: ThemeScope; label: string; description: string }) {
-  const selected = usePreferences((state) => state.preferences[scope]);
-  const saving = usePreferences((state) => state.saving);
-  const change = usePreferences((state) => state.changeTheme);
-
-  return (
-    <fieldset aria-busy={saving}>
-      <legend className="text-sm font-semibold">{label}</legend>
-      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      <div className="mt-3 grid grid-cols-3 gap-2">
-        {themes.map((theme) => {
-          const { icon: Icon, label } = themeOptions[theme];
-          return (
-            <label key={theme} className="flex cursor-pointer flex-wrap items-center gap-2 rounded-md border px-3 py-2.5 text-sm has-checked:border-ring has-checked:bg-accent has-checked:text-accent-foreground has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ring">
-              <input
-                className="sr-only"
-                type="radio"
-                name={scope + "-theme"}
-                checked={selected === theme}
-                aria-disabled={saving}
-                onChange={async () => {
-                  if (saving) return;
-                  try {
-                    await change(scope, theme);
-                    toast.success(scope === "app" ? "App appearance saved" : "Reader appearance saved");
-                  } catch (error) {
-                    toast.error(errorMessage(error));
-                  }
-                }}
-              />
-              <Icon className="size-4 shrink-0" />
-              {label}
-            </label>
-          );
-        })}
-      </div>
-    </fieldset>
-  );
+const sections=["general","appearance","library","reader","storage","backup","privacy"] as const;
+type Section=typeof sections[number];
+const names:Record<Section,string>={general:"General",appearance:"Appearance",library:"Library",reader:"Reader",storage:"Storage",backup:"Backup",privacy:"Privacy"};
+function WorkspaceSelect({field,label,options}:{field:keyof WorkspacePreferences;label:string;options:readonly [string,string][]}) {
+  const value=useWorkspaceSettings(state=>state.snapshot.workspace[field]);
+  const saving=useWorkspaceSettings(state=>state.saving);
+  const update=useWorkspaceSettings(state=>state.updateWorkspace);
+  return <label className="grid max-w-md gap-2 text-sm font-medium">{label}
+    <select className={fieldClass} value={value} disabled={saving} onChange={event=>{
+      void update({[field]:event.target.value} as Partial<WorkspacePreferences>).then(()=>toast.success("Preference saved"),reason=>toast.error(errorMessage(reason)));
+    }}>{options.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select>
+  </label>;
 }
-
+function Panel({section}:{section:Section}) {
+  const snapshot=useWorkspaceSettings(state=>state.snapshot);
+  const schema=usePreferences(state=>state.preferences.schemaVersion);
+  switch(section) {
+    case "general":return <div className="space-y-5">
+      <p className="text-sm text-muted-foreground">LibraDesk {snapshot.version} · {desktop?"Windows desktop":"Browser preview"}</p>
+      <WorkspaceSelect field="startPage" label="Open at startup" options={[["overview","Overview"],["library","Library"]]}/>
+      <p className="text-sm text-muted-foreground">Applies the next time the app opens. Links to a specific book or page still open directly.</p>
+    </div>;
+    case "appearance":return <ThemeOptions scope="app" label="App theme" description="Choose Light, Dark, or your system appearance for the workspace."/>;
+    case "library":return <div className="space-y-5">
+      <WorkspaceSelect field="libraryView" label="Default library view" options={[["grid","Grid"],["list","List"],["compact","Compact"]]}/>
+      <p className="text-sm text-muted-foreground">Used when opening Library. Its view buttons can change the current view.</p>
+      <div className="flex flex-wrap gap-2">
+        <Button asChild variant="outline"><Link to="/import">Manage scan folders</Link></Button>
+        <Button asChild variant="outline"><Link to="/organize">Organize library</Link></Button>
+        <Button asChild variant="outline"><Link to="/recovery">File recovery</Link></Button>
+      </div>
+    </div>;
+    case "reader":return <ReaderSettings/>;
+    case "storage":return <div className="space-y-4 text-sm">
+      <p>{desktop?`SQLite connected · Schema ${schema}`:"Appearance and workspace defaults are stored in this browser."}</p>
+      <div><p className="font-medium">Application data location</p><p className="mt-2 select-text break-all font-mono text-xs text-muted-foreground">{snapshot.dataPath}</p></div>
+      <p className="text-muted-foreground">Desktop data includes the library database, thumbnails, cache, backup folder, logs, and temporary files. Original PDFs remain at their registered locations.</p>
+      <p className="text-muted-foreground">Storage size reporting and cache cleanup are not available in this build.</p>
+    </div>;
+    case "backup":return <div className="space-y-4 text-sm">
+      <p className="font-medium">Backup creation and restore are not available in this build.</p>
+      <p className="text-muted-foreground">There are no automatic backups yet. Planned backups include library metadata, settings, notes, bookmarks, and reading history. Original PDF files are kept separately.</p>
+    </div>;
+    case "privacy":return <div className="space-y-4 text-sm">
+      <p className="font-medium">Your library is local to this device.</p>
+      <p className="text-muted-foreground">Core library features work offline. No cloud account or synchronization is configured.</p>
+      <p className="text-muted-foreground">Extracted PDF text, metadata, notes, bookmarks, and reading activity are stored in local application data. Source PDFs are read in place.</p>
+      <p className="text-muted-foreground">PDF scripting and external PDF links are disabled in the built-in reader.</p>
+    </div>;
+  }
+}
 export function SettingsPage() {
-  const { status, error, preferences, load } = usePreferences();
-
-  return (
-    <>
-      <PageHeading label="Settings" title="Preferences" description="Choose how the workspace and the reader look on this device." />
-      {status === "idle" || status === "loading" ? (
-        <div role="status" className="space-y-4">
-          <span className="sr-only">Loading preferences</span>
-          <Skeleton className="h-44 w-full motion-reduce:animate-none" />
-          <Skeleton className="h-28 w-full motion-reduce:animate-none" />
-        </div>
-      ) : status === "error" ? (
-        <section role="alert" className="rounded-xl border border-destructive/40 bg-card p-5">
-          <h2 className="text-base font-semibold">Storage unavailable</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{error?.message}</p>
-          {error?.retryable && (
-            <Button variant="outline" className="mt-4" onClick={() => void load()}>Try again</Button>
-          )}
-        </section>
-      ) : (
-        <div className="grid gap-4">
-          <section className="space-y-5 rounded-xl border bg-card p-5 sm:p-6" aria-labelledby="appearance-heading">
-            <h2 id="appearance-heading" className="font-display text-2xl">Appearance</h2>
-            <ThemeOptions scope="app" label="App theme" description="Applies to the workspace and its controls." />
-            <div className="border-t pt-5">
-              <ThemeOptions scope="reader" label="Reader theme" description="Applies inside the reader, independently of the app theme." />
-            </div>
-          </section>
-          <section className="flex items-start gap-4 rounded-xl border bg-card p-5 sm:p-6" aria-labelledby="storage-heading">
-            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground"><Database className="size-5" /></span>
-            <div>
-              <h2 id="storage-heading" className="font-semibold">Local storage</h2>
-              {desktop ? (
-                <>
-                  <p className="mt-1 text-sm text-muted-foreground">SQLite database connected · Schema {preferences.schemaVersion}</p>
-                  <p className="mt-2 font-mono text-xs text-muted-foreground">%LOCALAPPDATA%\LibraDesk</p>
-                </>
-              ) : (
-                <p className="mt-1 text-sm text-muted-foreground">Browser preview saves appearance in this browser. Open the Windows app to use local SQLite storage.</p>
-              )}
-            </div>
-          </section>
-        </div>
-      )}
-    </>
-  );
+  const theme=usePreferences();
+  const status=useWorkspaceSettings(state=>state.status);
+  const error=useWorkspaceSettings(state=>state.error);
+  const load=useWorkspaceSettings(state=>state.load);
+  const [params,setParams]=useSearchParams();
+  const section=sections.find(value=>value===params.get("section"))??"general";
+  useEffect(()=>{void load(true);},[load]);
+  const loading=theme.status==="idle"||theme.status==="loading"||status==="idle"||status==="loading";
+  return <>
+    <PageHeading label="Settings" title="Preferences" description="Workspace, library, reader, and local data settings."/>
+    <nav aria-label="Settings sections" className="mb-5 flex flex-wrap gap-2">{sections.map(value=>
+      <Button key={value} variant={value===section?"default":"outline"} aria-current={value===section?"page":undefined} onClick={()=>setParams({section:value})}>{names[value]}</Button>
+    )}</nav>
+    {loading?<Skeleton className="h-56" role="status" aria-label="Loading settings"/>:
+      theme.status==="error"||status==="error"?<section role="alert" className="space-y-3 rounded-xl border p-5">
+        <p className="text-sm text-destructive">{error??theme.error?.message??"Could not load settings."}</p>
+        <Button variant="outline" onClick={()=>{void theme.load();void load(true);}}>Reload settings</Button>
+      </section>:
+      <section className="space-y-5 rounded-xl border bg-card p-5 sm:p-6" aria-labelledby="settings-section-title">
+        <h2 id="settings-section-title" className="font-display text-2xl">{names[section]}</h2>
+        <Panel section={section}/>
+        {!desktop&&<p className="border-t pt-4 text-xs text-muted-foreground">Browser preview uses browser storage. Open the Windows app for local library tools.</p>}
+      </section>}
+  </>;
 }

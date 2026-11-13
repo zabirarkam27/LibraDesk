@@ -11,6 +11,7 @@ import type { CatalogView } from "./book-card";
 import { categoryPath, getOrganization, queryCatalog, readingStatuses, type CatalogQuery } from "./library-client";
 import { fieldClass } from "./query-feedback";
 import { VirtualBooks } from "./virtual-books";
+import { useWorkspaceSettings } from "@/features/settings/workspace-store";
 
 const views = [
   { id: "grid", label: "Grid", icon: LayoutGrid },
@@ -53,7 +54,9 @@ function parseQuery(key: string): CatalogQuery {
 
 function DesktopCatalog() {
   const section = useRef<HTMLElement>(null);
-  const [view, setView] = useState<CatalogView>("grid");
+  const defaultView=useWorkspaceSettings(state=>state.snapshot.workspace.libraryView);
+  const [selectedView, setView] = useState<CatalogView|null>(null);
+  const view=selectedView??defaultView;
   const [params, setParams] = useSearchParams();
   const key = params.toString();
   const input = useMemo(() => parseQuery(key), [key]);
