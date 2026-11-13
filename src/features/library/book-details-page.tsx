@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { Link, useParams } from "react-router";
 import { BookCover } from "@/features/metadata/book-cover";
 import { ExtractionStatus } from "@/features/extraction/extraction-status";
+import { RelinkButton } from "@/features/recovery/relink-button";
 import { useMetadataQuery } from "@/features/metadata/use-metadata-query";
 import { desktop } from "@/shared/lib/preferences-client";
 import { formatBytes } from "@/shared/lib/file-size";
@@ -75,6 +76,7 @@ function Details({ id }: { id: number }) {
             {file.pages === null ? "Unknown pages" : `${file.pages} pages`} · {formatBytes(file.bytes)} · {file.availability}
           </p>
           <ExtractionStatus file={file.id} revision={file.revision} available={file.availability === "available"} />
+          <RelinkButton file={file.id} />
         </li>)}</ul> : <p className="text-sm text-muted-foreground">No file is attached to this book.</p>}
       </section>
       {editing && <BookEditor book={book} organization={organization} close={() => { setEditing(false); retry(); }}

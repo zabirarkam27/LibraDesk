@@ -25,6 +25,12 @@ Open **PDF contents** to search extracted pages across your library in Bengali o
 
 Background extraction runs while the window is visible and the reader is closed. **Book details → Files** shows progress and manual retry for failed files. Search includes pages saved so far; select **Refresh results** as extraction progresses. Excerpts use normalized text, while original extracted text is retained separately. Image-only PDFs have no embedded text; OCR is excluded. Background extraction cannot unlock encrypted PDFs.
 
+Open **File recovery** to see missing, inaccessible, and invalid PDFs. File checks run in the background at startup, resume after interruption, and repeat hourly. **Check files now** starts another pass when the current pass has finished. Clear **Show only unavailable files** to inspect available files and change results.
+
+Select **Relink PDF** in File recovery or Book details, choose a replacement, compare its SHA-256 and metadata, then confirm. Cancelling preserves the current link. Relinking retains the book, notes, bookmarks, and reading progress. A different replacement advances the file revision, so old page anchors may need review. Original and replacement PDFs remain in place.
+
+In **Metadata → Exact duplicates**, compare copies, save a preferred record, or ignore a group while retaining every copy. **Remove library record** requires a separate confirmation and acknowledgement. The kept copy is rehashed before removal. Removing a book's last file also removes that book's library notes, bookmarks, progress, and collection memberships; its PDF stays on disk. A book with other files retains its book-level records.
+
 ## Build checks
 
 ```powershell

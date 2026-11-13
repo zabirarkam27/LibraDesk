@@ -1209,6 +1209,8 @@ OCR is excluded.
 
 ## Task 6.3 - Missing File Detection
 
+- [x] Completed on 2026-11-13. Added persisted background file verification, startup/hourly/manual passes, separate missing/inaccessible/invalid states, and a bounded File recovery listing. See the [development log](docs/development-log.md).
+
 Implement:
 
 - File existence checks.
@@ -1221,6 +1223,8 @@ Do not block application startup by scanning every HDD path.
 **Approval required before Task 6.4.**
 
 ## Task 6.4 - File Relinking
+
+- [x] Completed on 2026-11-13. Added native replacement selection, PDF/hash/metadata comparison, expiring previews, cancel/confirm, confirmation-time rehash, and identity-preserving relinks with notes, bookmarks and progress retained. See the [development log](docs/development-log.md).
 
 Implement:
 
@@ -1237,6 +1241,8 @@ Preserve notes, bookmarks and reading progress.
 
 ## Task 6.5 - Changed File Detection
 
+- [x] Completed on 2026-11-13. Background checks compare size and full-precision timestamps, hash changed sources, retain derivatives for identical bytes, and invalidate changed revisions while preserving manual metadata. See the [development log](docs/development-log.md).
+
 Detect:
 
 - Changed file size.
@@ -1248,6 +1254,8 @@ Do not overwrite user metadata.
 **Approval required before Task 6.6.**
 
 ## Task 6.6 - Duplicate Management UI
+
+- [x] Completed on 2026-11-13. Added bounded file comparisons, preferred copies, ignore/reopen, and acknowledged database-only removal protected by a freshly rehashed kept copy. See the [development log](docs/development-log.md).
 
 Implement:
 

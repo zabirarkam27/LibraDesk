@@ -1,12 +1,12 @@
 import { FileCheck2, Files } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router";
-import { toast } from "sonner";
 import { desktop } from "@/shared/lib/preferences-client";
 import { Button } from "@/shared/ui/button";
 import { PageHeading } from "@/shared/ui/page-heading";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { listDuplicates, metadataPage, setDuplicateReview, type DuplicateGroup, type MetadataRow } from "./client";
+import { listDuplicates, metadataPage, type MetadataRow } from "./client";
+import { DuplicateReview } from "@/features/recovery/duplicate-review";
 import { MetadataEditor } from "./metadata-editor";
 import { useMetadataQuery } from "./use-metadata-query";
 
@@ -71,46 +71,17 @@ function Queue() {
   );
 }
 
-function DuplicateCard({ group }: { group: DuplicateGroup }) {
-  const [busy, setBusy] = useState(false);
-  async function update() {
-    setBusy(true);
-    try {
-      await setDuplicateReview(group.hash, !group.reviewed);
-    } catch {
-      toast.error("LibraDesk could not update this duplicate group.");
-    } finally {
-      setBusy(false);
-    }
-  }
-  return (
-    <li className="space-y-3 px-5 py-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold">{group.count} identical files · {group.reviewed ? "Reviewed" : "Needs review"}</p>
-        <Button size="sm" variant="outline" disabled={busy} onClick={() => void update()}>
-          {group.reviewed ? "Reopen review" : "Keep all and mark reviewed"}
-        </Button>
-      </div>
-      <p className="break-all font-mono text-xs text-muted-foreground">{group.hash}</p>
-      <ul className="space-y-1 text-sm">
-        {group.members.map((member) => <li key={member.path} className="break-all">{member.title} <span className="text-xs text-muted-foreground">· {member.path}</span></li>)}
-      </ul>
-      {group.members.length < group.count && <p className="text-xs text-muted-foreground">Showing {group.members.length} of {group.count} paths.</p>}
-    </li>
-  );
-}
-
 function Duplicates() {
   const [after, setAfter] = useState<string | null>(null);
   const query = useCallback(() => listDuplicates(after), [after]);
   const { data, error, retry } = useMetadataQuery(query);
   return (
     <section aria-label="Exact duplicates" className="rounded-xl border bg-card">
-      <p className="border-b px-5 py-4 text-sm text-muted-foreground">These files match by SHA-256. Reviewing a group keeps every copy in the library.</p>
+      <p className="border-b px-5 py-4 text-sm text-muted-foreground">Compare SHA-256 duplicate groups, choose a preferred copy, or remove individual library records after confirmation. Original PDFs are never deleted.</p>
       {error && <div role="alert" className="p-5 text-sm">Could not load duplicate groups. <Button size="sm" variant="outline" onClick={retry}>Retry</Button></div>}
       {!data && !error && <Skeleton className="m-5 h-24" aria-label="Loading duplicate groups" role="status" />}
       {data?.length === 0 && <p className="p-5 text-sm text-muted-foreground">No exact duplicate groups on this page.</p>}
-      {data && data.length > 0 && <ul className="divide-y">{data.slice(0, 20).map((group) => <DuplicateCard key={group.hash} group={group} />)}</ul>}
+      {data && data.length > 0 && <ul className="divide-y">{data.slice(0, 20).map((group) => <DuplicateReview key={group.hash} group={group} />)}</ul>}
       {(after !== null || (data?.length ?? 0) > 20) && (
         <div className="flex gap-2 border-t px-5 py-3">
           {after !== null && <Button size="sm" variant="outline" onClick={() => setAfter(null)}>First page</Button>}

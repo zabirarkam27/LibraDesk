@@ -14,6 +14,7 @@ const navigation = [
   { to: "/", name: "Overview", icon: LayoutGrid },
   { to: "/library", name: "Library", icon: LibraryBig },
   { to: "/search", name: "PDF contents", icon: Search },
+  { to: "/recovery", name: "File recovery", icon: FolderInput },
   { to: "/organize", name: "Organize", icon: FolderTree },
   { to: "/import", name: "Import", icon: FolderInput },
   { to: "/metadata", name: "Metadata", icon: FileCheck2 },

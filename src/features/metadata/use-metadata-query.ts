@@ -2,7 +2,8 @@ import { listen } from "@tauri-apps/api/event";
 import { useEffect, useState } from "react";
 import { metadataEvent } from "./client";
 
-export function useMetadataQuery<T>(query: () => Promise<T>) {
+const defaultEvents = [metadataEvent, "scan-updated", "catalog-updated"];
+export function useMetadataQuery<T>(query: () => Promise<T>, events: readonly string[] = defaultEvents) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -32,14 +33,14 @@ export function useMetadataQuery<T>(query: () => Promise<T>) {
     }
 
     schedule();
-    const subscriptions = [metadataEvent, "scan-updated", "catalog-updated"].map((event) =>
+    const subscriptions = events.map((event) =>
       listen(event, schedule).catch(() => undefined));
     return () => {
       disposed = true;
       window.clearTimeout(timer);
       void Promise.all(subscriptions).then((remove) => remove.forEach((unlisten) => unlisten?.()));
     };
-  }, [query, attempt]);
+  }, [query, attempt, events]);
 
   return { data, error, retry: () => setAttempt((value) => value + 1) };
 }

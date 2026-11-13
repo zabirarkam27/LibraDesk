@@ -1,0 +1,14 @@
+import { invoke } from "@tauri-apps/api/core";
+export type RecoveryFile = { id:number; bookId:number; title:string; path:string; revision:number; availability:string; bytes:number; pages:number|null; checkedAt:number|null; result:string|null };
+export type Verification = { status:string; checked:number; total:number; missing:number; inaccessible:number; invalid:number; changed:number };
+export type RelinkPreview = { draft:number; fileId:number; title:string; originalPath:string; replacementPath:string; oldHash:string|null; newHash:string; identical:boolean; oldPages:number|null; newPages:number|null; oldTitle:string|null; newTitle:string|null; oldAuthor:string|null; newAuthor:string|null; bytes:number };
+export type DuplicateFile = { id:number; revision:number; bookId:number; title:string; author:string|null; path:string; bytes:number; pages:number|null; availability:string; checkedAt:number|null; preferred:boolean; notes:number; bookmarks:number };
+export const recoveryEvents = ["recovery-updated", "catalog-updated"] as const;
+export const snapshot = () => invoke<Verification>("recovery_snapshot");
+export const listFiles = (after:number, unavailableOnly:boolean) => invoke<RecoveryFile[]>("recovery_files",{after,unavailableOnly});
+export const verify = () => invoke<void>("start_file_verification");
+export const previewRelink = (file:number) => invoke<RelinkPreview|null>("preview_relink",{file});
+export const confirmRelink = (draft:number) => invoke<void>("confirm_relink",{draft});
+export const cancelRelink = (draft:number) => invoke<void>("cancel_relink",{draft});
+export const duplicateFiles = (hash:string,after:number) => invoke<DuplicateFile[]>("duplicate_files",{hash,after});
+export const duplicateAction = (hash:string,file:number,revision:number,keep:number,action:"prefer"|"remove") => invoke<void>("duplicate_action",{hash,file,revision,keep,action});

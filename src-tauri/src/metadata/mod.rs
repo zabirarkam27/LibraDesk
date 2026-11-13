@@ -8,6 +8,7 @@ mod tests;
 
 pub(crate) use pdf::filename_title;
 pub(crate) use pdf::Source;
+pub(crate) use pdf::{analyze, hash, Analysis};
 pub(crate) use repository::refresh_scanned_files;
 
 pub const EVENT: &str = "metadata-updated";

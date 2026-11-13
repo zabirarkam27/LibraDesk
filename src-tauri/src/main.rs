@@ -6,6 +6,7 @@ mod database;
 mod extraction;
 mod metadata;
 mod reader;
+mod recovery;
 mod scan;
 mod storage;
 
@@ -23,10 +24,19 @@ fn main() {
         .manage(commands::State::default())
         .setup(|app| {
             scan::start(app.handle().clone());
+            recovery::start(app.handle().clone());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_preferences,
+            recovery::commands::recovery_snapshot,
+            recovery::commands::recovery_files,
+            recovery::commands::start_file_verification,
+            recovery::commands::preview_relink,
+            recovery::commands::confirm_relink,
+            recovery::commands::cancel_relink,
+            recovery::commands::duplicate_files,
+            recovery::commands::duplicate_action,
             extraction::commands::claim_text_extraction,
             extraction::commands::read_extraction_range,
             extraction::commands::renew_text_extraction,

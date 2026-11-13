@@ -22,6 +22,10 @@ const MIGRATIONS: &[(&str, &str)] = &[
         "page_search",
         include_str!("../migrations/0008_page_search.sql"),
     ),
+    (
+        "file_recovery",
+        include_str!("../migrations/0009_file_recovery.sql"),
+    ),
 ];
 const UPSERT_THEME: &str = "
     INSERT INTO settings(scope, key, value_json, updated_at)
