@@ -37,6 +37,8 @@ In **Metadata → Exact duplicates**, compare copies, save a preferred record, o
 
 ## Build checks
 
+Overview includes reading analytics from saved sessions: completed/currently reading statuses, page views, active time, local-day activity and paginated history. Page views are unique within each session, with revisits counted again in later sessions. Completion is a manual status, never inferred from opening the last page.
+
 ```powershell
 npm run build
 cargo check --locked --manifest-path src-tauri/Cargo.toml

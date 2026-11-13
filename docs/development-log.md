@@ -189,3 +189,10 @@ Implemented staged verified inspection, version checks, schema migration, explic
 
 Validation: 42 Rust tests passed, including live idle connections, injected post-copy rollback, tampered/future/staged backups, annotations/progress/themes, cache isolation and protected cleanup. Clippy with warnings denied and frontend build passed. Isolated browser bridge checks passed picker cancellation, checksum error, preview/no-write, acknowledgement, cancellation, recovery error, successful reload-only modal and shortcut isolation. These browser checks mock IPC; native restore logic is exercised against real SQLite fixtures. No personal library was restored. Commit: see Git history for feat: restore validated backups with safety rollback.
 
+
+## 2026-11-14 · Task 7.5 — Reading analytics
+
+Added transactional SQLite aggregates and bounded 20-session history, manual completed/reading totals, session page views, active reader time and rolling 30-day activity attributed to local session-start dates. Overview retains category distribution and explains metric semantics. No migration or invented statistics.
+
+Validation: persisted fixture reconciled 23 sessions, 69 views and 23 active minutes, pagination boundaries, old activity exclusion, reopen and deletion cascade. Browser checks passed bilingual history, totals, bars, pagination, empty states and error/retry. Frontend build and Clippy passed. Commit: see feat: add persisted reading analytics and history.
+

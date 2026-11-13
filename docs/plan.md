@@ -95,7 +95,7 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 | [x] 7.2 Storage management | 1.6, 3.5, 7.1 | Reconcile storage totals and clear only validated cache entries. Verify records remain intact. |
 | [x] 7.3 Backup creation | 1.7, 7.1 | Validate a live database snapshot and versioned manifest, with and without thumbnails. Verify PDFs stay outside the default backup. |
 | [x] 7.4 Backup restore | 6.2, 7.3 | Verified 2026-11-14: corrupt/newer backups, cancellation, injected rollback, idle connections, covers, rebuilt indexes and confirmation UI. |
-| [ ] 7.5 Reading analytics | 4.6, 5.6, 7.1 | Compare completion, reading activity, page counts, category totals, and history with persisted fixtures. |
+| [x] 7.5 Reading analytics | 4.6, 5.6, 7.1 | Verified 2026-11-14: persisted totals, dates, bounded history, restart, cascade, empty and retry states. |
 
 ## Phase 8 · Quality assurance and release
 

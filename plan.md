@@ -1346,6 +1346,8 @@ Never silently overwrite a newer database.
 
 ## Task 7.5 - Reading Analytics
 
+- [x] Completed on 2026-11-14. Overview now shows persisted completion/status totals, session page views, active time, 30-day activity and paginated reading history alongside category distribution. SQLite reconciliation/reopen/deletion and browser totals/pagination/empty/error checks passed; frontend build and Clippy passed. See development log.
+
 Implement:
 
 - Books completed.

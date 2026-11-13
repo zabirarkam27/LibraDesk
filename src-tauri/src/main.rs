@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod analytics;
 mod backup;
 mod catalog;
 mod commands;
@@ -34,6 +35,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_preferences,
+            analytics::reading_analytics,
             backup::commands::create_backup,
             backup::commands::inspect_backup,
             backup::commands::cancel_restore,

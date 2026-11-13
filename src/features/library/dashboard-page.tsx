@@ -8,6 +8,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import type { BookSummary } from "./catalog-client";
 import { getDashboard } from "./library-client";
 import { DesktopNotice, QueryError } from "./query-feedback";
+import { ReadingAnalytics } from "./reading-analytics";
 
 function BookList({ title, books }: { title: string; books: BookSummary[] }) {
   return <section className="rounded-xl border bg-card p-5">
@@ -60,6 +61,6 @@ export function OverviewPage() {
       <Button asChild variant="outline"><Link to="/library">Open library</Link></Button>
       <Button asChild variant="outline"><Link to="/organize">Organize</Link></Button>
     </div>
-    {desktop ? <Dashboard /> : <DesktopNotice />}
+    {desktop ? <><Dashboard /><ReadingAnalytics /></> : <DesktopNotice />}
   </>;
 }
