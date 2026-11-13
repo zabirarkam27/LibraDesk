@@ -16,11 +16,11 @@ import { ReaderAnnotations } from "./reader-annotations";
 import { useReader } from "./use-reader";
 import { flushReaderBeforeClose } from "./reader-client";
 
-function ReaderWorkspace({ book, file }: { book: number; file: number | null }) {
+function ReaderWorkspace({ book, file, targetPage, revision }: { book: number; file: number | null; targetPage: number | null; revision: number | null }) {
   const navigate = useNavigate();
   const root = useRef<HTMLElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
-  const reader = useReader(book, file);
+  const reader = useReader(book, file, targetPage, revision);
   const themePreference = usePreferences((state) => state.preferences.reader);
   const changeTheme = usePreferences((state) => state.changeTheme);
   const theme = useResolvedTheme(themePreference);
@@ -211,7 +211,11 @@ export function ReaderPage() {
   const [params] = useSearchParams();
   const book = Number(params.get("book"));
   const file = params.has("file") ? Number(params.get("file")) : null;
-  if (!desktop || !Number.isSafeInteger(book) || book <= 0 || file !== null && (!Number.isSafeInteger(file) || file <= 0)) {
+  const targetPage = params.has("page") ? Number(params.get("page")) : null;
+  const revision = params.has("revision") ? Number(params.get("revision")) : null;
+  const invalidTarget = targetPage !== null && (!Number.isSafeInteger(targetPage) || targetPage < 1 || targetPage > 1_000_000)
+    || revision !== null && (!Number.isSafeInteger(revision) || revision < 1 || file === null);
+  if (!desktop || invalidTarget || !Number.isSafeInteger(book) || book <= 0 || file !== null && (!Number.isSafeInteger(file) || file <= 0)) {
     return <section className="grid min-h-80 place-items-center rounded-xl border bg-card p-6 text-center">
       <div><BookOpen className="mx-auto mb-4 size-7 text-muted-foreground" />
         <h1 className="font-display text-3xl">Open a book to read</h1>
@@ -220,5 +224,5 @@ export function ReaderPage() {
       </div>
     </section>;
   }
-  return <ReaderWorkspace key={`${book}-${file}`} book={book} file={file} />;
+  return <ReaderWorkspace key={`${book}-${file}-${targetPage}-${revision}`} book={book} file={file} targetPage={targetPage} revision={revision} />;
 }

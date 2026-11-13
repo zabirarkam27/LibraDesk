@@ -6,7 +6,7 @@ use crate::{
 };
 use std::fs;
 
-fn setup() -> (tempfile::TempDir, Database, i64, i64) {
+pub(super) fn setup() -> (tempfile::TempDir, Database, i64, i64) {
     let fixture = tempfile::tempdir().unwrap();
     let path = fixture.path().join("source.pdf");
     fs::write(&path, b"%PDF-1.7\ntext fixture").unwrap();
@@ -19,14 +19,14 @@ fn setup() -> (tempfile::TempDir, Database, i64, i64) {
     tx.commit().unwrap();
     (fixture, db, book, file)
 }
-fn key(task: &TextTask) -> JobKey {
+pub(super) fn key(task: &TextTask) -> JobKey {
     JobKey {
         file_id: task.file_id,
         revision: task.revision,
         lease: task.lease,
     }
 }
-fn page(number: i64, text: &str) -> PageText {
+pub(super) fn page(number: i64, text: &str) -> PageText {
     PageText {
         number,
         text: text.into(),

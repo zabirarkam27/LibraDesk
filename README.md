@@ -21,6 +21,10 @@ Open a book in **Library** and select **Read**. The reader supports page navigat
 
 Use the arrow keys or Page Up/Down to change pages, Home/End for the first/last page, +/− to zoom, Ctrl+F to find text, and F11 for fullscreen. Escape exits fullscreen. Reading status can be changed in the book editor.
 
+Open **PDF contents** to search extracted pages across your library in Bengali or English. Ctrl+K also offers **PDF contents** in the search scope. Each result shows the book, source file, page, and a short excerpt; select its title to open that page. Search matches word prefixes, and all entered words must match on the same page.
+
+Background extraction runs while the window is visible and the reader is closed. **Book details → Files** shows progress and manual retry for failed files. Search includes pages saved so far; select **Refresh results** as extraction progresses. Excerpts use normalized text, while original extracted text is retained separately. Image-only PDFs have no embedded text; OCR is excluded. Background extraction cannot unlock encrypted PDFs.
+
 ## Build checks
 
 ```powershell

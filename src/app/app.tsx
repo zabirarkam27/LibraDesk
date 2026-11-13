@@ -13,6 +13,7 @@ const BookDetailsPage = lazy(() => import("@/features/library/book-details-page"
 const OrganizationPage = lazy(() => import("@/features/library/organization-page").then((module) => ({ default: module.OrganizationPage })));
 const CollectionPage = lazy(() => import("@/features/library/collection-page").then((module) => ({ default: module.CollectionPage })));
 const ReaderPage = lazy(() => import("@/features/reader/reader-page").then((module) => ({ default: module.ReaderPage })));
+const ContentSearchPage = lazy(() => import("@/features/content-search/content-search-page").then((module) => ({ default: module.ContentSearchPage })));
 
 function NotFound() {
   return (
@@ -30,6 +31,7 @@ export function App() {
         <Route index element={<OverviewPage />} />
         <Route path="library" element={<LibraryPage />} />
         <Route path="library/:id" element={<BookDetailsPage />} />
+        <Route path="search" element={<ContentSearchPage />} />
         <Route path="organize" element={<OrganizationPage />} />
         <Route path="collections/:id" element={<CollectionPage />} />
         <Route path="import" element={<ImportPage />} />

@@ -1,6 +1,15 @@
 use super::repository::{ExtractionStatus, Failure, JobKey, PageText, TextTask};
+use super::search::{PageQuery, PageResults};
 use crate::commands::{unavailable, with_database, CommandError};
 use tauri::{ipc::Response, AppHandle, Emitter};
+
+#[tauri::command]
+pub async fn search_page_text(
+    app: AppHandle,
+    query: PageQuery,
+) -> Result<PageResults, CommandError> {
+    with_database(app, move |db| db.search_page_text(&query)).await
+}
 
 fn changed(app: &AppHandle, file: i64) {
     let _ = app.emit("extraction-updated", file);

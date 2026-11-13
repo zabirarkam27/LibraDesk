@@ -81,7 +81,7 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 | Task | Depends on | Exit check |
 | --- | --- | --- |
 | [x] 6.1 PDF text extraction | 2.4, 5.1 | Index bounded page batches, simulate interruption, and resume without duplicate text or blocking the UI. |
-| [ ] 6.2 Full-text search index | 4.9, 6.1 | Verify page-aware hits, snippets, navigation, index maintenance, and stale revision exclusion. |
+| [x] 6.2 Full-text search index | 4.9, 6.1 | Verify page-aware hits, snippets, navigation, index maintenance, and stale revision exclusion. |
 | [ ] 6.3 Missing file detection | 4.1, 2.3 | Disconnect a source drive and verify responsive startup, background detection, and distinction from denied access. |
 | [ ] 6.4 File relinking | 3.3, 5.7, 6.3 | Validate and compare replacements, test cancel and confirm, and retain notes, bookmarks, and progress. |
 | [ ] 6.5 Changed file detection | 3.3, 3.6, 6.3 | Simulate size and timestamp changes, rehash when needed, and preserve manual metadata. |

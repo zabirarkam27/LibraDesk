@@ -1,4 +1,4 @@
-import { BookOpen, Ellipsis, FileCheck2, FolderInput, FolderTree, LayoutGrid, LibraryBig, Settings2 } from "lucide-react";
+import { BookOpen, Ellipsis, FileCheck2, FolderInput, FolderTree, LayoutGrid, LibraryBig, Search, Settings2 } from "lucide-react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { usePreferences } from "@/features/settings/preferences-store";
 import { desktop } from "@/shared/lib/preferences-client";
@@ -13,6 +13,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 const navigation = [
   { to: "/", name: "Overview", icon: LayoutGrid },
   { to: "/library", name: "Library", icon: LibraryBig },
+  { to: "/search", name: "PDF contents", icon: Search },
   { to: "/organize", name: "Organize", icon: FolderTree },
   { to: "/import", name: "Import", icon: FolderInput },
   { to: "/metadata", name: "Metadata", icon: FileCheck2 },

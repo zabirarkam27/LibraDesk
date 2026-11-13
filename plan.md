@@ -1192,6 +1192,8 @@ Implement:
 
 ## Task 6.2 - Full-text Search Index
 
+- [x] Completed on 2026-11-13. Added migration 0008 with the page FTS5 index, transactional synchronization and backfill, bilingual ranked page search with bounded snippets, and revision-aware navigation from results into the reader. See the [development log](docs/development-log.md).
+
 Implement:
 
 - Dedicated FTS5 content index.

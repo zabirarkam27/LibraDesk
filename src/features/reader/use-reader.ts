@@ -11,7 +11,7 @@ import {
 
 export type Outline = NonNullable<Awaited<ReturnType<PDFDocumentProxy["getOutline"]>>>;
 export type ReaderEngine = { pdf: PDFDocumentProxy; viewer: PDFViewer; bus: EventBus; link: PDFLinkService };
-export function useReader(book: number, file: number | null) {
+export function useReader(book: number, file: number | null, targetPage: number | null = null, expectedRevision: number | null = null) {
   const container = useRef<HTMLDivElement>(null);
   const viewerElement = useRef<HTMLDivElement>(null);
   const engineRef = useRef<ReaderEngine | null>(null);
@@ -60,6 +60,9 @@ export function useReader(book: number, file: number | null) {
         descriptor = await readerLifecycle(async () => disposed ? null : openReader(book, file));
         if (disposed || !descriptor || !container.current || !viewerElement.current) return;
         setSource(descriptor);
+        if (expectedRevision !== null && descriptor.revision !== expectedRevision) {
+          throw new Error("This search result refers to an older PDF revision. Refresh PDF contents search before opening it.");
+        }
         preferenceRef.current = descriptor.preferences;
         setPreferences(descriptor.preferences);
         writer = createProgressWriter(descriptor, report);
@@ -85,6 +88,7 @@ export function useReader(book: number, file: number | null) {
         clearTimeout(timeout);
         if (disposed) return;
         if (pdf.numPages > 1_000_000) throw new Error("This PDF has too many pages to open.");
+        if (targetPage !== null && targetPage > pdf.numPages) throw new Error("This search result's page is unavailable. Refresh PDF contents search.");
         const component = await import("pdfjs-dist/web/pdf_viewer.mjs");
         if (disposed || !container.current || !viewerElement.current) return;
         const bus = new component.EventBus();
@@ -101,7 +105,7 @@ export function useReader(book: number, file: number | null) {
         viewer = new component.PDFViewer(options);
         link.setViewer(viewer);
         link.setDocument(pdf);
-        const initial = Math.min(pdf.numPages, Math.max(1, descriptor.resumePage));
+        const initial = targetPage ?? Math.min(pdf.numPages, Math.max(1, descriptor.resumePage));
         let initialized = false;
         bus.on("pagesinit", () => {
           if (disposed || !viewer || !descriptor) return;
@@ -155,7 +159,7 @@ export function useReader(book: number, file: number | null) {
       void l10n?.destroy().catch(() => undefined);
       void readerLifecycle(finish).catch(() => { if (descriptor) void closeReader(descriptor.sessionId).catch(() => undefined); });
     };
-  }, [book, file, attempt]);
+  }, [book, file, targetPage, expectedRevision, attempt]);
 
   function goTo(value: number) {
     navigationEpoch.current++;

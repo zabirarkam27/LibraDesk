@@ -18,6 +18,10 @@ const MIGRATIONS: &[(&str, &str)] = &[
         "text_extraction",
         include_str!("../migrations/0007_text_extraction.sql"),
     ),
+    (
+        "page_search",
+        include_str!("../migrations/0008_page_search.sql"),
+    ),
 ];
 const UPSERT_THEME: &str = "
     INSERT INTO settings(scope, key, value_json, updated_at)
@@ -380,6 +384,43 @@ mod tests {
         assert_eq!(db.get_book(book).unwrap().files.len(), 1);
         assert_eq!(db.get_book(other_book).unwrap().files.len(), 1);
         migrate(&mut db.0, MIGRATIONS).unwrap();
+    }
+
+    #[test]
+    fn page_search_migration_indexes_existing_extraction_and_replays_safely() {
+        use crate::{
+            catalog::repository::{insert_book, insert_file},
+            extraction::search::PageQuery,
+        };
+        let fixture = tempfile::tempdir().unwrap();
+        let path = fixture.path().join("source.pdf");
+        std::fs::write(&path, b"%PDF-1.7\nfixture").unwrap();
+        let stamp = crate::scan::files::stamp(&std::fs::File::open(&path).unwrap()).unwrap();
+        let mut connection = Connection::open_in_memory().unwrap();
+        connection
+            .pragma_update(None, "foreign_keys", true)
+            .unwrap();
+        migrate(&mut connection, &MIGRATIONS[..7]).unwrap();
+        let tx = connection.unchecked_transaction().unwrap();
+        let book = insert_book(&tx, "Backfill").unwrap();
+        let file = insert_file(&tx, book, path.to_str().unwrap(), &stamp).unwrap();
+        tx.execute("INSERT INTO page_text(file_id,file_revision,page_number,text,normalized_text,extracted_at)
+         VALUES(?1,1,7,'বাংলা Reader','বাংলা reader',0)",[file]).unwrap();
+        tx.commit().unwrap();
+        migrate(&mut connection, MIGRATIONS).unwrap();
+        let mut db = Database(connection);
+        let query = PageQuery {
+            text: "বাংলা rea".into(),
+            page: 0,
+        };
+        assert_eq!(db.search_page_text(&query).unwrap().hits[0].page_number, 7);
+        migrate(&mut db.0, MIGRATIONS).unwrap();
+        assert_eq!(db.search_page_text(&query).unwrap().total, 1);
+        db.0.execute(
+            "INSERT INTO page_text_fts(page_text_fts,rank) VALUES('integrity-check',1)",
+            [],
+        )
+        .unwrap();
     }
 
     #[test]

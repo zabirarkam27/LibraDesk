@@ -35,6 +35,7 @@ fn main() {
             extraction::commands::fail_text_extraction,
             extraction::commands::retry_text_extraction,
             extraction::commands::text_extraction_status,
+            extraction::commands::search_page_text,
             reader::commands::open_reader,
             reader::commands::read_reader_range,
             reader::commands::save_reader_progress,

@@ -4,6 +4,7 @@ import { Button } from "@/shared/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
 import { useNavigate } from "react-router";
+import { fieldClass } from "@/features/library/query-feedback";
 
 export function SearchEntry() {
   const [open, setOpen] = useState(false);
@@ -32,15 +33,20 @@ export function SearchEntry() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Search library</DialogTitle>
-          <DialogDescription>Find a title, author, or tag in বাংলা or English.</DialogDescription>
+          <DialogDescription>Search metadata or extracted PDF contents in বাংলা or English.</DialogDescription>
         </DialogHeader>
-        <form className="flex gap-2" onSubmit={(event) => {
+        <form className="grid gap-3" onSubmit={(event) => {
           event.preventDefault();
           const query = String(new FormData(event.currentTarget).get("search") ?? "").trim();
-          navigate("/library?" + new URLSearchParams({ q: query }));
+          const scope = new FormData(event.currentTarget).get("scope");
+          navigate((scope === "contents" ? "/search?" : "/library?") + new URLSearchParams({ q: query }));
           setOpen(false);
         }}>
-          <Input name="search" aria-label="Title, author, or tag" placeholder="Title, author, or tag" maxLength={256} />
+          <select name="scope" aria-label="Search in" className={fieldClass}>
+            <option value="metadata">Titles, authors, and tags</option>
+            <option value="contents">PDF contents</option>
+          </select>
+          <Input name="search" aria-label="Search terms" placeholder="বাংলা or English words" maxLength={256} />
           <Button>Search</Button>
         </form>
       </DialogContent>
