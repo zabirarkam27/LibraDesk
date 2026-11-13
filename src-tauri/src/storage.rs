@@ -18,7 +18,7 @@ fn is_link(metadata: &fs::Metadata) -> bool {
     }
 }
 
-fn prepare_directory(path: &Path) -> io::Result<()> {
+pub(crate) fn prepare_directory(path: &Path) -> io::Result<()> {
     match fs::create_dir(path) {
         Ok(()) => {}
         Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {}

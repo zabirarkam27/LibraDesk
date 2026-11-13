@@ -1,12 +1,13 @@
 import type { PDFPageProxy } from "pdfjs-dist";
 import { desktop } from "@/shared/lib/preferences-client";
+import { beginBackgroundWork,backgroundPaused } from "@/shared/lib/background-work";
 import { isReaderActive } from "@/features/reader/reader-client";
 import { claim, commit, fail, read, release, renew, type Failure, type PageText, type TextTask } from "./client";
 
 const PAGE_BYTES = 256 * 1024;
 const encoder = new TextEncoder();
 const yieldToUi = () => new Promise<void>((resolve) => window.setTimeout(resolve, 0));
-const paused = () => document.hidden || isReaderActive();
+const paused = () => document.hidden || isReaderActive() || backgroundPaused();
 class Stop extends Error {}
 class Failed extends Error { constructor(public reason: Failure) { super(reason); } }
 
@@ -103,13 +104,15 @@ export function startTextExtractionWorker() {
   started = true;
   async function run() {
     let delay = 1500;
+    const finish=beginBackgroundWork();
     try {
+      if(!finish)return;
       if (!paused()) {
         const task = await claim();
         if (task) { await processTextTask(task); delay = 100; }
       }
     } catch { delay = 5000; }
-    finally { window.setTimeout(() => void run(), delay); }
+    finally { finish?.();window.setTimeout(() => void run(), delay); }
   }
   void run();
 }

@@ -67,6 +67,7 @@ pub async fn preview_relink(
 }
 #[tauri::command]
 pub async fn confirm_relink(app: AppHandle, draft: i64) -> Result<(), CommandError> {
+    let generation = crate::maintenance::generation();
     let saved = with_database(app.clone(), move |db| db.relink_draft(draft)).await?;
     let (saved, handle) = tauri::async_runtime::spawn_blocking(move || {
         let file = super::probe::verified_handle(&saved.candidate, &saved.digest)
@@ -77,6 +78,9 @@ pub async fn confirm_relink(app: AppHandle, draft: i64) -> Result<(), CommandErr
     .map_err(|_| unavailable())??;
     with_database(app.clone(), move |db| {
         let _read_guard = handle;
+        if generation != crate::maintenance::generation() {
+            return Err(crate::database::Error::CatalogConflict);
+        }
         db.confirm_relink(&saved)
     })
     .await?;
@@ -104,6 +108,7 @@ pub async fn duplicate_action(
     keep: i64,
     action: DuplicateAction,
 ) -> Result<(), CommandError> {
+    let generation = crate::maintenance::generation();
     if matches!(action, DuplicateAction::Remove) {
         let source =
             with_database(app.clone(), move |db| db.duplicate_keep_source(&hash, keep)).await?;
@@ -119,6 +124,9 @@ pub async fn duplicate_action(
         .map_err(|_| unavailable())??;
         with_database(app.clone(), move |db| {
             let _read_guard = handle;
+            if generation != crate::maintenance::generation() {
+                return Err(crate::database::Error::CatalogConflict);
+            }
             db.remove_duplicate(file, revision, &source)
         })
         .await?;

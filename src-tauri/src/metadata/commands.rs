@@ -19,11 +19,14 @@ fn rejected(code: &'static str, message: &'static str) -> CommandError {
     }
 }
 
-fn cache_root(app: &AppHandle) -> Result<PathBuf, CommandError> {
-    app.path()
+async fn cache_root(app: &AppHandle) -> Result<PathBuf, CommandError> {
+    let root = app
+        .path()
         .local_data_dir()
         .map(|path| path.join("LibraDesk"))
-        .map_err(|_| unavailable())
+        .map_err(|_| unavailable())?;
+    let generation = with_database(app.clone(), |db| db.cover_cache_generation()).await?;
+    super::resolve_cache_root(&root, generation.as_deref()).map_err(|_| unavailable())
 }
 
 fn stale_cover() -> CommandError {
@@ -43,9 +46,13 @@ pub async fn read_cover_range(
     app: AppHandle,
     file_id: i64,
     revision: i64,
+    generation: u64,
     offset: i64,
     length: i64,
 ) -> Result<Response, CommandError> {
+    if generation != crate::maintenance::generation() {
+        return Err(stale_cover());
+    }
     let source = with_database(app, move |db| Ok(db.cover_source(file_id, revision)?))
         .await?
         .ok_or_else(stale_cover)?;
@@ -62,9 +69,13 @@ pub async fn finish_cover(
     app: AppHandle,
     file_id: i64,
     revision: i64,
+    generation: u64,
     png: Option<Vec<u8>>,
     raw: Option<RawMetadata>,
 ) -> Result<(), CommandError> {
+    if generation != crate::maintenance::generation() {
+        return Err(stale_cover());
+    }
     let Some(source) = with_database(app.clone(), move |db| {
         Ok(db.cover_source(file_id, revision)?)
     })
@@ -72,9 +83,15 @@ pub async fn finish_cover(
     else {
         return Ok(());
     };
-    let root = cache_root(&app)?;
+    let root = cache_root(&app).await?;
     let checked_source = source.clone();
     let prepared = tauri::async_runtime::spawn_blocking(move || {
+        let _access = crate::maintenance::ACCESS
+            .read()
+            .unwrap_or_else(|error| error.into_inner());
+        if generation != crate::maintenance::generation() {
+            return (None, false, "cover_stale");
+        }
         if checked_source.bytes > MAX_COVER_SOURCE {
             return (None, false, "cover_size_limit");
         }
@@ -91,6 +108,9 @@ pub async fn finish_cover(
     let (image, current, error) = prepared;
     let raw = raw.filter(RawMetadata::is_bounded);
     with_database(app.clone(), move |db| {
+        if generation != crate::maintenance::generation() {
+            return Ok(());
+        }
         if current {
             db.complete_cover(&source, image, raw)?;
         } else {
@@ -113,7 +133,7 @@ pub async fn get_book_cover(
     if version != Some(revision) {
         return Err(stale_cover());
     }
-    let root = cache_root(&app)?;
+    let root = cache_root(&app).await?;
     let result =
         tauri::async_runtime::spawn_blocking(move || cover::load_png(&root, file_id, revision))
             .await

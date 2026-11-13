@@ -95,6 +95,12 @@ pub fn usage(root: &Path) -> io::Result<Usage> {
     out.database = measure(&root.join("database"), 0, &mut out)?;
     out.thumbnails = measure(&root.join("thumbnails"), 0, &mut out)?;
     out.cache = measure(&root.join("cache"), 0, &mut out)?;
+    for folder in cover_folders(root)? {
+        let _generation_guard = directory(folder.parent().ok_or(io::ErrorKind::InvalidInput)?)?;
+        let bytes = measure(&folder, 0, &mut Usage::default())?;
+        out.cache = out.cache.saturating_sub(bytes);
+        out.thumbnails = out.thumbnails.saturating_add(bytes);
+    }
     out.temporary = measure(&root.join("temp"), 0, &mut out)?;
     out.backups = measure(&root.join("backups"), 0, &mut out)?;
     out.logs = measure(&root.join("logs"), 0, &mut out)?;
@@ -121,6 +127,25 @@ fn protected_source(path: &Path) -> bool {
     let mut header = [0; 5];
     file.read_exact(&mut header).is_ok() && &header == b"%PDF-"
 }
+fn cover_folders(root: &Path) -> io::Result<Vec<PathBuf>> {
+    let cache = root.join("cache");
+    let _guard = directory(&cache)?;
+    let mut folders = Vec::new();
+    for entry in fs::read_dir(cache)?.take(LIMIT + 1) {
+        let entry = entry?;
+        if !crate::metadata::valid_cache_generation(&entry.file_name().to_string_lossy()) {
+            continue;
+        }
+        let Ok(_generation_guard) = directory(&entry.path()) else {
+            continue;
+        };
+        let folder = entry.path().join("thumbnails");
+        if directory(&folder).is_ok() {
+            folders.push(folder);
+        }
+    }
+    Ok(folders)
+}
 pub fn clean(root: &Path, kind: CacheKind) -> io::Result<Cleanup> {
     let _root_guard = directory(root)?;
     let root = fs::canonicalize(root)?;
@@ -129,17 +154,29 @@ pub fn clean(root: &Path, kind: CacheKind) -> io::Result<Cleanup> {
         CacheKind::Thumbnails => "thumbnails",
         CacheKind::Temporary => "temp",
     });
-    let _guard = directory(&folder)?;
-    if fs::canonicalize(&folder)? != folder {
-        return Err(io::ErrorKind::InvalidInput.into());
-    }
     let mut result = Cleanup {
         removed: 0,
         bytes: 0,
         retained: 0,
         usage: Usage::default(),
     };
-    for entry in fs::read_dir(&folder)?.take(LIMIT + 1) {
+    clean_folder(&folder, kind, &mut result)?;
+    if matches!(kind, CacheKind::Thumbnails) {
+        for folder in cover_folders(&root)? {
+            let parent = folder.parent().ok_or(io::ErrorKind::InvalidInput)?;
+            let _generation_guard = directory(parent)?;
+            clean_folder(&folder, kind, &mut result)?;
+        }
+    }
+    result.usage = usage(&root)?;
+    Ok(result)
+}
+fn clean_folder(folder: &Path, kind: CacheKind, result: &mut Cleanup) -> io::Result<()> {
+    let _guard = directory(folder)?;
+    if fs::canonicalize(folder)? != folder {
+        return Err(io::ErrorKind::InvalidInput.into());
+    }
+    for entry in fs::read_dir(folder)?.take(LIMIT + 1) {
         if result.removed + result.retained >= LIMIT as u64 {
             return Err(io::ErrorKind::InvalidData.into());
         }
@@ -186,8 +223,7 @@ pub fn clean(root: &Path, kind: CacheKind) -> io::Result<Cleanup> {
             Err(error) => return Err(error),
         }
     }
-    result.usage = usage(&root)?;
-    Ok(result)
+    Ok(())
 }
 fn failure() -> CommandError {
     CommandError{code:"storage_operation_failed",message:"Storage could not be inspected or cleaned. Close active work and retry. Protected or linked entries are retained.",retryable:true}
@@ -221,6 +257,24 @@ pub async fn clear_cache(app: AppHandle, kind: CacheKind) -> Result<Cleanup, Com
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn restored_cover_generations_are_accounted_and_cleaned_without_touching_sources() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path().join("LibraDesk");
+        crate::storage::initialize(&root).unwrap();
+        let covers = crate::metadata::resolve_cache_root(&root, Some("covers-test")).unwrap();
+        fs::write(covers.join("thumbnails/1-1.png"), b"png").unwrap();
+        fs::write(covers.join("thumbnails/2-1.png"), b"%PDF-protected").unwrap();
+        fs::write(root.join("cache/other"), b"cache").unwrap();
+        let before = usage(&root).unwrap();
+        assert_eq!(before.thumbnails, 17);
+        assert_eq!(before.cache, 5);
+        let cleaned = clean(&root, CacheKind::Thumbnails).unwrap();
+        assert_eq!(cleaned.removed, 1);
+        assert_eq!(cleaned.usage.thumbnails, 14);
+        assert!(covers.join("thumbnails/2-1.png").exists());
+        assert!(root.join("cache/other").exists());
+    }
     #[test]
     fn storage_totals_and_cleanup_preserve_database_backups_pdfs_and_nested_files() {
         let dir = tempfile::tempdir().unwrap();

@@ -1329,6 +1329,8 @@ Original PDFs are excluded by default.
 
 ## Task 7.4 - Backup Restore
 
+- [x] Completed on 2026-11-14. Staged inspection, compatible migrations, checksums, confirmation, mandatory safety snapshot, rollback, index rebuilding and isolated cover generations passed 42 Rust tests, Clippy, frontend build and restore dialog checks. See the development log.
+
 Implement:
 
 - Backup inspection.

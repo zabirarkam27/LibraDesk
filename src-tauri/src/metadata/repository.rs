@@ -100,6 +100,7 @@ fn store_raw(tx: &Transaction<'_>, source: &Source, raw: &RawMetadata) -> Result
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CoverTask {
+    pub generation: u64,
     pub file_id: i64,
     pub revision: i64,
     pub length: i64,
@@ -167,6 +168,15 @@ pub struct DuplicateGroup {
 }
 
 impl Database {
+    pub fn cover_cache_generation(
+        &self,
+    ) -> std::result::Result<Option<String>, crate::database::Error> {
+        let value:Option<String>=self.0.query_row("SELECT value_json FROM settings WHERE scope='app' AND key='cover_cache_generation'",
+          [],|row|row.get(0)).optional()?;
+        value
+            .map(|value| serde_json::from_str(&value).map_err(crate::database::Error::from))
+            .transpose()
+    }
     fn metadata_transaction(&self) -> Result<Transaction<'_>> {
         Transaction::new_unchecked(&self.0, TransactionBehavior::Immediate)
     }
@@ -234,6 +244,7 @@ impl Database {
                 [],
                 |row| {
                     Ok(CoverTask {
+                        generation: crate::maintenance::generation(),
                         file_id: row.get(0)?,
                         revision: row.get(1)?,
                         length: row.get(2)?,

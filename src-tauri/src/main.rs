@@ -26,6 +26,7 @@ fn main() {
         }))
         .plugin(tauri_plugin_dialog::init())
         .manage(commands::State::default())
+        .manage(backup::RestoreState::default())
         .setup(|app| {
             scan::start(app.handle().clone());
             recovery::start(app.handle().clone());
@@ -34,6 +35,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::get_preferences,
             backup::commands::create_backup,
+            backup::commands::inspect_backup,
+            backup::commands::cancel_restore,
+            backup::commands::restore_backup,
             storage_management::storage_usage,
             storage_management::clear_cache,
             settings::get_settings_snapshot,

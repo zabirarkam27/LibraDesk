@@ -13,6 +13,7 @@ export function SearchEntry() {
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        if(document.querySelector('[role="dialog"]'))return;
         event.preventDefault();
         setOpen(true);
       }

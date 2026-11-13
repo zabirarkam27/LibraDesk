@@ -7,3 +7,6 @@ static GENERATION: AtomicU64 = AtomicU64::new(0);
 pub fn generation() -> u64 {
     GENERATION.load(Ordering::SeqCst)
 }
+pub fn advance() {
+    GENERATION.fetch_add(1, Ordering::SeqCst);
+}

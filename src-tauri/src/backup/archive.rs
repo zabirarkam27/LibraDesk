@@ -279,6 +279,8 @@ pub fn create(
     let mut entries = Vec::new();
     add_entry(stage, "library.sqlite3".into(), &mut entries)?;
     if include_thumbnails {
+        let active_root =
+            crate::metadata::resolve_cache_root(root, db.cover_cache_generation()?.as_deref())?;
         fs::create_dir(stage.join("thumbnails"))?;
         let snapshot = Connection::open_with_flags(
             stage.join("library.sqlite3"),
@@ -294,7 +296,7 @@ pub fn create(
             }
             let (id, revision) = row?;
             // Missing/invalid disposable covers are omitted and regenerate after restore.
-            if let Ok(bytes) = crate::metadata::backup_thumbnail(root, id, revision) {
+            if let Ok(bytes) = crate::metadata::backup_thumbnail(&active_root, id, revision) {
                 let name = format!("thumbnails/{id}-{revision}.png");
                 let mut output = fs::OpenOptions::new()
                     .write(true)
@@ -339,7 +341,6 @@ pub fn create(
     Ok(summarize(&final_path, &checked))
 }
 // Copy only whitelisted manifest payloads into an isolated folder. Adjacent WAL/SHM files are never trusted.
-#[cfg(test)]
 pub fn copy_verified(folder: &Path, destination: &Path, value: &Manifest) -> Result<()> {
     let _guard = directory(folder)?;
     let _thumbs = if value

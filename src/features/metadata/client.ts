@@ -31,7 +31,7 @@ export type DuplicateGroup = {
   members: { title: string; path: string }[];
 };
 
-export type CoverTask = { fileId: number; revision: number; length: number; needsMetadata: boolean };
+export type CoverTask = { fileId: number; revision: number; generation:number; length: number; needsMetadata: boolean };
 export type CoverResult = { png: number[] | null; raw: RawMetadata | null };
 
 export const metadataEvent = "metadata-updated";
@@ -42,7 +42,7 @@ export const listDuplicates = (after: string | null) => invoke<DuplicateGroup[]>
 export const setDuplicateReview = (hash: string, reviewed: boolean) => invoke("set_duplicate_review", { hash, reviewed });
 export const nextCoverTask = () => invoke<CoverTask | null>("next_cover_task");
 export const finishCover = (task: CoverTask, result: CoverResult) =>
-  invoke("finish_cover", { fileId: task.fileId, revision: task.revision, ...result });
+  invoke("finish_cover", { fileId: task.fileId, revision: task.revision, generation:task.generation, ...result });
 export const getCover = (fileId: number, revision: number) => invoke<ArrayBuffer>("get_book_cover", { fileId, revision });
 export const coverRange = (task: CoverTask, offset: number, length: number) =>
-  invoke<ArrayBuffer>("read_cover_range", { fileId: task.fileId, revision: task.revision, offset, length });
+  invoke<ArrayBuffer>("read_cover_range", { fileId: task.fileId, revision: task.revision, generation:task.generation, offset, length });

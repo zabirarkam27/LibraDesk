@@ -54,3 +54,5 @@ The last command builds a debug desktop executable. Installer packaging is track
 - [Development log](docs/development-log.md)
 
 Manual backup: in **Settings → Backup**, choose optional thumbnails and a destination, then **Create backup**. Otherwise the managed backups folder is used. Keep the complete generated folder and manifest together. Backups contain local library data and extracted text, are not encrypted, and exclude source PDFs.
+
+Restore: choose a complete backup folder in the same settings area. Inspect its counts and acknowledge replacement before confirming. LibraDesk saves the current database to managed backups first, restores validated data and rebuilds search indexes. Reload when prompted. Sources stay in their original locations; use File recovery for unavailable paths. Newer application/schema backups are rejected.

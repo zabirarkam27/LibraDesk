@@ -4,11 +4,13 @@ import { Button } from "@/shared/ui/button";
 import { desktop,errorMessage } from "@/shared/lib/preferences-client";
 import { formatBytes } from "@/shared/lib/file-size";
 import { flushReaderBeforeClose,readerLifecycle } from "@/features/reader/reader-client";
+import { RestoreSettings } from "./restore-settings";
 type BackupSummary={path:string;createdAt:number;schemaVersion:number;books:number;notes:number;bookmarks:number;readingSessions:number;thumbnails:number;bytes:number};
 export function BackupSettings(){
   const [thumbnails,setThumbnails]=useState(false);
   const [choose,setChoose]=useState(false);
   const [busy,setBusy]=useState(false);
+  const [restoring,setRestoring]=useState(false);
   const [result,setResult]=useState<BackupSummary|null>(null);
   const [message,setMessage]=useState<string|null>(null);
   const [error,setError]=useState<string|null>(null);
@@ -23,7 +25,7 @@ export function BackupSettings(){
   }
   return <div className="space-y-5 text-sm">
     <p className="text-muted-foreground">Create a consistent database snapshot with library metadata, settings, notes, bookmarks, extracted text, and reading history. Original PDF files stay in their existing locations.</p>
-    <fieldset disabled={busy||!desktop} className="space-y-3">
+    <fieldset disabled={busy||restoring||!desktop} className="space-y-3">
       <legend className="mb-3 font-semibold">Backup options</legend>
       <label className="flex items-center gap-2"><input type="checkbox" checked={thumbnails} onChange={event=>setThumbnails(event.target.checked)}/>Include cached thumbnails</label>
       <label className="flex items-center gap-2"><input type="checkbox" checked={choose} onChange={event=>setChoose(event.target.checked)}/>Choose a destination folder</label>
@@ -40,6 +42,7 @@ export function BackupSettings(){
       <p>{result.books} books · {result.notes} notes · {result.bookmarks} bookmarks · {result.readingSessions} reading sessions · {result.thumbnails} thumbnails</p>
       <p className="text-xs text-muted-foreground">Keep the whole backup folder together. Restore checks every listed file before replacing library state.</p>
     </section>}
-    <p className="text-xs text-muted-foreground">Backups are manual and are not encrypted. Restore controls will be added in the next step.</p>
+    <p className="text-xs text-muted-foreground">Backups are manual and are not encrypted.</p>
+    <RestoreSettings disabled={busy} onBusy={setRestoring}/>
   </div>;
 }

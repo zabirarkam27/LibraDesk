@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Default)]
-pub struct State(Mutex<Option<Database>>);
+pub struct State(pub(crate) Mutex<Option<Database>>);
 
 #[derive(Serialize)]
 pub struct CommandError {
