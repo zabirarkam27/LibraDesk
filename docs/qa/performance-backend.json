@@ -1,0 +1,106 @@
+[
+  {
+    "databaseBytes": 573440,
+    "discoveryMs": 24.891,
+    "fixture": "Generated valid single-page PDFs; metadata/reader benchmarks are separate",
+    "importMs": 69.9593,
+    "openAndFirstQueryMs": 4.2471000000000005,
+    "records": 100,
+    "searches": [
+      {
+        "maxMs": 1.5462,
+        "p50Ms": 1.4473,
+        "query": "বই"
+      },
+      {
+        "maxMs": 1.1345999999999998,
+        "p50Ms": 1.0678,
+        "query": "বই-99"
+      },
+      {
+        "maxMs": 1.1378,
+        "p50Ms": 1.0153,
+        "query": "' OR 1=1 --"
+      }
+    ],
+    "thumbnailBytes": 0
+  },
+  {
+    "databaseBytes": 1867776,
+    "discoveryMs": 161.4747,
+    "fixture": "Generated valid single-page PDFs; metadata/reader benchmarks are separate",
+    "importMs": 597.9564,
+    "openAndFirstQueryMs": 5.0241,
+    "records": 1000,
+    "searches": [
+      {
+        "maxMs": 11.200800000000001,
+        "p50Ms": 8.424600000000002,
+        "query": "বই"
+      },
+      {
+        "maxMs": 5.443,
+        "p50Ms": 4.9383,
+        "query": "বই-99"
+      },
+      {
+        "maxMs": 5.3434,
+        "p50Ms": 4.8369,
+        "query": "' OR 1=1 --"
+      }
+    ],
+    "thumbnailBytes": 0
+  },
+  {
+    "databaseBytes": 7610368,
+    "discoveryMs": 889.3717,
+    "fixture": "Generated valid single-page PDFs; metadata/reader benchmarks are separate",
+    "importMs": 4421.4133,
+    "openAndFirstQueryMs": 8.2445,
+    "records": 5000,
+    "searches": [
+      {
+        "maxMs": 54.7835,
+        "p50Ms": 45.0714,
+        "query": "বই"
+      },
+      {
+        "maxMs": 35.7418,
+        "p50Ms": 31.6546,
+        "query": "বই-99"
+      },
+      {
+        "maxMs": 26.7243,
+        "p50Ms": 25.3974,
+        "query": "' OR 1=1 --"
+      }
+    ],
+    "thumbnailBytes": 0
+  },
+  {
+    "databaseBytes": 14790656,
+    "discoveryMs": 2438.2041,
+    "fixture": "Generated valid single-page PDFs; metadata/reader benchmarks are separate",
+    "importMs": 9787.293800000001,
+    "openAndFirstQueryMs": 11.880099999999999,
+    "records": 10001,
+    "searches": [
+      {
+        "maxMs": 133.5548,
+        "p50Ms": 109.84960000000001,
+        "query": "বই"
+      },
+      {
+        "maxMs": 59.0369,
+        "p50Ms": 55.760600000000004,
+        "query": "বই-99"
+      },
+      {
+        "maxMs": 55.1192,
+        "p50Ms": 49.8448,
+        "query": "' OR 1=1 --"
+      }
+    ],
+    "thumbnailBytes": 0
+  }
+]

@@ -1,11 +1,11 @@
 use crate::{
-    commands::{unavailable, with_database, CommandError},
+    commands::{with_database, CommandError},
     database::{Database, Error},
     reader::ReaderPreferences,
 };
 use rusqlite::OptionalExtension;
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
 
 #[derive(Clone, Copy, Default, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -59,11 +59,7 @@ impl Database {
 }
 #[tauri::command]
 pub async fn get_settings_snapshot(app: AppHandle) -> Result<SettingsSnapshot, CommandError> {
-    let data_path = app
-        .path()
-        .local_data_dir()
-        .map_err(|_| unavailable())?
-        .join("LibraDesk")
+    let data_path = crate::storage_management::root(&app)?
         .to_string_lossy()
         .into_owned();
     let version = app.package_info().version.to_string();

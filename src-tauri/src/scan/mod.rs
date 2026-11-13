@@ -5,4 +5,8 @@ mod repository;
 mod tests;
 mod worker;
 
+#[cfg(test)]
+pub(crate) use repository::Action;
 pub use worker::start;
+#[cfg(test)]
+pub(crate) use worker::step;

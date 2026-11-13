@@ -68,7 +68,9 @@ Back up through SQLite's backup API, with a versioned manifest and optional thum
 
 ## Security boundary
 
-Keep production CSP restrictive and development allowances tied to loopback. Register only required commands and grant Tauri capabilities to specific windows. Keep filesystem and SQL APIs behind Rust services. Validate every incoming ID, path, query, page, range, and mutation. Revalidate approved roots and selected files at the native boundary. Keep token scopes and lifetimes narrow. Use parameterized SQL and construct FTS expressions from escaped terms. Revisit capabilities, CSP, PDF links, restore paths, and destructive database actions during Task 8.5.
+Production CSP is restricted to bundled assets, workers and native IPC; development allowances are tied to loopback. Commands and window capabilities expose only required operations. Filesystem and SQL APIs remain behind Rust services with validated IDs, paths, ranges and mutations. Search binds values and constructs literal FTS terms. See the completed [security review](security-review.md) for evidence and limits.
+
+Phase 7 maintenance uses a process-wide read/write gate shared by commands, scanner and verifier. Restore takes exclusive access, rejects old queued work with an epoch, copies a staged SQLite snapshot in place, rebuilds indexes and switches a database-stored cover generation. Frontend workers finish/checkpoint before restore; the UI requires reload afterward. Analytics reads saved status/session aggregates and bounded history in a SQLite read transaction. Debug native QA can use an isolated absolute data root; that override is compiled out of release binaries.
 
 References
 

@@ -97,11 +97,8 @@ pub(crate) async fn with_database<T: Send + 'static>(
 }
 
 pub(crate) fn database_path(app: &AppHandle) -> Result<PathBuf, CommandError> {
-    let path = app
-        .path()
-        .local_data_dir()
-        .map_err(|_| storage_unavailable())?;
-    storage::initialize(&path.join("LibraDesk")).map_err(|_| storage_unavailable())
+    let path = crate::storage_management::root(app)?;
+    storage::initialize(&path).map_err(|_| storage_unavailable())
 }
 
 pub(crate) fn unavailable() -> CommandError {

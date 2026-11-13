@@ -1369,6 +1369,8 @@ Use real persisted data.
 
 ## Task 8.1 - Rust Backend Testing
 
+- [x] Completed 2026-11-14. Final Windows suite: 46 tests passed, covering scanner/PDF/metadata/hash/duplicates/paths/database/recovery, restore, analytics and security. Performance benchmark passed separately. No known critical failure; see testing strategy and development log.
+
 Test:
 
 - File discovery.
@@ -1383,6 +1385,8 @@ Test:
 **Approval required before Task 8.2.**
 
 ## Task 8.2 - Frontend Testing
+
+- [x] Completed 2026-11-14. Committed ten repeatable browser suites for routes/navigation/search/filters/forms/reader/bookmarks/notes/settings and analytics. All passed against final frontend; real PDF.js with mock IPC. See testing strategy for scope.
 
 Test:
 
@@ -1399,6 +1403,8 @@ Test:
 
 ## Task 8.3 - Integration Testing
 
+- [x] Completed 2026-11-14. New real SQLite/file fixture passed interrupted scan/reopen/resume/import, metadata editing, reader state/note, backup/restore, relink and reopen with unchanged source bytes. Isolated native IPC and 10,001-book backup also passed.
+
 Test:
 
 - Import.
@@ -1414,6 +1420,8 @@ Test:
 **Approval required before Task 8.4.**
 
 ## Task 8.4 - Large Collection Performance Testing
+
+- [x] Completed 2026-11-14. Measured 100/1,000/5,000/10,001 valid generated PDFs, SQLite search/import/storage, grid frames/heap and native startup/process-tree memory. Agreed 500 ms / 3 s / 500 MiB budgets passed within documented idle-catalog scope. See performance report and raw snapshots.
 
 Use test datasets containing:
 
@@ -1438,6 +1446,8 @@ Use representative large PDF files and avoid copying the entire personal collect
 
 ## Task 8.5 - Security and Data Safety Review
 
+- [x] Completed 2026-11-14. Reviewed permissions/CSP/PDF actions/input/SQL/paths/backups/restore/destructive actions. Added passing SQL/FTS and real Windows junction regressions. Residual limits are documented in security review.
+
 Verify:
 
 - Tauri permissions.
@@ -1454,6 +1464,8 @@ Verify:
 
 ## Task 8.6 - Windows Release Build
 
+- [ ] Partially completed 2026-11-14. Production x64/NSIS build, icon/version, install/uninstall, expected binary marker and source/data preservation passed. Automatic approval review blocked installed-release launch on the owner's real AppData; authorization requested. Isolated embedded-frontend native QA passed. See release report.
+
 Implement:
 
 - Application icon.
@@ -1469,6 +1481,8 @@ Verify that uninstalling LibraDesk does not delete original PDF files.
 **Approval required before Task 8.7.**
 
 ## Task 8.7 - Final Documentation
+
+- [ ] Prepared 2026-11-14. README, installation, user guide, architecture/database, backup/recovery, troubleshooting, known limitations, test/performance/security reports and release report updated. Final release smoke scope and explicit project acceptance remain pending.
 
 Update:
 

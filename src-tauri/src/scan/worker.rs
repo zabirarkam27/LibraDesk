@@ -82,7 +82,7 @@ pub fn start(app: AppHandle) {
     });
 }
 
-pub(super) fn step(db: &Database, work: &Work, notify: impl Fn()) -> rusqlite::Result<()> {
+pub(crate) fn step(db: &Database, work: &Work, notify: impl Fn()) -> rusqlite::Result<()> {
     let root = Path::new(&work.root);
     if work.importing {
         let checked = db

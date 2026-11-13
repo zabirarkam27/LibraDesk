@@ -11,6 +11,8 @@ mod metadata;
 mod reader;
 mod recovery;
 mod scan;
+#[cfg(test)]
+mod security_tests;
 mod settings;
 mod storage;
 mod storage_management;

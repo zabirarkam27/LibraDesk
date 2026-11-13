@@ -1,6 +1,8 @@
 pub mod commands;
 pub(crate) use repository::ReaderPreferences;
 #[cfg(test)]
+pub(crate) use repository::{AnnotationInput, AnnotationKind, ProgressInput};
+#[cfg(test)]
 pub(crate) use repository::{Layout, Zoom};
 mod repository;
 #[cfg(test)]

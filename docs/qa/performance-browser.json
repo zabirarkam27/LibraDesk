@@ -1,0 +1,38 @@
+[
+  {
+    "records": 100,
+    "initialUiMs": 580.6898,
+    "scrollFrameP50Ms": 16.5,
+    "scrollFrameP95Ms": 19.299999997019768,
+    "renderedItems": 12,
+    "rendererJsHeapBytes": 7941828,
+    "scope": "Headless Chrome, fixture IPC; native SQLite timings measured separately"
+  },
+  {
+    "records": 1000,
+    "initialUiMs": 357.0192000000002,
+    "scrollFrameP50Ms": 16.5,
+    "scrollFrameP95Ms": 19.399999998509884,
+    "renderedItems": 12,
+    "rendererJsHeapBytes": 7641380,
+    "scope": "Headless Chrome, fixture IPC; native SQLite timings measured separately"
+  },
+  {
+    "records": 5000,
+    "initialUiMs": 391.8010999999997,
+    "scrollFrameP50Ms": 16.700000002980232,
+    "scrollFrameP95Ms": 19.5,
+    "renderedItems": 12,
+    "rendererJsHeapBytes": 14374868,
+    "scope": "Headless Chrome, fixture IPC; native SQLite timings measured separately"
+  },
+  {
+    "records": 10001,
+    "initialUiMs": 379.21719999999914,
+    "scrollFrameP50Ms": 16.69999999552965,
+    "scrollFrameP95Ms": 18.799999997019768,
+    "renderedItems": 12,
+    "rendererJsHeapBytes": 20000508,
+    "scope": "Headless Chrome, fixture IPC; native SQLite timings measured separately"
+  }
+]

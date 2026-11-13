@@ -1,0 +1,21 @@
+# Troubleshooting
+
+| Symptom | Action |
+| --- | --- |
+| App will not open | Check Windows x64 and installed WebView2 Runtime. Close another running LibraDesk instance. Reinstall the application without removing AppData. |
+| Storage/database unavailable | Check free space and write access to %LOCALAPPDATA%\LibraDesk. Close other tools that lock its files, then restart. Preserve database/WAL/SHM before manual recovery. |
+| Build cannot replace libradesk.exe | Close that executable, then rerun the failed build. Do not delete your library database. |
+| Missing books after drive removal | Reconnect the disk and run file verification. Relink if the source path changed. |
+| Invalid or inaccessible PDF | Check access and open the original in a trusted viewer. A header-valid scan entry can still contain malformed PDF structures. Rescan after correcting the source. |
+| Search misses words | Confirm metadata versus PDF-contents scope, indexing coverage and current file revision. Image-only pages need OCR. Background extraction pauses in the reader or hidden window. |
+| Encrypted PDF not indexed | Open it manually with its password for reading. Background indexing does not request or retain passwords. |
+| Metadata stays incomplete | Review parser errors in Metadata and enter manual fields. Large/complex files may use the bounded cover-worker metadata fallback. |
+| Cover is absent | Ensure the source is available. Clear thumbnail cache if necessary; visible covers regenerate. |
+| Note/bookmark has a stale anchor | The source content/revision changed. Review the saved page against the new document. |
+| Reader close reports save failure | Retry while storage is available; keep the window open until the checkpoint succeeds. |
+| Backup checksum/schema/version error | Keep the original folder intact, select a complete copy, and use a compatible application version. Do not edit a manifest to bypass validation. |
+| Restore failed | The app attempts rollback. Preserve the safety snapshot. If rollback also failed, stop further writes and retain all database files for recovery. |
+| Native QA opens the wrong window | Close other LibraDesk instances. Use the embedded debug build and generated QA profile; release builds ignore the QA data override. |
+| Installer QA refuses an installation | It protects an existing registered copy. Review/uninstall that copy yourself before testing; do not delete registry entries to force the test. |
+
+Report a reproducible sequence, app/Windows version, and safe error text. Avoid posting personal paths, documents, notes, extracted text, databases or backups in public issues. See the [test strategy](testing-strategy.md) for generated fixtures.

@@ -196,3 +196,16 @@ Added transactional SQLite aggregates and bounded 20-session history, manual com
 
 Validation: persisted fixture reconciled 23 sessions, 69 views and 23 active minutes, pagination boundaries, old activity exclusion, reopen and deletion cascade. Browser checks passed bilingual history, totals, bars, pagination, empty states and error/retry. Frontend build and Clippy passed. Commit: see feat: add persisted reading analytics and history.
 
+
+## 2026-11-14 · Phase 8 QA and release preparation
+
+User authorized finishing Phase 7 then all Phase 8, overriding individual implementation gates for that scope. Final project acceptance is still explicit. Added durable browser/PDF generators/runners, native isolated QA profile support compiled out of release, cross-feature import-through-restore/relink integration and SQL/junction regressions.
+
+Final backend: 46 passed, one explicit benchmark ignored in routine run and passed separately. All ten committed browser suites passed the final frontend. Strict frontend build, Rust fmt and Clippy warnings-denied passed. Generated valid single-page datasets at 100/1000/5000/10001 measured import/search/storage; grid/CDP and native process-tree memory reports are linked in performance-report.md. Final native 10001 profile: startup 704.82 ms, max warm IPC query 91.91 ms, max total working set 457.91 MiB. Native backup contained 10001 books. No personal source collection was copied.
+
+Production NSIS 0.1.0 x64 built; NSIS tools refreshed with hash verification by Tauri. Install/uninstall returned 0, registry cleanup and PDF/data fixtures survived. Initial binary equality assertion exposed the expected Tauri UNK→NSS bundle marker; corrected test now verifies every other byte. Final installer is 6570546 bytes, SHA256 31F6F0FF6BAD1C3850E8AED869E9A7075CFBAA8B8CA44864252859B640D175F3. It is unsigned and requires existing WebView2.
+
+Automatic approval review rejected installed release launch because production ignores the QA data override and can update the owner's live AppData through background checks. That launch was not executed. Asked owner for launch authorization or acceptance of isolated-only scope; all unaffected checks and documentation completed. Tasks 8.6/8.7 remain pending this decision/final acceptance. No workaround used.
+
+Documentation: installation, user guide, backup/recovery, troubleshooting, known limitations, security review, performance report/raw nonpersonal snapshots, release report, architecture/database updates and status checklists. Commit reference: see test: add reproducible release QA and Windows installer in Git history.
+

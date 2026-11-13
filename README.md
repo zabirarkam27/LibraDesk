@@ -15,7 +15,7 @@ Open **Settings** in the desktop window to verify the database connection and ch
 
 Settings contains General, Appearance, Library, Reader, Storage, Backup, and Privacy. General saves the startup page; Library saves the default grid/list/compact view and links to folder management, organization, and recovery. Reader offers its own theme and saved zoom, layout, fullscreen, and shortcut defaults. The startup page applies on the next launch without replacing book/page links or normal navigation. Reader changes also refresh when Settings is reopened after using the reader.
 
-Storage shows the connected schema, resolved data folder, and usage for the database/WAL, thumbnails, cache, temporary files, managed backups, and logs. Confirm cleanup for a selected cache category. Cleanup retains subfolders, reparse points, database records, backups, PDFs, and recent temporary files; eligible temporary files must be older than 24 hours. Covers regenerate when requested. Backup creation is available under Backup; restore is the next task. Privacy describes local data and PDF-reading behavior.
+Storage shows the connected schema, data folder, and usage for database/WAL, thumbnails, cache, temporary files, backups and logs. Confirm cleanup for a category. Cleanup protects database records, backups, PDF content, reparse points and recent temporary files; eligible temporary files must be older than 24 hours. Generated covers in known restore cache generations are also clearable. Covers regenerate when requested. Backup supports creation and inspected restore. Privacy describes local data and PDF-reading behavior.
 
 Open **Import**, choose **Add folders**, then select **Scan folder** beside an enabled root. The preview shows what LibraDesk found. Select **Review import** and confirm to add eligible paths to **Library**. The app reads the originals in place. An interrupted scan appears as **Paused** when the app reopens. A previously confirmed import resumes automatically.
 
@@ -46,7 +46,7 @@ cargo test --locked --manifest-path src-tauri/Cargo.toml
 npm run tauri build -- --debug --no-bundle
 ```
 
-The last command builds a debug desktop executable. Installer packaging is tracked in the project plan.
+The last command builds a debug desktop executable. For the Windows x64 NSIS installer, run `npm run tauri build -- --bundles nsis -- --locked`. Output: `src-tauri/target/release/bundle/nsis/LibraDesk_0.1.0_x64-setup.exe`. WebView2 must be preinstalled; the installer is unsigned. See the installation guide and release report for verification scope.
 
 ## Project documentation
 
@@ -54,6 +54,9 @@ The last command builds a debug desktop executable. Installer packaging is track
 - [Architecture](docs/architecture.md) and [decisions](docs/decisions.md)
 - [Database schema](docs/database-schema.md)
 - [Development log](docs/development-log.md)
+- [Installation](docs/installation.md) and [user guide](docs/user-guide.md)
+- [Backup/recovery](docs/backup-recovery.md), [troubleshooting](docs/troubleshooting.md) and [known limitations](docs/known-limitations.md)
+- [Testing](docs/testing-strategy.md), [performance](docs/performance-report.md), [security review](docs/security-review.md) and [release report](docs/release-report.md)
 
 Manual backup: in **Settings → Backup**, choose optional thumbnails and a destination, then **Create backup**. Otherwise the managed backups folder is used. Keep the complete generated folder and manifest together. Backups contain local library data and extracted text, are not encrypted, and exclude source PDFs.
 

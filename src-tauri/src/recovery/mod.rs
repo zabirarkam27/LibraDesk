@@ -1,6 +1,6 @@
 pub mod commands;
 mod duplicates;
-mod probe;
+pub(crate) mod probe;
 mod repository;
 #[cfg(test)]
 mod tests;

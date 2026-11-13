@@ -46,7 +46,7 @@ The Phase 4 editor can supply ordered author names instead of IDs. Existing iden
 | `thumbnails` | `file_id` PK and FK to book_files with cascade, `file_revision`, `relative_path`, `width`, `height`, `size_bytes`, `created_at` | Positive dimensions, nonnegative size, and unique validated cache path. Use a versioned filename. Commit the pointer after the generated image has been promoted into place. |
 | `duplicate_reviews` | PK `(sha256, file_id)`, `file_id` FK to book_files with cascade, `decision`, `reviewed_at` | Groups use current hashes shared by at least two files. Reviewing a group records a keep decision for each current member. Reopening clears the review and a changed revision invalidates its prior decision. |
 
-Scan confirmation advances a persisted job revision before importing. The preview flags equal-size files as possible duplicates. Import keeps each eligible distinct path and uses its filename stem as a provisional title. Each candidate and its outcome commit in the same transaction, with the file path unique key protecting retries and overlapping roots. In the planned change-detection feature, bump the file revision and invalidate stale hash, metadata derivatives, covers, and indexed text when a file changes.
+Scan confirmation advances a persisted job revision before importing. The preview flags equal-size files as possible duplicates. Import keeps each eligible distinct path and uses its filename stem as a provisional title. Each candidate and its outcome commit in the same transaction, with the file path unique key protecting retries and overlapping roots. Implemented change detection compares size/full-precision timestamps and hashes when needed, advancing revisions and invalidating stale derivatives while retaining manual metadata.
 
 ## Reader, settings, and analytics
 
@@ -101,3 +101,11 @@ References
 - [SQLite FTS5](https://sqlite.org/fts5.html)
 - [SQLite foreign keys](https://sqlite.org/foreignkeys.html)
 - [SQLite online backup API](https://sqlite.org/backup.html)
+
+## Phase 7 settings, restore and analytics
+
+No migration was added for Phase 7. Typed workspace defaults use settings scope app/key workspace; reader preferences and app/reader themes retain separate keys. Restore stores the selected cover generation as JSON at app/cover_cache_generation. The generation changes in the same SQLite replacement as library data, avoiding old cached id/revision collisions.
+
+Restore stages compatible schema migrations, closes active sessions at their last checkpoint, resets active extraction leases, removes relink/verification drafts and rebuilds both FTS indexes. The online backup API replaces the live connection in place under maintenance exclusion; on failure it restores the mandatory safety snapshot. Idle worker connections remain valid.
+
+Analytics uses existing books.reading_status and reading_sessions pages_read/active_ms/start time, with a transactional aggregate and 20-item history pages. Distinct per-session page records support the view count. Activity uses local session-start dates; no lifetime unique-page estimate is invented.

@@ -59,6 +59,7 @@ export async function renderCover(task: CoverTask): Promise<CoverResult> {
     rangeChunkSize: CHUNK_SIZE,
     disableAutoFetch: true,
     disableStream: true,
+    enableXfa: false,
     useWasm: false,
     useSystemFonts: true,
     maxImageSize: 12_000_000,

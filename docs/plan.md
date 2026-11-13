@@ -101,10 +101,12 @@ Use this checklist to track task status. The [detailed plan](../plan.md) defines
 
 | Task | Depends on | Exit check |
 | --- | --- | --- |
-| [ ] 8.1 Rust backend testing | 2.7, 6.6, 7.4 | Pass scanner, path, parsing, hash, duplicate, database, and recovery tests on Windows. |
-| [ ] 8.2 Frontend testing | 4.10, 5.9, 7.5 | Pass routing, search, filter, form, reader, annotation, and settings tests. |
-| [ ] 8.3 Integration testing | 8.1, 8.2 | Exercise interrupted import through restore, relink, and reader use on a clean profile. |
-| [ ] 8.4 Large collection performance | 8.3 | Record startup, search, scroll, import, memory, database, and thumbnail metrics at 100, 1,000, 5,000, and 10,000+ records. Agree on budgets before testing. |
-| [ ] 8.5 Security and data safety | 8.3 | Audit capabilities, CSP, PDF scripting, paths, input, SQL, backups, and destructive actions. Verify source PDFs stay intact. |
+| [x] 8.1 Rust backend testing | 2.7, 6.6, 7.4 | Pass scanner, path, parsing, hash, duplicate, database, and recovery tests on Windows. |
+| [x] 8.2 Frontend testing | 4.10, 5.9, 7.5 | Pass routing, search, filter, form, reader, annotation, and settings tests. |
+| [x] 8.3 Integration testing | 8.1, 8.2 | Exercise interrupted import through restore, relink, and reader use on a clean profile. |
+| [x] 8.4 Large collection performance | 8.3 | Record startup, search, scroll, import, memory, database, and thumbnail metrics at 100, 1,000, 5,000, and 10,000+ records. Agree on budgets before testing. |
+| [x] 8.5 Security and data safety | 8.3 | Audit capabilities, CSP, PDF scripting, paths, input, SQL, backups, and destructive actions. Verify source PDFs stay intact. |
 | [ ] 8.6 Windows release build | 8.4, 8.5 | Verify version, icon, installer, and offline launch. Install and uninstall on a clean profile and check data preservation. |
 | [ ] 8.7 Final documentation | 8.6 | Review setup, guide, recovery, limitations, and release report against the final acceptance checklist. Obtain release approval. |
+
+Phase 8 evidence (2026-11-14): [test strategy](testing-strategy.md), [performance](performance-report.md), [security](security-review.md), [release report](release-report.md). Tasks 8.6–8.7 have complete installer/doc artifacts but remain pending the installed-release smoke decision and final acceptance. User batch authorization covers Phase 7 and Phase 8 implementation gates; final project approval is separate.

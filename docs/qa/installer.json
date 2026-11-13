@@ -1,0 +1,10 @@
+{
+  "version": "0.1.0",
+  "installExitCode": 0,
+  "uninstallExitCode": 0,
+  "installedBinaryMatches": true,
+  "sourcePdfPreserved": true,
+  "userDataSubfolderPreserved": true,
+  "uninstallRegistryRemoved": true,
+  "scope": "Clean current-user install directory on existing Windows account; isolated native profile tested separately"
+}

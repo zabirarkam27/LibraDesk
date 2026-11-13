@@ -1,0 +1,31 @@
+{
+  "scope": "Embedded-frontend debug native app, real SQLite 10001 records, idle catalog with parsing queues removed; working set includes app and descendant WebView2 processes",
+  "initialUiMs": 704.8159999999999,
+  "searchMaxMs": 91.91319999999996,
+  "searchTimesMs": [
+    76.37009999999998,
+    75.57459999999992,
+    91.91319999999996,
+    77.86239999999998,
+    75.96360000000004,
+    76.34019999999987,
+    77.24000000000001,
+    74.63850000000002,
+    78.31829999999991,
+    74.13419999999996
+  ],
+  "workingSetSamplesBytes": [
+    474165248,
+    474296320,
+    480157696,
+    479793152,
+    479813632
+  ],
+  "maxWorkingSetMiB": 457.9140625,
+  "backupBooks": 10001,
+  "budgets": {
+    "initialUiMs": 3000,
+    "warmSearchMs": 500,
+    "normalMemoryMiB": 500
+  }
+}

@@ -35,6 +35,16 @@ pub struct Cleanup {
     pub usage: Usage,
 }
 pub(crate) fn root(app: &AppHandle) -> Result<PathBuf, CommandError> {
+    // Test-only profile isolation is compiled out of release builds.
+    #[cfg(debug_assertions)]
+    if let Some(value) = std::env::var_os("LIBRADESK_QA_DATA_DIR") {
+        let path = PathBuf::from(value);
+        if !path.is_absolute() {
+            return Err(unavailable());
+        }
+        crate::storage::prepare_directory(&path).map_err(|_| unavailable())?;
+        return fs::canonicalize(path).map_err(|_| unavailable());
+    }
     app.path()
         .local_data_dir()
         .map(|p| p.join("LibraDesk"))

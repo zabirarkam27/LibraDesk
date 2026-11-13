@@ -1,6 +1,6 @@
 use std::{io::ErrorKind, path::PathBuf};
 
-use tauri::{ipc::Response, AppHandle, Emitter, Manager};
+use tauri::{ipc::Response, AppHandle, Emitter};
 
 use crate::commands::{unavailable, with_database, CommandError};
 
@@ -20,11 +20,7 @@ fn rejected(code: &'static str, message: &'static str) -> CommandError {
 }
 
 async fn cache_root(app: &AppHandle) -> Result<PathBuf, CommandError> {
-    let root = app
-        .path()
-        .local_data_dir()
-        .map(|path| path.join("LibraDesk"))
-        .map_err(|_| unavailable())?;
+    let root = crate::storage_management::root(app)?;
     let generation = with_database(app.clone(), |db| db.cover_cache_generation()).await?;
     super::resolve_cache_root(&root, generation.as_deref()).map_err(|_| unavailable())
 }
