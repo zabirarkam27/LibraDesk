@@ -22,6 +22,9 @@ pub const EVENT: &str = "scan-updated";
 pub fn start(app: AppHandle) {
     thread::spawn(move || {
         let database = loop {
+            let _access = crate::maintenance::ACCESS
+                .read()
+                .unwrap_or_else(|error| error.into_inner());
             let opened = database_path(&app)
                 .ok()
                 .and_then(|file| Database::open(&file).ok());
@@ -34,6 +37,10 @@ pub fn start(app: AppHandle) {
         let last_event = Cell::new(Instant::now());
         let update_pending = Cell::new(false);
         loop {
+            let access = crate::maintenance::ACCESS
+                .read()
+                .unwrap_or_else(|error| error.into_inner());
+            let mut delay = Duration::ZERO;
             match database.next_work() {
                 Ok(Some(work)) => {
                     let notify = || {
@@ -48,7 +55,7 @@ pub fn start(app: AppHandle) {
                     if let Err(error) = step(&database, &work, notify) {
                         eprintln!("LibraDesk scan job {} failed: {error}", work.id);
                         let _ = database.fail_work(&work, "database_error");
-                        thread::sleep(Duration::from_secs(1));
+                        delay = Duration::from_secs(1);
                     }
                     notify();
                 }
@@ -61,11 +68,15 @@ pub fn start(app: AppHandle) {
                         Ok(true) => {
                             let _ = app.emit(metadata::EVENT, ());
                         }
-                        Ok(false) => thread::sleep(Duration::from_millis(350)),
-                        Err(_) => thread::sleep(Duration::from_secs(2)),
+                        Ok(false) => delay = Duration::from_millis(350),
+                        Err(_) => delay = Duration::from_secs(2),
                     }
                 }
-                Err(_) => thread::sleep(Duration::from_secs(2)),
+                Err(_) => delay = Duration::from_secs(2),
+            }
+            drop(access);
+            if !delay.is_zero() {
+                thread::sleep(delay);
             }
         }
     });

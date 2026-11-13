@@ -48,4 +48,3 @@ export function ThemeOptions({ scope, label, description }: { scope: ThemeScope;
     </fieldset>
   );
 }
-

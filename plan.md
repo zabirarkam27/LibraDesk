@@ -1294,6 +1294,8 @@ Implement:
 
 ## Task 7.2 - Storage Management
 
+- [x] Completed on 2026-11-13. Added categorized AppData usage and confirmed cache cleanup with protected database/backups/PDFs, nonrecursive deletion, directory guards, and a 24-hour temporary-file policy. Tests and build checks passed; see the [development log](docs/development-log.md).
+
 Display:
 
 - Database size.

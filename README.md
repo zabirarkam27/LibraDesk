@@ -15,7 +15,7 @@ Open **Settings** in the desktop window to verify the database connection and ch
 
 Settings contains General, Appearance, Library, Reader, Storage, Backup, and Privacy. General saves the startup page; Library saves the default grid/list/compact view and links to folder management, organization, and recovery. Reader offers its own theme and saved zoom, layout, fullscreen, and shortcut defaults. The startup page applies on the next launch without replacing book/page links or normal navigation. Reader changes also refresh when Settings is reopened after using the reader.
 
-Storage shows the connected schema and resolved data folder. Storage-size reporting, cache cleanup, and backup creation/restore are not available yet; their sections state the current status. Privacy describes the app's local data and PDF-reading behavior.
+Storage shows the connected schema, resolved data folder, and usage for the database/WAL, thumbnails, cache, temporary files, managed backups, and logs. Confirm cleanup for a selected cache category. Cleanup retains subfolders, reparse points, database records, backups, PDFs, and recent temporary files; eligible temporary files must be older than 24 hours. Covers regenerate when requested. Backup creation/restore remains a later task. Privacy describes local data and PDF-reading behavior.
 
 Open **Import**, choose **Add folders**, then select **Scan folder** beside an enabled root. The preview shows what LibraDesk found. Select **Review import** and confirm to add eligible paths to **Library**. The app reads the originals in place. An interrupted scan appears as **Paused** when the app reopens. A previously confirmed import resumes automatically.
 

@@ -76,7 +76,14 @@ pub(crate) async fn with_database<T: Send + 'static>(
     app: AppHandle,
     operation: impl FnOnce(&Database) -> Result<T, database::Error> + Send + 'static,
 ) -> Result<T, CommandError> {
+    let generation = crate::maintenance::generation();
     tauri::async_runtime::spawn_blocking(move || {
+        let _access = crate::maintenance::ACCESS
+            .read()
+            .map_err(|_| unavailable())?;
+        if generation != crate::maintenance::generation() {
+            return Err(unavailable());
+        }
         let state = app.state::<State>();
         let mut database = state.0.lock().map_err(|_| unavailable())?;
         if database.is_none() {

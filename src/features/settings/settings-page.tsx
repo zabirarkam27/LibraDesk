@@ -9,6 +9,7 @@ import { fieldClass } from "@/features/library/query-feedback";
 import { usePreferences } from "./preferences-store";
 import { useWorkspaceSettings,type WorkspacePreferences } from "./workspace-store";
 import { ThemeOptions } from "./theme-options";
+import { StorageSettings } from "./storage-settings";
 import { ReaderSettings } from "./reader-settings";
 
 const sections=["general","appearance","library","reader","storage","backup","privacy"] as const;
@@ -26,7 +27,6 @@ function WorkspaceSelect({field,label,options}:{field:keyof WorkspacePreferences
 }
 function Panel({section}:{section:Section}) {
   const snapshot=useWorkspaceSettings(state=>state.snapshot);
-  const schema=usePreferences(state=>state.preferences.schemaVersion);
   switch(section) {
     case "general":return <div className="space-y-5">
       <p className="text-sm text-muted-foreground">LibraDesk {snapshot.version} · {desktop?"Windows desktop":"Browser preview"}</p>
@@ -44,12 +44,7 @@ function Panel({section}:{section:Section}) {
       </div>
     </div>;
     case "reader":return <ReaderSettings/>;
-    case "storage":return <div className="space-y-4 text-sm">
-      <p>{desktop?`SQLite connected · Schema ${schema}`:"Appearance and workspace defaults are stored in this browser."}</p>
-      <div><p className="font-medium">Application data location</p><p className="mt-2 select-text break-all font-mono text-xs text-muted-foreground">{snapshot.dataPath}</p></div>
-      <p className="text-muted-foreground">Desktop data includes the library database, thumbnails, cache, backup folder, logs, and temporary files. Original PDFs remain at their registered locations.</p>
-      <p className="text-muted-foreground">Storage size reporting and cache cleanup are not available in this build.</p>
-    </div>;
+    case "storage":return <StorageSettings/>;
     case "backup":return <div className="space-y-4 text-sm">
       <p className="font-medium">Backup creation and restore are not available in this build.</p>
       <p className="text-muted-foreground">There are no automatic backups yet. Planned backups include library metadata, settings, notes, bookmarks, and reading history. Original PDF files are kept separately.</p>

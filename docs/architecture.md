@@ -16,6 +16,8 @@ Catalog search, filters, sorting, and page selection live in the URL. A counted 
 
 ## Native commands and background work
 
+Storage maintenance takes an exclusive process-wide maintenance gate; database commands and native scan/recovery work take shared access. Disk inventory skips reparse points and limits traversal. Cleanup holds validated directory handles, deletes only direct eligible cache files, checks both PDF extensions and signatures, and leaves database records and backups intact. Temporary cleanup retains files younger than 24 hours. Thumbnail cleanup accepts only generated numeric-ID/revision PNG names.
+
 Keep Tauri command handlers thin. They decode request DTOs, dispatch to domain services, and return structured responses. Under `src-tauri/src/`, separate command handlers, domain services, SQLite repositories and migrations, and native file operations. Only Rust repositories issue SQL.
 
 Use IDs for known books, files, scan roots, and jobs. A native picker supplies paths when adding roots or relinking. Return a stable error code and retryability alongside details suitable for the frontend. Map these codes to localized user messages. Keep paths and document contents out of ordinary logs. Distinguish missing files from denied access, corrupt PDFs, unsupported encryption, storage failures, and cancellation.

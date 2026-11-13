@@ -168,3 +168,10 @@ Verification: all 35 Rust tests passed, including real database reopen, safe def
 Native Windows verification opened the new Settings page against the existing library, displayed all seven areas and application version, read the user's existing reader defaults, and showed schema 9 with the resolved local AppData path. No preference changes were saved in the personal library during this check.
 
 Created native settings.rs and frontend workspace-store, startup-route, reader-settings and theme-options modules. Updated the app provider/command registration, reader type exports, library view initialization, settings page, README, architecture, schema contract and both roadmaps. Existing .vscode, personal data, generated browser fixtures/profiles and build products remain excluded from Git.
+
+
+## 2026-11-13 · Task 7.2 · Storage management
+
+The owner authorized completing Phase 7 and then all Phase 8. Added categorized disk usage and confirmed cleanup in Settings/Storage. Database/WAL, thumbnail, cache, temp, managed backup and log totals are separate; external backup/source locations are outside these totals. Cleanup accepts only fixed cache categories, retains directories/reparse points/PDF extensions and PDF signatures, and never changes database records or backups. Temporary files require a 24-hour age; thumbnails require generated numeric-ID/revision PNG names. Windows directory read handles prevent directory replacement while cleaning.
+
+A process-wide shared/exclusive maintenance gate coordinates native commands and background scanner/recovery work, preparing safe backup/restore quiescence. The cleanup fixture reconciled byte totals and preserved database, backups, original/disguised PDFs, nested entries, private PNGs and recent temp files. Browser checks covered totals, cancel/confirm, protected data, age explanation, errors/retry and compact layout. Focused Rust tests, Clippy, TypeScript/Vite and formatting passed. A blank line at the end of the prior theme-options module was removed during cleanup.

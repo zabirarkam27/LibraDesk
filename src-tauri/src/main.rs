@@ -4,12 +4,14 @@ mod catalog;
 mod commands;
 mod database;
 mod extraction;
+mod maintenance;
 mod metadata;
 mod reader;
 mod recovery;
 mod scan;
 mod settings;
 mod storage;
+mod storage_management;
 
 use tauri::Manager;
 
@@ -30,6 +32,8 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_preferences,
+            storage_management::storage_usage,
+            storage_management::clear_cache,
             settings::get_settings_snapshot,
             settings::save_workspace_preferences,
             recovery::commands::recovery_snapshot,
