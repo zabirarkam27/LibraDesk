@@ -1464,7 +1464,7 @@ Verify:
 
 ## Task 8.6 - Windows Release Build
 
-- [ ] Partially completed 2026-11-14. Production x64/NSIS build, icon/version, install/uninstall, expected binary marker and source/data preservation passed. Automatic approval review blocked installed-release launch on the owner's real AppData; authorization requested. Isolated embedded-frontend native QA passed. See release report.
+- [x] Completed 2026-11-14. Production x64/NSIS build, icon/version, install/uninstall, expected binary marker and source/data preservation passed. After explicit owner authorization, installed release startup, production IPC, settings/restore and offline library navigation passed on real AppData. Isolated native QA also passed. Fresh-OS/absent-WebView testing and unsigned status are documented limits. See release report.
 
 Implement:
 
@@ -1482,7 +1482,7 @@ Verify that uninstalling LibraDesk does not delete original PDF files.
 
 ## Task 8.7 - Final Documentation
 
-- [ ] Prepared 2026-11-14. README, installation, user guide, architecture/database, backup/recovery, troubleshooting, known limitations, test/performance/security reports and release report updated. Final release smoke scope and explicit project acceptance remain pending.
+- [x] Completed 2026-11-14. README, installation, user guide, architecture/database, backup/recovery, troubleshooting, known limitations, test/performance/security evidence and final release report are complete. Documentation links verified. Final project acceptance remains explicitly pending the owner's decision.
 
 Update:
 
@@ -1578,31 +1578,33 @@ Do not proceed to unrelated tasks while a blocking issue remains unresolved.
 
 LibraDesk can be considered production-ready only when:
 
-- [ ] Windows desktop application launches reliably.
-- [ ] SQLite database initializes and persists.
-- [ ] AppData storage works.
-- [ ] Multiple HDD folders can be registered.
-- [ ] Recursive PDF scanning works.
-- [ ] Import preview works.
-- [ ] Interrupted scanning can resume.
-- [ ] Metadata extraction works.
-- [ ] Cover thumbnails are generated.
-- [ ] Duplicate detection works.
-- [ ] Original PDF files remain untouched.
-- [ ] Categories and collections work.
-- [ ] Bengali and English search work.
-- [ ] Book Details pages work.
-- [ ] Built-in PDF Reader works.
-- [ ] Reading progress persists.
-- [ ] Bookmarks and Notes work.
-- [ ] Missing files can be relinked.
-- [ ] Backup and restore work.
-- [ ] Large library navigation remains responsive.
-- [ ] Windows installer works.
-- [ ] Uninstallation preserves original books.
-- [ ] Documentation is complete.
-- [ ] Critical tests pass.
+- [x] Windows desktop application launches reliably.
+- [x] SQLite database initializes and persists.
+- [x] AppData storage works.
+- [x] Multiple HDD folders can be registered.
+- [x] Recursive PDF scanning works.
+- [x] Import preview works.
+- [x] Interrupted scanning can resume.
+- [x] Metadata extraction works.
+- [x] Cover thumbnails are generated.
+- [x] Duplicate detection works.
+- [x] Original PDF files remain untouched.
+- [x] Categories and collections work.
+- [x] Bengali and English search work.
+- [x] Book Details pages work.
+- [x] Built-in PDF Reader works.
+- [x] Reading progress persists.
+- [x] Bookmarks and Notes work.
+- [x] Missing files can be relinked.
+- [x] Backup and restore work.
+- [x] Large library navigation remains responsive.
+- [x] Windows installer works.
+- [x] Uninstallation preserves original books.
+- [x] Documentation is complete.
+- [x] Critical tests pass.
 - [ ] Final user approval is received.
+
+Verified through the Phase 1–8 evidence and final authorized release smoke on 2026-11-14. Test environments, performance workload, unsigned installer and WebView2 prerequisite are documented in the release report. Permission to run release tests does not imply final project acceptance.
 
 ---
 

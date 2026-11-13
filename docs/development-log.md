@@ -209,3 +209,10 @@ Automatic approval review rejected installed release launch because production i
 
 Documentation: installation, user guide, backup/recovery, troubleshooting, known limitations, security review, performance report/raw nonpersonal snapshots, release report, architecture/database updates and status checklists. Commit reference: see test: add reproducible release QA and Windows installer in Git history.
 
+
+## 2026-11-14 · Final authorized release verification
+
+The owner explicitly authorized installed release launch against real AppData. Ran test-installer.ps1 with IncludeReleaseSmoke: expected NSIS binary marker, version 0.1.0, production protocol/native IPC, Backup/Restore UI, offline Library navigation and exclusion of the debug QA override all passed. Visually inspected the native library screenshot; it remains ignored and was not committed because it contains personal library information. No live backup restore or record removal was performed.
+
+The subsequent uninstall returned 0; original fixture PDF bytes, user-data subfolder and registry cleanup passed again. QA installation removed. Installer checksum remains 31F6F0FF6BAD1C3850E8AED869E9A7075CFBAA8B8CA44864252859B640D175F3. Updated Phase 8 tasks 8.6/8.7 and final release/security reports. All requested implementation/verification is complete; final project acceptance remains the owner's separate decision. Commit reference: see docs: finalize authorized Windows release verification.
+

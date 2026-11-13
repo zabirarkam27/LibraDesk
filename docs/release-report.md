@@ -1,6 +1,6 @@
 # LibraDesk 0.1.0 release report
 
-Prepared 2026-11-14. Phase 7 is implemented and pushed through 2fb29ae. Phase 8 QA, packaging and documentation are implemented; installed-release launch on the owner's live AppData remains an explicitly permission-dependent smoke check. Final project acceptance has not been granted.
+Completed 2026-11-14. Phase 7 and all Phase 8 implementation, QA, packaging and documentation tasks are complete. The owner authorized the installed-release launch on their live AppData, and that smoke check passed. Final project acceptance remains the owner's separate decision.
 
 ## Delivered behavior
 
@@ -19,6 +19,7 @@ Restore inspects and stages before replacing anything, checks versions/hashes/sc
 - Agreed native budgets passed: startup 705 ms, warm search maximum 91.91 ms and full app/WebView2 process-tree working set maximum 457.91 MiB. See [performance report](performance-report.md) for workload bounds and all four sizes.
 - SQL/FTS metacharacter and Windows junction regressions passed. [Security review](security-review.md) records CSP, permissions, PDF actions, paths, backups and destructive operations.
 - Production x64 executable and NSIS installer built successfully. Current-user install/uninstall exited 0, executable/version checks passed, original PDF hash and user-data subfolder survived, and the uninstall registry entry was removed.
+- With explicit owner authorization, the installed release launched through its production protocol, returned native settings/version through IPC, displayed Backup/Restore and navigated the library with WebView network access disabled. The release correctly ignored the debug-only QA profile override. The library screenshot was visually checked; personal contents remain outside Git. Installation was then uninstalled and preservation checks passed again.
 - Installer tests used a clean directory on the existing Windows account. Isolated native profile QA used a debug build with embedded frontend. Fresh Windows/absent-WebView testing was not performed.
 
 ## Installer artifact
@@ -35,11 +36,11 @@ SHA-256:
 
 The installer and executable are unsigned. WebView2 must be preinstalled. Source and QA reports are versioned; generated installers, databases, PDFs, caches and private backups are excluded from Git. No GitHub release upload is implied by a source push.
 
-## Pending release smoke and acceptance
+## Final acceptance
 
-Automatic approval review rejected launching the installed release because release builds use the owner's actual %LOCALAPPDATA%\LibraDesk library; startup metadata/file checks can update that database. The debug-only QA override is intentionally unavailable in production. The rejected launch was not executed. The owner was asked to authorize that specific launch or keep the isolated checks only. No workaround was used.
+The initial automatic approval review rejection was resolved by the owner's explicit instruction to run the release. The prepared install/smoke/uninstall test then passed on 2026-11-14. This launch used the account's real AppData and normal local background checks; no backup restore or record removal was performed against the owner's library.
 
-All unaffected installer/preservation, native-isolation, backend, browser, performance, security and documentation work has proceeded. Once the owner decides, either execute the authorized installed smoke or record their acceptance of the stated isolated-test scope. Then request final project/release acceptance; completion approval is still outstanding.
+All planned implementation and verification work is complete within the documented test scope. The QA installation has been removed; the generated installer remains available for normal installation. Final project/release acceptance is requested separately and is not inferred from permission to run tests.
 
 ## Documentation
 
