@@ -1,0 +1,17 @@
+﻿{
+    "version":  "0.2.0",
+    "tag":  "v0.2.0",
+    "releaseUrl":  "https://github.com/zabirarkam27/LibraDesk/releases/tag/v0.2.0",
+    "sourceCommit":  "dea88a3248f73d7610f92964d0df329233c7a4fa",
+    "draft":  false,
+    "prerelease":  false,
+    "latest":  true,
+    "installerUrl":  "https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/LibraDesk_0.2.0_x64-setup.exe",
+    "installerBytes":  224588853,
+    "sha256":  "8b9aca0af1c59f9985cfa342e0beda6c956c379fd26aec8a46664567db9482a1",
+    "githubAssetDigestMatches":  true,
+    "publicInstallerHttpStatus":  200,
+    "publicChecksumHttpStatus":  200,
+    "checksumTextMatches":  true,
+    "publicReadmeVerified":  true
+}

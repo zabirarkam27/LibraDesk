@@ -33,7 +33,9 @@ Custom PNG/JPEG/WebP thumbnails support preview/cancel/save/reset and are normal
 - Final installer payload/runtime signature audited; no PDF or SQLite library payload packaged.
 - Real current-user installation, expected executable bytes/version, authorized release startup/native IPC/settings/offline navigation and uninstall passed. Source PDF/data fixtures and registry cleanup checks passed.
 
-Evidence: [native edits](qa/source-edits-native-0.2.0.json), [distribution](qa/distribution-0.2.0.json), [installer](qa/installer-0.2.0.json), [release smoke](qa/release-smoke-0.2.0.json). Publication receipt is recorded after upload.
+Evidence: [native edits](qa/source-edits-native-0.2.0.json), [distribution](qa/distribution-0.2.0.json), [installer](qa/installer-0.2.0.json), [release smoke](qa/release-smoke-0.2.0.json), [public publication receipt](qa/published-0.2.0.json).
+
+Published as the public Latest release on 2026-11-14, targeting tested source commit dea88a3248f73d7610f92964d0df329233c7a4fa. Unauthenticated installer/checksum downloads returned HTTP 200. GitHub asset size/digest and downloaded checksum contents match the audited installer; public README download link verified.
 
 ## Limits
 
