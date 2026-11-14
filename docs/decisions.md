@@ -13,3 +13,9 @@ These decisions guide implementation. The targeted checks identify where a choic
 | ADR-007 | Use independent FTS5 indexes for metadata and page text. Normalize derived text and validate Bengali matches against fixtures. | Keeps fast catalog queries separate from background content indexing. Verify combining marks, canonical equivalence, mixed scripts, prefix matching, and ranking. |
 | ADR-008 | Persist import and indexing checkpoints. Use the SQLite backup API and stage restores with a safety snapshot. | Supports recovery from interrupted work and produces a consistent snapshot under WAL. Exercise restart, repeated confirmation, failed restore, and index rebuild. |
 | ADR-009 | Include page-linked personal notes in Task 5.7 alongside bookmarks. | Gives the existing notes requirement a delivery task and keeps it with reader annotations. Verify CRUD, restart, relink preservation, and backup/restore. |
+
+## ADR-010 · Original-PDF metadata updates and durable custom thumbnails
+
+The owner explicitly authorized manual catalog edits to update original PDF metadata and chose no persistent safety backup. Use bounded incremental Info/XMP writes with same-folder staging, Windows atomic replacement and a separate durable attempt journal. Surface per-file completion/errors and Retry/Stop; defer active readers. Block restore/removal while prepared attempts need reconciliation, and never replay restored jobs. This replaces the earlier global source-read-only policy for manual metadata changes only.
+
+Store custom cover PNGs as user-owned database BLOBs rather than generated cache. They survive cache cleanup and all database backups, and do not alter PDF pages.

@@ -169,3 +169,81 @@ fn restore_uses_a_new_cache_generation_and_preserves_old_cache() {
     let next = archive::create(&db, &root, &root.join("backups"), true).unwrap();
     assert_eq!(next.thumbnails, 0);
 }
+
+#[test]
+fn custom_thumbnails_survive_cache_cleanup_and_restore_without_replaying_pdf_edits() {
+    let (dir, root, mut db) = setup();
+    let png = |color: [u8; 3]| {
+        let mut bytes = Vec::new();
+        {
+            let mut encoder = png::Encoder::new(&mut bytes, 1, 1);
+            encoder.set_color(png::ColorType::Rgb);
+            encoder.set_depth(png::BitDepth::Eight);
+            let mut writer = encoder.write_header().unwrap();
+            writer.write_image_data(&color).unwrap();
+        }
+        bytes
+    };
+    let first = png([120, 30, 20]);
+    let second = png([20, 30, 120]);
+    let original = fs::read(dir.path().join("original.pdf")).unwrap();
+    crate::metadata::process_next(&db).unwrap();
+    db.save_custom_cover(1, db.get_book(1).unwrap().revision, Some(&first))
+        .unwrap();
+    let revision = db.get_book(1).unwrap().custom_cover_revision.unwrap();
+    assert_eq!(db.cover_revision(1).unwrap(), Some(-revision));
+    assert!(db.next_cover().unwrap().is_none());
+    assert_eq!(db.custom_cover(1, -revision).unwrap().unwrap(), first);
+    assert!(db.save_custom_cover(1, 1, Some(b"bad PNG")).is_err());
+    let book = db.get_book(1).unwrap();
+    db.update_book(
+        1,
+        book.revision,
+        &crate::catalog::repository::BookInput {
+            title: book.title,
+            genre: Some("Restored genre".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let saved = archive::create(&db, &root, &root.join("backups"), false).unwrap();
+    db.save_custom_cover(1, db.get_book(1).unwrap().revision, Some(&second))
+        .unwrap();
+    let revision2 = db.get_book(1).unwrap().custom_cover_revision.unwrap();
+    assert!(revision2 > revision);
+    crate::storage_management::clean(&root, crate::storage_management::CacheKind::Thumbnails)
+        .unwrap();
+    assert_eq!(db.custom_cover(1, -revision2).unwrap().unwrap(), second);
+    let draft = restore::prepare(&root, Path::new(&saved.path), 1).unwrap();
+    restore::apply(&mut db, &root, draft, false).unwrap();
+    assert_eq!(db.custom_cover(1, -revision).unwrap().unwrap(), first);
+    assert_eq!(
+        db.get_book(1).unwrap().genre.as_deref(),
+        Some("Restored genre")
+    );
+    assert_eq!(db.pdf_write_status(1).unwrap()[0].status, "not_requested");
+    assert_eq!(fs::read(dir.path().join("original.pdf")).unwrap(), original);
+    db.save_custom_cover(1, db.get_book(1).unwrap().revision, None)
+        .unwrap();
+    assert!(db.get_book(1).unwrap().custom_cover_revision.is_none());
+    assert!(db.next_cover().unwrap().is_some());
+}
+
+#[test]
+fn restore_refuses_unreconciled_pdf_writes_before_replacing_library_data() {
+    let (dir, root, mut db) = setup();
+    let backup = archive::create(&db, &root, &root.join("backups"), false).unwrap();
+    let draft = restore::prepare(&root, Path::new(&backup.path), 1).unwrap();
+    let original = fs::read(dir.path().join("original.pdf")).unwrap();
+    db.0.execute("INSERT INTO pdf_write_attempts(file_id,generation,source_revision,source_path,source_token,original_sha256,prepared_sha256,stage_path,created_at) SELECT id,1,revision,path_key,coalesce(source_token,''),zeroblob(32),zeroblob(32),path_key||'.pending',0 FROM book_files WHERE id=1",[]).unwrap();
+    let result = restore::apply(&mut db, &root, draft, false);
+    assert!(result.is_err());
+    assert!(result
+        .err()
+        .unwrap()
+        .message()
+        .contains("PDF metadata saves"));
+    assert_eq!(title(&db), "Backup title");
+    assert_eq!(fs::read(dir.path().join("original.pdf")).unwrap(), original);
+    assert_eq!(fs::read_dir(root.join("backups")).unwrap().count(), 1);
+}

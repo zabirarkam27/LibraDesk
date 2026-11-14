@@ -5,12 +5,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/shared/ui/input";
 import { saveMetadata, type Edit, type MetadataRow } from "./client";
 
-const fields = ["title", "author", "subject"] as const;
+const fields = ["title", "author", "subject", "genre"] as const;
 
 export function MetadataEditor({ rows, onClose }: { rows: MetadataRow[]; onClose: () => void }) {
   const single = rows.length === 1 ? rows[0] : null;
   const [draft, setDraft] = useState<Record<Edit["field"], string>>({
-    title: single?.title ?? "", author: single?.author ?? "", subject: single?.subject ?? "",
+    title: single?.title ?? "", author: single?.author ?? "", subject: single?.subject ?? "", genre: single?.genre ?? "",
   });
   const [fieldsToSave, setFieldsToSave] = useState<Edit["field"][]>([]);
   const [saving, setSaving] = useState(false);
@@ -30,7 +30,7 @@ export function MetadataEditor({ rows, onClose }: { rows: MetadataRow[]; onClose
     setSaving(true);
     try {
       await saveMetadata(rows.map(({ id }) => id), edits);
-      toast.success("Metadata saved");
+      toast.success("Library metadata saved; PDF updates queued");
       onClose();
     } catch {
       toast.error("LibraDesk could not save the selected metadata.");
@@ -43,7 +43,7 @@ export function MetadataEditor({ rows, onClose }: { rows: MetadataRow[]; onClose
       <DialogContent className="max-h-[85dvh] overflow-y-auto" showCloseButton={!saving}>
         <DialogHeader>
           <DialogTitle>{single ? "Edit book metadata" : `Edit ${rows.length} books`}</DialogTitle>
-          <DialogDescription>Select the fields to save. A checked, empty author or subject records that it is unknown.</DialogDescription>
+          <DialogDescription>Selected fields are saved to the library and queued for atomic PDF metadata updates without a safety backup. A checked, empty author or subject clears it. Check each book's PDF metadata sync status for failures.</DialogDescription>
         </DialogHeader>
         {raw && (
           <details className="rounded-md border px-3 py-2 text-sm">

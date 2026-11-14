@@ -1,0 +1,7 @@
+{
+  "version": "0.2.0",
+  "productionProtocol": "http://tauri.localhost/",
+  "offlineNavigation": true,
+  "releaseIgnoresQaProfile": true,
+  "settingsBackupRestore": true
+}

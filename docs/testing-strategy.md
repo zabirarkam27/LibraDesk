@@ -18,7 +18,7 @@ npm run test:browser
 
 The PDF generator requires Python with reportlab and Pillow. It uses the Windows Nirmala font for Bengali. Chrome must be installed at its standard Windows path. Browser runners use Node's built-in CDP/WebSocket support, bind fixture servers to loopback, create separate temporary profiles under target, and remove only their checked profile paths. No browser automation dependency is required. Large generated PDFs remain under ignored target.
 
-The ten browser suites cover catalog routing, grid/list/compact virtualization, CRUD/forms, organization, filters, Ctrl+K, real PDF.js rendering, navigation, search/highlights, bookmarks/notes, reader preferences, close persistence, extraction resume, full-text snippets, recovery, duplicates, all settings areas, storage, backup, restore and analytics. Historical phase numbers identify their feature contracts. IPC is mocked in these browser suites; PDF parsing/rendering is real. They do not establish native filesystem correctness.
+The eleven browser suites cover catalog routing, grid/list/compact virtualization, CRUD/forms, organization, filters, Ctrl+K, real PDF.js rendering, navigation, search/highlights, bookmarks/notes, reader preferences, close persistence, extraction resume, full-text snippets, recovery, duplicates, all settings areas, storage, backup, restore and analytics. Historical phase numbers identify their feature contracts. IPC is mocked in these browser suites; PDF parsing/rendering is real. They do not establish native filesystem correctness.
 
 Rust tests exercise real SQLite migrations/FTS, transactions, files, hashes, source handles, extraction leases, paths, duplicates, recovery, archive validation and rollback. A cross-feature integration test runs interrupted discovery/reopen/confirmation/import, metadata, edits, reader state/note, backup, restore, relink and reopen, and compares original PDF bytes. SQL/FTS metacharacters and real Windows junctions have regression coverage.
 
@@ -51,3 +51,18 @@ Installed release startup smoke is a separate opt-in: -IncludeReleaseSmoke. That
 Distribution checks use scripts/test-distribution.ps1 (requires developer-side 7-Zip) to inspect the NSIS payload, validate the embedded runtime's Microsoft signature and generate SHA256SUMS.txt. After publishing, scripts/verify-release.ps1 verifies the public HTTP downloads, GitHub asset digest, checksum contents, Latest release and README link. These tools are not end-user installation requirements. Nonpersonal versioned receipts are kept in docs/qa.
 
 Raw reports are written under ignored target. Reviewed, nonpersonal snapshots and interpretation are in the performance and release reports. Tests on one Windows account do not prove behavior on every drive, permission setup, Windows version or fresh OS installation.
+
+## v0.2.0 source-edit verification
+
+Routine backend suite: 56 passed, 0 failed; three explicit tests are ignored (one performance benchmark and two native fixture preparation/verification helpers). Formatting, warnings-denied Clippy and production frontend build passed. Eleven browser suites include source metadata queue/failure/retry/stop, notification/navigation, genre and manual-cover preview/cancel/save/reset, with real image decoding and mock native IPC.
+
+Real SQLite/filesystem tests cover Unicode Info/XMP roundtrip, unknown-field preservation, unchanged pages, reanchored notes/progress, category descendant renames, crash after replacement/newer generations, cancellation, locked retry, tampered stage, read-only/external changes, signatures, encryption/oversize refusal, active-reader deferral, DACL/origin preservation, restore blocking and manual-cover backup/cleanup/restore.
+
+~~~powershell
+cargo test --locked --manifest-path src-tauri/Cargo.toml prepare_native_edit_fixture -- --ignored --nocapture
+cargo build --locked --manifest-path src-tauri/Cargo.toml --features tauri/custom-protocol
+node scripts/test-native-edits.mjs
+cargo test --locked --manifest-path src-tauri/Cargo.toml verify_native_edit_fixture -- --ignored --nocapture
+~~~
+
+The native runner validates the isolated generated profile and its native Settings dataPath before any edit. It writes all book fields into a generated PDF, saves a JPEG-derived custom thumbnail, clears generated caches, backs up and renders the edited document in the actual PDF.js reader. The independent Rust verifier reopens the on-disk PDF after the app closes and checks fields, original page bytes, notes and database integrity. No personal source PDF is used. See [native receipt](qa/source-edits-native-0.2.0.json).

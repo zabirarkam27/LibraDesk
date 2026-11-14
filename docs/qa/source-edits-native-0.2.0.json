@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "profile": "isolated generated PDF/library under target",
+  "nativeMetadataSync": "completed",
+  "standardAndCustomFieldsRequested": true,
+  "jpegPreviewAndNativeThumbnailSave": true,
+  "customCoverSurvivesCacheClear": true,
+  "thumbnailDoesNotModifySource": true,
+  "editedPdfRenderedInNativeReader": true,
+  "backupWithoutGeneratedCoversBooks": 1,
+  "productionProtocol": "http://tauri.localhost/",
+  "independentPostClosePdfVerification": "passed",
+  "routineBackendTestsPassed": 56,
+  "browserSuitesPassed": 11
+}

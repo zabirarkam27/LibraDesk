@@ -29,7 +29,7 @@ export function BackupSettings(){
       <legend className="mb-3 font-semibold">Backup options</legend>
       <label className="flex items-center gap-2"><input type="checkbox" checked={thumbnails} onChange={event=>setThumbnails(event.target.checked)}/>Include cached thumbnails</label>
       <label className="flex items-center gap-2"><input type="checkbox" checked={choose} onChange={event=>setChoose(event.target.checked)}/>Choose a destination folder</label>
-      <p className="text-xs text-muted-foreground">Without a selected destination, backups go to the application's backups folder. Each backup is a separate folder with a versioned manifest and SHA-256 checksums.</p>
+      <p className="text-xs text-muted-foreground">Without a selected destination, backups go to the application's backups folder. Each backup has a versioned manifest and SHA-256 checksums. Custom thumbnails are library data and are always included; this option controls generated cover caches.</p>
       <Button onClick={()=>void create()}>{busy?"Creating and verifying backup…":"Create backup"}</Button>
     </fieldset>
     {!desktop&&<p>Open the Windows app to create local backups.</p>}

@@ -93,6 +93,7 @@ pub fn prepare(root: &Path, folder: &Path, id: u64) -> Result<Draft> {
     }
     let db = Database::open(&file)?;
     db.preferences(None)?;
+    db.0.execute_batch("DELETE FROM pdf_write_attempts;DELETE FROM pdf_write_jobs;")?;
     db.recover_scans()?;
     db.0.execute_batch("UPDATE reading_sessions SET ended_at=last_checkpoint_at WHERE ended_at IS NULL;
   UPDATE text_extraction_jobs SET lease=lease+1,lease_expires_at=NULL,status=CASE WHEN status='running' THEN 'queued' ELSE status END;
@@ -156,6 +157,15 @@ pub fn apply(
     draft: Draft,
     fail_after_copy: bool,
 ) -> Result<Restored> {
+    let pending: bool =
+        db.0.query_row("SELECT EXISTS(SELECT 1 FROM pdf_write_attempts)", [], |r| {
+            r.get(0)
+        })?;
+    if pending {
+        return Err(Error::Invalid(
+            "Finish or stop pending PDF metadata saves in Book details before restoring a library.",
+        ));
+    }
     if archive::timestamp().saturating_sub(draft.created_at) > 900_000 {
         return Err(Error::Invalid(
             "Restore preview expired. Inspect the backup again.",

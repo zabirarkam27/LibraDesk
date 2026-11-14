@@ -37,6 +37,7 @@ export type BookSummary = {
 export type BookInput = {
   title: string;
   subject?: string | null;
+  genre?: string | null;
   publisher?: string | null;
   isbn?: string | null;
   publicationYear?: number | null;
@@ -56,6 +57,8 @@ export type BookDetails = {
   title: string;
   author: string | null;
   subject: string | null;
+  genre: string | null;
+  customCoverRevision: number | null;
   publisher: string | null;
   isbn: string | null;
   publicationYear: number | null;

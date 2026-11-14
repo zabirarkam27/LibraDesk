@@ -20,6 +20,9 @@ pub struct CommandError {
 
 fn database_error(error: database::Error) -> CommandError {
     match error {
+        database::Error::Sqlite(rusqlite::Error::SqliteFailure(_,Some(message))) if message=="PDF metadata save in progress; retry removal" => CommandError{
+            code:"pdf_write_in_progress",message:"A PDF metadata save is still pending. Finish or stop its sync in Book details, then retry removal.",retryable:true,
+        },
         database::Error::ReaderSourceUnavailable => CommandError {
             code: "reader_source_unavailable",
             message: "The PDF is missing, inaccessible, or changed. Check its drive and rescan the folder before reopening.",

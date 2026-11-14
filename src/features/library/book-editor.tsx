@@ -29,7 +29,7 @@ export function BookEditor({ book, organization, close, saved }: {
 }) {
   const [original] = useState(book);
   const [draft, setDraft] = useState<BookInput>({
-    title: book.title, subject: book.subject, publisher: book.publisher, isbn: book.isbn,
+    title: book.title, subject: book.subject, genre: book.genre, publisher: book.publisher, isbn: book.isbn,
     publicationYear: book.publicationYear, language: book.language,
     readingStatus: book.readingStatus, isFavorite: book.isFavorite,
     categoryIds: book.categoryIds, tagIds: book.tagIds, collectionIds: book.collectionIds,
@@ -54,10 +54,10 @@ export function BookEditor({ book, organization, close, saved }: {
     <Dialog open onOpenChange={(open) => { if (!open && !saving) close(); }}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl" showCloseButton={!saving}>
         <DialogHeader><DialogTitle>Edit book</DialogTitle>
-          <DialogDescription>Save metadata and organize this book in your library.</DialogDescription></DialogHeader>
+          <DialogDescription>Save this library edit and queue an atomic metadata update for every attached PDF, without a safety backup. Check PDF metadata sync below for failures or retry. Title changes update PDF metadata; filenames stay the same.</DialogDescription></DialogHeader>
         <form onSubmit={(event) => void submit(event)} className="space-y-4">
           <fieldset disabled={saving} className="grid gap-3 sm:grid-cols-2">
-            {(["title", "subject", "publisher", "isbn", "language"] as const).map((field) => (
+            {(["title", "subject", "genre", "publisher", "isbn", "language"] as const).map((field) => (
               <label key={field} className="grid gap-1 text-sm font-medium">
                 <span>{field === "isbn" ? "ISBN" : field[0].toUpperCase() + field.slice(1)}</span>
                 <Input required={field === "title"} maxLength={4096} value={draft[field] ?? ""}

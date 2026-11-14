@@ -122,6 +122,7 @@ pub struct ReviewRow {
     pub title: String,
     pub author: Option<String>,
     pub subject: Option<String>,
+    pub genre: Option<String>,
     pub path: String,
     pub raw: RawMetadata,
     pub needs_review: bool,
@@ -135,6 +136,7 @@ pub enum Field {
     Title,
     Author,
     Subject,
+    Genre,
 }
 
 impl Field {
@@ -143,6 +145,7 @@ impl Field {
             Self::Title => "title",
             Self::Author => "author",
             Self::Subject => "subject",
+            Self::Genre => "genre",
         }
     }
 }
@@ -240,7 +243,7 @@ impl Database {
                 "SELECT f.id,f.revision,f.size_bytes,m.file_id IS NULL FROM processing_jobs p
              JOIN book_files f ON f.id=p.file_id AND f.revision=p.file_revision
              LEFT JOIN pdf_metadata m ON m.file_id=f.id AND m.file_revision=f.revision
-             WHERE p.kind='cover' AND p.status='queued' ORDER BY p.file_id LIMIT 1",
+             WHERE p.kind='cover' AND p.status='queued' AND NOT EXISTS(SELECT 1 FROM custom_covers WHERE book_id=f.book_id) ORDER BY p.file_id LIMIT 1",
                 [],
                 |row| {
                     Ok(CoverTask {
@@ -317,6 +320,10 @@ impl Database {
     }
 
     pub fn cover_revision(&self, id: i64) -> Result<Option<i64>> {
+        let custom:Option<i64>=self.0.query_row("SELECT -c.revision FROM custom_covers c JOIN book_files f ON f.book_id=c.book_id WHERE f.id=?1",[id],|r|r.get(0)).optional()?;
+        if custom.is_some() {
+            return Ok(custom);
+        }
         self.0.query_row(
             "SELECT t.file_revision FROM thumbnails t JOIN book_files f ON f.id=t.file_id
              JOIN processing_jobs p ON p.file_id=f.id AND p.file_revision=f.revision AND p.kind='cover'
@@ -352,7 +359,7 @@ impl Database {
                            SELECT 1 FROM metadata_overrides WHERE book_id=b.id AND field='title'
                        )) OR ((m.author IS NULL OR trim(m.author)='') AND NOT EXISTS(
                            SELECT 1 FROM metadata_overrides WHERE book_id=b.id AND field='author'
-                       )) AS needs_review
+                       )) AS needs_review,b.genre AS genre
                 FROM books b JOIN book_files f ON f.book_id=b.id AND f.is_primary=1
                 JOIN processing_jobs a ON a.file_id=f.id AND a.file_revision=f.revision AND a.kind='analysis'
                 LEFT JOIN processing_jobs c ON c.file_id=f.id AND c.file_revision=f.revision AND c.kind='cover'
@@ -369,6 +376,7 @@ impl Database {
                     title: row.get(2)?,
                     author: row.get(3)?,
                     subject: row.get(4)?,
+                    genre: row.get(16)?,
                     path: row.get(5)?,
                     raw: RawMetadata {
                         title: row.get(6)?,
@@ -403,7 +411,9 @@ impl Database {
                 let field = edit.field.key();
                 let value = edit.value.trim();
                 let value = (!value.is_empty()).then_some(value);
-                save_override(&tx, *id, field, value)?;
+                if edit.field != Field::Genre {
+                    save_override(&tx, *id, field, value)?;
+                }
                 if edit.field == Field::Title {
                     tx.execute(
                         "UPDATE books SET title=?2,title_sort_key=?3 WHERE id=?1",
@@ -413,7 +423,11 @@ impl Database {
                     set_author_text(&tx, *id, value)?;
                 } else {
                     tx.execute(
-                        "UPDATE books SET subject=?2 WHERE id=?1",
+                        if edit.field == Field::Genre {
+                            "UPDATE books SET genre=?2 WHERE id=?1"
+                        } else {
+                            "UPDATE books SET subject=?2 WHERE id=?1"
+                        },
                         params![id, value],
                     )?;
                 }
@@ -422,6 +436,7 @@ impl Database {
                 &format!("UPDATE books SET revision=revision+1,updated_at={NOW} WHERE id=?1"),
                 [id],
             )?;
+            crate::source_edits::enqueue(&tx, *id)?;
         }
         tx.commit()?;
         Ok(true)

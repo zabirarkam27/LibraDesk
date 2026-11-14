@@ -11,10 +11,10 @@ use crate::{
 type Result<T> = std::result::Result<T, Error>;
 const NOW: &str = "CAST(unixepoch('subsec') * 1000 AS INTEGER)";
 const FILE_COLUMNS: &str = "id,book_id,original_path,size_bytes,modified_at,last_verified_at,page_count,availability,revision,is_primary,
- (SELECT file_revision FROM thumbnails WHERE file_id=book_files.id AND file_revision=book_files.revision)";
+ coalesce((SELECT -revision FROM custom_covers WHERE book_id=book_files.book_id),(SELECT file_revision FROM thumbnails WHERE file_id=book_files.id AND file_revision=book_files.revision))";
 
 pub(super) const SUMMARY_COLUMNS: &str =
-    "b.id,b.title,f.original_path,f.size_bytes,f.id,b.author,f.page_count,t.file_revision,
+    "b.id,b.title,f.original_path,f.size_bytes,f.id,b.author,f.page_count,coalesce((SELECT -revision FROM custom_covers WHERE book_id=b.id),t.file_revision),
      EXISTS(SELECT 1 FROM book_files other WHERE other.sha256=f.sha256 AND other.id<>f.id),
      b.is_favorite,b.reading_status,b.revision,b.language,b.publication_year";
 pub(super) const SUMMARY_JOINS: &str = "LEFT JOIN book_files f ON f.book_id=b.id AND f.is_primary=1
@@ -65,6 +65,8 @@ pub struct BookDetails {
     pub title: String,
     pub author: Option<String>,
     pub subject: Option<String>,
+    pub genre: Option<String>,
+    pub custom_cover_revision: Option<i64>,
     pub publisher: Option<String>,
     pub isbn: Option<String>,
     pub publication_year: Option<i64>,
@@ -107,6 +109,7 @@ pub struct Author {
 pub struct BookInput {
     pub title: String,
     pub subject: Option<String>,
+    pub genre: Option<String>,
     pub publisher: Option<String>,
     pub isbn: Option<String>,
     pub publication_year: Option<i64>,
@@ -150,6 +153,7 @@ impl BookInput {
         let fields = [
             Some(title),
             self.subject.as_deref(),
+            self.genre.as_deref(),
             self.publisher.as_deref(),
             self.isbn.as_deref(),
             self.language.as_deref(),
@@ -271,12 +275,14 @@ fn book_files(connection: &Connection, id: i64) -> rusqlite::Result<Vec<BookFile
 
 fn book_details(connection: &Connection, id: i64) -> Result<BookDetails> {
     let mut book = connection.query_row(
-        "SELECT id,title,author,subject,publisher,isbn,publication_year,language,revision,is_favorite,reading_status FROM books WHERE id=?1",
+        "SELECT id,title,author,subject,publisher,isbn,publication_year,language,revision,is_favorite,reading_status,genre,(SELECT revision FROM custom_covers WHERE book_id=books.id) FROM books WHERE id=?1",
         [id], |row| Ok(BookDetails {
             id: row.get(0)?,
             title: row.get(1)?,
             author: row.get(2)?,
             subject: row.get(3)?,
+            genre: row.get(11)?,
+            custom_cover_revision: row.get(12)?,
             publisher: row.get(4)?,
             isbn: row.get(5)?,
             publication_year: row.get(6)?,
@@ -358,10 +364,10 @@ fn check_revision(tx: &Transaction<'_>, id: i64, expected: i64) -> Result<()> {
 fn persist_metadata(tx: &Transaction<'_>, id: i64, input: &BookInput, title: &str) -> Result<()> {
     let subject = input.subject.as_deref().and_then(trimmed);
     tx.execute(
-        "UPDATE books SET title=?2,title_sort_key=?3,subject=?4,publisher=?5,isbn=?6,publication_year=?7,language=?8
+        "UPDATE books SET title=?2,title_sort_key=?3,subject=?4,publisher=?5,isbn=?6,publication_year=?7,language=?8,genre=?9
          WHERE id=?1",
         params![id, title, super::search::normalize(title), subject, input.publisher.as_deref().and_then(trimmed),
-                input.isbn.as_deref().and_then(trimmed), input.publication_year, input.language.as_deref().and_then(trimmed)],
+                input.isbn.as_deref().and_then(trimmed), input.publication_year, input.language.as_deref().and_then(trimmed),input.genre.as_deref().and_then(trimmed)],
     )?;
     save_override(tx, id, "title", Some(title))?;
     save_override(tx, id, "subject", subject)?;
@@ -448,6 +454,7 @@ impl Database {
             "UPDATE books SET is_favorite=coalesce(?2,is_favorite),reading_status=coalesce(?3,reading_status),
              revision=revision+1,updated_at={NOW} WHERE id=?1"
         ),params![id,favorite,status.map(ReadingStatus::key)])?;
+        crate::source_edits::enqueue(&tx, id)?;
         tx.commit()?;
         Ok(())
     }
@@ -495,6 +502,7 @@ impl Database {
             [id],
         )?;
         let book = book_details(&tx, id)?;
+        crate::source_edits::enqueue(&tx, id)?;
         tx.commit()?;
         Ok(book)
     }

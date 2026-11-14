@@ -1,5 +1,9 @@
 # LibraDesk implementation roadmap
 
+## 2026-11-14 authorized follow-up: PDF metadata and manual thumbnails
+
+The owner requested original-PDF metadata write-back and selected **atomic save without a persistent backup**. This explicitly supersedes historical blanket “never overwrite source documents” wording for manual metadata/organization edits only. Import, reading and record removal still do not modify source PDFs; filenames and page content remain unchanged. Notes/progress/custom thumbnails remain local library data. See the [current release report](release-report.md).
+
 Use this checklist to track task status. The [detailed plan](../plan.md) defines scope, acceptance, and approval rules. Run tasks in the listed order unless the owner approves a change. Dependencies below list the main technical prerequisites in addition to the approval gates. A task is complete when its exit check is supported by evidence in the [development log](development-log.md).
 
 ## Phase 0 · Repository inspection and planning

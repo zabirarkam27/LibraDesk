@@ -1,53 +1,44 @@
-# LibraDesk 0.1.1 release report
+# LibraDesk 0.2.0 release report
 
-Date: 2026-11-14. This distribution update packages the local Windows application for end users and adds a detailed public-facing README. The [0.1.0 implementation and Phase 8 report](releases/0.1.0.md) remains available as historical evidence.
+Date: 2026-11-14. Owner-authorized original-PDF metadata write-back and manual thumbnails, with the explicit choice of atomic save without persistent original-file backups. Historical distribution evidence remains in the [0.1.1 report](releases/0.1.1-report.md).
 
-## Changes
+## Delivered behavior
 
-- Version synchronized to 0.1.1 across npm, Cargo and Tauri configuration.
-- Current-user Windows x64 NSIS installer embeds Microsoft's complete WebView2 Evergreen standalone installer. Setup can supply a missing runtime locally after the setup file is downloaded.
-- Publisher/homepage metadata identify the repository and maintainer handle.
-- Installer QA and release smoke read the current configured version.
-- Distribution audit verifies the NSIS mode/payload, the Microsoft runtime's valid signature, absence of PDF/database payloads and setup checksum.
-- README now provides a project banner, purpose/features, executable links, practical hardware recommendations, installation/update/uninstall steps, English/Bengali quick start, technology stack, architecture, performance evidence, backup/privacy, development and troubleshooting.
+Manual metadata and organization edits enqueue per-file Info/XMP updates, including genre and taxonomy. A durable prepared-attempt journal reconciles interrupted replacement and newer generations. Files are staged, synced, validated and replaced on the same volume using MoveFileExW; source DACL and Zone.Identifier are preserved. Active readers defer writing. Source changes, signatures, encryption/EFS, oversized/unsupported PDFs and access failures are refused visibly. Book details show completion/failure and Retry/Stop; global notifications provide View book.
 
-## Artifacts and URLs
+Custom PNG/JPEG/WebP thumbnails support preview/cancel/save/reset and are normalized into database BLOBs. They survive cache cleanup and all database backups and never change PDF pages. Notes/bookmarks/progress stay local and retain their anchors after metadata-only updates. Restore refuses live prepared attempts and clears restored write intents. Record removal never deletes PDFs.
+
+## Artifact
 
 | Item | Value |
 | --- | --- |
-| Platform | Windows 11 x64, Intel/AMD |
-| Setup | LibraDesk_0.1.1_x64-setup.exe |
-| Setup bytes | 224,490,298 (~214.09 MiB) |
-| SHA-256 | 570f70afa19afe04f247d757c1f9c9cf005cc487d21e30ebf1e072d56bda4e49 |
-| Runtime payload | Microsoft WebView2 Evergreen standalone, 215,116,512 bytes |
-| Runtime signature | Valid, Microsoft Corporation |
-| App/installer signing | Unsigned |
-| Release | [v0.1.1](https://github.com/zabirarkam27/LibraDesk/releases/tag/v0.1.1) |
-| Direct setup download | [setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/LibraDesk_0.1.1_x64-setup.exe) |
-| Checksums | [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/SHA256SUMS.txt) |
-
-Source assets, metadata and documentation are versioned; generated installers, source PDFs, library databases, private caches and backups remain excluded from Git.
-
-Publication verified on 2026-11-14: the public, non-prerelease GitHub release is marked Latest and targets source commit 80ef136fceb4040d7dc2f577313a1f64b6e07a9f. Unauthenticated setup/checksum URLs returned HTTP 200. Setup Content-Length, GitHub's asset SHA-256 digest and downloaded checksum text all match the audited local artifact. The public README includes the setup link. See the [publication receipt](qa/published-0.1.1.json).
+| Target | Windows 11 x64, Intel/AMD |
+| Setup | LibraDesk_0.2.0_x64-setup.exe |
+| Size | 224,588,853 bytes (~214.18 MiB) |
+| SHA-256 | 8b9aca0af1c59f9985cfa342e0beda6c956c379fd26aec8a46664567db9482a1 |
+| Embedded prerequisite | Full WebView2 Evergreen standalone, 215,116,512 bytes; valid Microsoft signature |
+| App/setup signature | Unsigned |
+| Release | [v0.2.0](https://github.com/zabirarkam27/LibraDesk/releases/tag/v0.2.0) |
+| Setup download | [setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/LibraDesk_0.2.0_x64-setup.exe) |
+| Integrity | [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/SHA256SUMS.txt) |
 
 ## Verification
 
-- Frontend production build passed.
-- Rust formatting and Clippy with warnings denied passed.
-- 46 ordinary Rust tests passed after the version bump, including archive/version compatibility; the explicit scale benchmark remains opt-in.
-- Final installer payload contains the executable and embedded runtime; no PDF or SQLite library payload was found. Microsoft's embedded runtime signature verified as valid.
-- Real current-user setup completed in a unique QA destination; version 0.1.1 and every executable byte after the expected Tauri bundle marker matched.
-- With existing explicit launch authorization, installed release startup, production-protocol native IPC, Settings/Restore UI and offline Library navigation passed.
-- Uninstall returned 0, removed the program/registration and preserved source PDF bytes and a user-data subfolder.
-- Existing ten browser-suite and collection-performance results describe the unchanged UI/library implementation. No new low-memory or sustained-indexing benchmark is claimed for this packaging-only update.
-- README/doc local links and SVG XML passed validation. Public release assets, checksum, Latest routing, source commit and README download link passed post-upload verification.
+- 56 ordinary Rust tests passed; three explicit helpers/benchmark ignored in the routine run.
+- Eleven browser suites passed, including source-write states, failure notification/navigation, genre and real image preview/cancel/save/reset.
+- Frontend production build, Rust fmt and Clippy with warnings denied passed.
+- Actual isolated native IPC edited a generated PDF and saved a JPEG-derived cover, retained it through cache cleanup, created a backup and rendered the edited PDF in the actual reader.
+- Independent post-close verification reopened the disk PDF and checked standard/custom fields, original page bytes, notes and database integrity.
+- Native regressions cover crash after replacement, newer edits, locked retry, tampered staging, cancellation, signatures/encryption/oversize, read-only/external changes, active readers, Windows DACL/origin preservation, restore blocking and custom-cover backup/restore.
+- Final installer payload/runtime signature audited; no PDF or SQLite library payload packaged.
+- Real current-user installation, expected executable bytes/version, authorized release startup/native IPC/settings/offline navigation and uninstall passed. Source PDF/data fixtures and registry cleanup checks passed.
 
-Machine-readable evidence: [distribution](qa/distribution-0.1.1.json), [installer](qa/installer-0.1.1.json), [release smoke](qa/release-smoke-0.1.1.json).
+Evidence: [native edits](qa/source-edits-native-0.2.0.json), [distribution](qa/distribution-0.2.0.json), [installer](qa/installer-0.2.0.json), [release smoke](qa/release-smoke-0.2.0.json). Publication receipt is recorded after upload.
 
-## Support scope and limits
+## Limits
 
-The application targets Windows 11 x64. Suggested 8 GB RAM / dual-core x64 / 2 GB free space / 1280 × 720 requirements are practical planning recommendations, not a measured minimum. Test hardware was a Ryzen 5 8500G with about 32 GB RAM. ARM64, 32-bit, macOS and Linux installers are not published.
+No personal PDF was edited for QA. The installed release smoke used the previously authorized live AppData launch without metadata-edit/restore/deletion commands. Merely upgrading does not queue PDF writes. A runtime-absent fresh OS was not tested. Historical 10,001-record idle-catalog performance does not measure sustained source writing.
 
-Runtime inclusion is verified, but the missing-runtime branch was not executed on a fresh Windows installation; no shared runtime or registry detection was removed from the test machine. Existing runtime installations should be kept updated. Organization policies and unsigned-app restrictions can prevent installation. Evergreen runtime maintenance is independent of the app's offline core.
+Metadata writes support writable unsigned/unencrypted PDFs up to 256 MiB and require staging space. No persistent PDF backup or source-metadata undo is supplied. Incremental revisions can retain previous metadata bytes; PDF/A conformance and preservation of every filesystem attribute/alternate stream are not certified. Custom fields may not display in other viewers or reconstruct on fresh import. Database restore cannot undo physical PDF edits.
 
-No source-PDF mutation, database migration or automatic application updater is introduced by this update. Back up original PDFs separately from database snapshots. Final project acceptance remains distinct from authorization to prepare and publish the requested installer.
+Final project acceptance remains separate from authorization to implement and distribute this feature.

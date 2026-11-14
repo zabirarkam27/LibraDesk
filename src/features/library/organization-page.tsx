@@ -126,6 +126,6 @@ function Groups() {
   </>;
 }
 export function OrganizationPage() {
-  return <><PageHeading label="Library" title="Organize" description="Manage nested categories, tags, collections, and reading lists." />
+  return <><PageHeading label="Library" title="Organize" description="Manage nested categories, tags, collections, and reading lists. Name and membership changes queue metadata updates for the assigned PDFs." />
     {desktop ? <Groups /> : <DesktopNotice />}</>;
 }

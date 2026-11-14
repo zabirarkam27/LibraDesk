@@ -13,6 +13,8 @@ import { getBook } from "./catalog-client";
 import { BookEditor } from "./book-editor";
 import { getOrganization, readingStatuses } from "./library-client";
 import { DesktopNotice, QueryError } from "./query-feedback";
+import { ThumbnailEditor } from "./thumbnail-editor";
+import { PdfMetadataStatus } from "./pdf-metadata-status";
 
 function Details({ id }: { id: number }) {
   const query = useCallback(async () => {
@@ -27,7 +29,7 @@ function Details({ id }: { id: number }) {
   const primary = book.files.find((file) => file.isPrimary) ?? book.files[0];
   const fields = [
     ["Authors", book.authors.map((author) => author.displayName).join(", ") || null],
-    ["Subject", book.subject], ["Publisher", book.publisher], ["ISBN", book.isbn],
+    ["Subject", book.subject], ["Genre", book.genre], ["Publisher", book.publisher], ["ISBN", book.isbn],
     ["Publication year", book.publicationYear], ["Language", book.language],
     ["Reading status", readingStatuses.find((status) => status.value === book.readingStatus)?.label],
     ["Favorite", book.isFavorite ? "Yes" : "No"],
@@ -43,7 +45,7 @@ function Details({ id }: { id: number }) {
         </div>
       </div>
       <section className="grid gap-6 rounded-xl border bg-card p-5 sm:grid-cols-[10rem_minmax(0,1fr)]">
-        <BookCover fileId={primary?.id ?? null} revision={primary?.coverRevision ?? null} className="h-52 w-40" />
+        <div className="space-y-3"><BookCover fileId={primary?.id ?? null} revision={primary?.coverRevision ?? null} className="h-52 w-40" /><ThumbnailEditor book={book} saved={retry} /></div>
         <div className="min-w-0">
           <h1 className="font-display text-3xl wrap-anywhere">{book.title}</h1>
           <dl className="mt-5 grid grid-cols-[8rem_minmax(0,1fr)] gap-3 text-sm">
@@ -79,6 +81,7 @@ function Details({ id }: { id: number }) {
           <RelinkButton file={file.id} />
         </li>)}</ul> : <p className="text-sm text-muted-foreground">No file is attached to this book.</p>}
       </section>
+      <PdfMetadataStatus book={book.id} files={book.files} />
       {editing && <BookEditor book={book} organization={organization} close={() => { setEditing(false); retry(); }}
         saved={() => { setEditing(false); retry(); }} />}
     </>

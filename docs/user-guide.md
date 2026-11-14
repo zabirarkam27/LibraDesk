@@ -1,6 +1,6 @@
 # LibraDesk user guide
 
-LibraDesk manages PDFs where they already live. Categories, tags, collections, edits, notes and progress are stored locally; importing never copies, renames or moves source PDFs.
+LibraDesk manages PDFs where they already live. Categories, tags, collections, edits, notes and progress are stored locally; manual book metadata and organization edits additionally queue original-PDF updates without a persistent PDF backup; importing never copies, renames or moves source PDFs.
 
 ## Import and organize
 
@@ -34,8 +34,20 @@ In Metadata → Exact duplicates, inspect copies, choose a preferred record, ign
 
 General chooses the startup page. Appearance controls the app theme; Reader has its own appearance, zoom and layout. Library chooses the default view. Storage reports local usage and confirms cache cleanup. Temporary files must be at least 24 hours old; linked folders, database/backups and PDF content are protected. Restored covers use separate cache generations, which the thumbnail cleanup can clear.
 
-In Backup, create a manual snapshot with optional thumbnails and a chosen destination, or use managed backups. Keep the whole generated folder and manifest. Original PDFs are excluded and backups are unencrypted. Store source PDFs separately using your own backup method.
+In Backup, create a manual snapshot with optional generated thumbnails (manual thumbnails are always included) and a chosen destination, or use managed backups. Keep the whole generated folder and manifest. Original PDFs are excluded and backups are unencrypted. Store source PDFs separately using your own backup method.
 
 To restore, select a complete backup folder, inspect its date/counts and acknowledge replacement. LibraDesk creates a safety snapshot of the current database, validates and restores the selected library, rebuilds indexes and asks you to reload. A failed replacement attempts automatic rollback. Newer/incompatible or corrupted backups are rejected. Paths on another computer may need relinking.
 
 See [backup and recovery](backup-recovery.md), [troubleshooting](troubleshooting.md) and [known limitations](known-limitations.md).
+
+## Edit metadata in source PDFs
+
+Use Book details → Edit metadata for title, authors, subject, genre, publisher, ISBN, language, year and organization. Metadata also supports bulk editing. Saving the catalog queues every attached PDF. Group renames/reparenting and membership, favorite or reading-status changes queue affected PDFs too. Check each file's PDF metadata sync panel: only Saved to PDF confirms a completed write. Failures show Retry and Stop, with a global notification and View book action. Close the reader to allow pending saves.
+
+The PDF must be writable, unsigned, unencrypted, structurally supported and no larger than 256 MiB. Its folder needs room for a complete staged file. A detected external change is refused; inspect/reverify it before retrying. No filename or page-content change is performed. Standard Info/XMP fields and LibraDesk-specific taxonomy/status properties are written; other applications may not expose custom properties.
+
+Your chosen policy is atomic save without a persistent original-file backup. Temporary output is validated before replacement; interrupted operations reconcile on restart. Stop does not undo a completed replacement. Incremental revisions may retain historical metadata bytes. Database restore cannot undo source-PDF edits, and restored jobs are not replayed.
+
+## Manual thumbnails
+
+In Book details choose Change thumbnail, select PNG/JPEG/WebP up to 10 MiB, review the preview and Save thumbnail. Cancel preserves the old cover; Use automatic thumbnail removes the manual choice. Images are normalized to at most 240 × 320 PNG pixels (32-million-pixel input limit). They are stored in SQLite, survive cache cleanup and are always included in database backups. They do not replace a PDF page. Notes, bookmarks and reading progress likewise remain local library data.

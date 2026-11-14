@@ -1,6 +1,6 @@
 [package]
 name = "libradesk"
-version = "0.1.1"
+version = "0.2.0"
 description = "Personal PDF library for Windows"
 edition = "2021"
 
@@ -10,6 +10,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 lopdf = { version = "0.47", default-features = false }
 png = "0.18"
+quick-xml = "0.42"
 rusqlite = { version = "0.41", features = ["bundled", "functions", "backup"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -21,4 +22,4 @@ tempfile = "3"
 unicode-normalization = "0.1"
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem"] }
+windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem", "Win32_Security"] }

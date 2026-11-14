@@ -16,6 +16,7 @@ export type MetadataRow = {
   title: string;
   author: string | null;
   subject: string | null;
+  genre: string | null;
   path: string;
   raw: RawMetadata;
   needsReview: boolean;
@@ -23,7 +24,7 @@ export type MetadataRow = {
   error: string | null;
 };
 
-export type Edit = { field: "title" | "author" | "subject"; value: string };
+export type Edit = { field: "title" | "author" | "subject" | "genre"; value: string };
 export type DuplicateGroup = {
   hash: string;
   count: number;

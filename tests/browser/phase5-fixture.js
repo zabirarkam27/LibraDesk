@@ -31,6 +31,7 @@
     transformCallback(fn) { callbacks.set(++callback, fn); return callback; },
     unregisterCallback(id) { callbacks.delete(id); },
     async invoke(command, args = {}) {
+      if(command==="pdf_metadata_status")return [];
       if (command === "plugin:event|listen") { subscriptions.set(args.handler, args.event); return args.handler; }
       if (command === "plugin:event|unlisten") return;
       if (command === "get_preferences") return { app: "light", reader: stored.theme || "light", schemaVersion: 6 };

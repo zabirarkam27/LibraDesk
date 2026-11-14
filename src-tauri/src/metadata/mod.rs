@@ -1,5 +1,6 @@
 pub mod commands;
 mod cover;
+pub mod manual_cover;
 mod pdf;
 mod repository;
 

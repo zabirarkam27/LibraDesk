@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/LibraDesk_0.1.1_x64-setup.exe"><strong>Download for Windows x64 · v0.1.1</strong></a>
+  <a href="https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/LibraDesk_0.2.0_x64-setup.exe"><strong>Download for Windows x64 · v0.2.0</strong></a>
   &nbsp;·&nbsp;
   <a href="https://github.com/zabirarkam27/LibraDesk/releases/latest">Latest release</a>
   &nbsp;·&nbsp;
@@ -32,7 +32,7 @@ A large PDF collection is easy to accumulate and difficult to use. Books spread 
 
 LibraDesk turns that collection into a searchable personal library. It catalogs PDFs in their existing locations and stores your organization, notes, bookmarks and reading history in a local SQLite database. You can browse by category, tag, collection, favorite or reading status, then open a book in the built-in reader.
 
-**Your PDFs stay where you put them.** Importing does not copy, move, rename or delete the originals. Core features work locally without accounts, subscriptions, cloud services or an application server.
+**Your PDFs stay where you put them.** Importing does not copy, move, rename or delete the originals. **Starting with v0.2.0, manual book metadata edits also update the original PDFs, using atomic replacement without a persistent PDF backup.** Check the per-file save status in Book details. Core features work locally without accounts, subscriptions, cloud services or an application server.
 
 ## Contents
 
@@ -55,14 +55,14 @@ LibraDesk turns that collection into a searchable personal library. It catalogs 
 
 | Download | What it contains |
 | --- | --- |
-| **[LibraDesk_0.1.1_x64-setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/LibraDesk_0.1.1_x64-setup.exe)** | Windows x64 setup with the Microsoft WebView2 Evergreen standalone installer bundled |
-| [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/SHA256SUMS.txt) | SHA-256 checksum for verifying the downloaded setup |
-| [Release notes](https://github.com/zabirarkam27/LibraDesk/releases/tag/v0.1.1) | Version changes, installation notes and verification scope |
+| **[LibraDesk_0.2.0_x64-setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/LibraDesk_0.2.0_x64-setup.exe)** | Windows x64 setup with the Microsoft WebView2 Evergreen standalone installer bundled |
+| [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/SHA256SUMS.txt) | SHA-256 checksum for verifying the downloaded setup |
+| [Release notes](https://github.com/zabirarkam27/LibraDesk/releases/tag/v0.2.0) | Version changes, installation notes and verification scope |
 | [All releases](https://github.com/zabirarkam27/LibraDesk/releases) | Published versions and assets |
 
 Download the **setup.exe** asset. GitHub's “Source code (zip)” and “Source code (tar.gz)” archives are for developers; they are not Windows installers.
 
-Current setup size: **224,490,298 bytes (~214.09 MiB)**. The checksum file identifies the exact release artifact.
+Current setup size: **224,588,853 bytes (~214.18 MiB)**. The checksum file identifies the exact release artifact.
 
 The setup is larger than the application because it includes the full WebView2 prerequisite. Once downloaded, it can install the missing runtime locally without fetching a bootstrapper from the internet. A suitable existing runtime is reused. Microsoft's Evergreen runtime can receive its own updates when the PC is online. See the [Tauri installer documentation](https://v2.tauri.app/distribute/windows-installer/#offline-installer) and [Microsoft's runtime distribution documentation](https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution#offline-deployment).
 
@@ -82,16 +82,16 @@ This release provides a **Windows 11 x64 installer for Intel/AMD PCs**. There ar
 | Display | 1280 × 720 or larger | 1920 × 1080 or larger |
 | WebView2 | Bundled standalone installer supplies it if missing | Keep the runtime updated |
 | Network | Needed to obtain the download; not needed for core use | Optional for downloading newer releases/runtime updates |
-| Permissions | Write access to your user profile and readable source folders | A normal personal Windows account |
+| Permissions | Write access to your user profile; source PDFs and their folders must be writable for metadata edits | A normal personal Windows account |
 
 These are **practical planning recommendations**, not a measured lower hardware limit. The release was tested on Windows 11 Pro with a Ryzen 5 8500G and about 32 GB installed RAM. It has not been benchmarked on every 8 GB PC, Windows build or storage device. Large image PDFs and sustained indexing can require more resources. An organization-managed PC may require IT approval for application/runtime installation.
 
 ## Installation
 
-1. Download [LibraDesk_0.1.1_x64-setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/LibraDesk_0.1.1_x64-setup.exe) from the official repository.
-2. Optional: compare the downloaded file's SHA-256 with [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/SHA256SUMS.txt):
+1. Download [LibraDesk_0.2.0_x64-setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/LibraDesk_0.2.0_x64-setup.exe) from the official repository.
+2. Optional: compare the downloaded file's SHA-256 with [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/SHA256SUMS.txt):
    ~~~powershell
-   Get-FileHash "$HOME\Downloads\LibraDesk_0.1.1_x64-setup.exe" -Algorithm SHA256
+   Get-FileHash "$HOME\Downloads\LibraDesk_0.2.0_x64-setup.exe" -Algorithm SHA256
    ~~~
 3. Close a running LibraDesk instance, then double-click the setup file.
 4. Follow the setup wizard and choose the installation location. The installer targets the current user. It supplies WebView2 if it is missing.
@@ -127,7 +127,7 @@ Paused discovery can resume after a restart, and a previously confirmed import r
 | Area | What you can do |
 | --- | --- |
 | Import | Register multiple folders, scan recursively, preview results, confirm import, pause/resume/cancel and inspect scan history |
-| Metadata | Extract PDF fields, fall back to filenames, edit metadata individually or in bulk and preserve manual edits on rescans |
+| Metadata | Edit titles, authors, genre, publisher, ISBN, year and language individually or in bulk; queue original-PDF Info/XMP updates and preserve manual edits on rescans |\n| Thumbnails | Choose a PNG/JPEG/WebP image, preview/save it or return to the generated cover; manual covers survive cache cleanup and library backups |
 | Library | Browse virtualized Grid/List/Compact views; combine filters, sorting and text queries |
 | Organization | Use nested categories, tags, favorites, reading statuses, collections and manually ordered reading queues |
 | Bilingual search | Search Bengali, English and mixed metadata; find indexed PDF page content with snippets and page-aware navigation |
@@ -140,6 +140,18 @@ Paused discovery can resume after a restart, and a previously confirmed import r
 | Appearance | Choose Light, Dark or System app appearance and separate reader appearance |
 
 Bengali and English support applies to library metadata, filenames and searchable text. The current interface is primarily English.
+
+## Editing original PDFs and choosing thumbnails
+
+Open **Library → book → Edit metadata**, save your changes, then check **PDF metadata sync** in Book details. The library saves first; **Saved to PDF** confirms each attached file has also been updated. Queued/writing are pending states. A failure shows its reason with **Retry** and **Stop**; a notification links back to the book even if you navigated away. Writes wait for an open reader to close. Renaming categories/tags/collections and changing memberships, favorites or reading status also queues affected PDFs.
+
+Title, authors and description use standard PDF Info/Dublin Core XMP fields. Publisher, language, ISBN, publication year, genre and organization are embedded in Info/XMP; categories, tags, collections, favorite and reading status also use LibraDesk-specific properties. Other PDF applications may display only standard fields. Fresh import does not reconstruct all custom organization fields.
+
+Only writable, unencrypted, unsigned PDFs up to **256 MiB** are supported for metadata writing. The source folder needs free space for a complete staged output. Read-only, locked, changed, signed, encrypted, malformed or unsupported documents fail visibly; the app keeps the catalog edit. Close other PDF editors before retrying.
+
+Saving creates and validates a sibling temporary file, preserves source access rules and its internet-origin marker, then replaces the source on the same volume. **There is no persistent original-PDF backup or undo history.** Interrupted writes are reconciled using a durable journal; Stop prevents pending work and does not undo completed writes. Incremental PDF revisions may retain earlier metadata bytes, so this is not secure metadata erasure or a PDF/A certification. File hashes/identity change; page content and filenames remain unchanged.
+
+Choose **Change thumbnail** in Book details for a PNG/JPEG/WebP file up to 10 MiB. Preview and save, cancel, or choose **Use automatic thumbnail**. The image is normalized to a bounded PNG and stored as library data, without changing the PDF's pages. Notes, bookmarks and reading progress also remain library data. Manual covers survive generated-cache cleanup and are always included in database backups.
 
 ## Keyboard shortcuts
 
@@ -169,11 +181,11 @@ App-owned data is stored under:
 └── temp\           Temporary processing and restore staging
 ~~~
 
-- **Original PDFs:** stay at their saved source paths; LibraDesk reads them in place.
+- **Original PDFs:** stay at their saved source paths. Import, reading and record removal do not rewrite them; manual metadata and organization edits queue updates to each attached PDF. Titles change PDF metadata, not filenames or page content.
 - **Local catalog:** stores metadata, organization, notes, bookmarks, sessions and extracted page text.
 - **No application account or cloud sync:** core work stays on the PC. There is no telemetry integration in the application.
-- **Backups:** contain library data and optional thumbnails, are unencrypted and exclude original PDFs. Keep a separate backup of your PDF folders.
-- **Restore:** inspects hashes/version/schema, stages compatible data, asks for replacement acknowledgement, creates a safety snapshot and rebuilds search indexes. Reload when prompted.
+- **Backups:** contain library data, all manual thumbnails and optional generated thumbnails, are unencrypted and exclude original PDFs. Keep a separate backup of your PDF folders.
+- **Restore:** cannot undo metadata already written into source PDFs and does not replay restored PDF-write jobs. Finish or stop prepared PDF saves first. It inspects hashes/version/schema, stages compatible data, asks for replacement acknowledgement, creates a safety snapshot and rebuilds search indexes. Reload when prompted.
 - **Record removal:** does not delete a source PDF. Removing a book's last file record also removes that book's catalog notes, bookmarks, progress and memberships after explicit confirmation.
 
 The underlying Microsoft runtime may maintain itself independently through Windows/Edge Update. Offline-first describes LibraDesk's core features, not a promise that Windows makes no network requests.
@@ -197,7 +209,7 @@ The stack below reflects the implemented code and installed dependencies.
 | Database | SQLite through rusqlite | Local transactions, migrations, WAL, relationships and persistence |
 | Search | SQLite FTS5 + Unicode normalization | Metadata ranking and page-aware bilingual text search |
 | PDF reader | PDF.js 6 | Range-based rendering, contents, thumbnails and text processing |
-| PDF metadata | lopdf + bounded PDF.js fallback | Native metadata parsing and fallback processing |
+| PDF metadata | lopdf + quick-xml + bounded PDF.js fallback | Native parsing, incremental Info/XMP updates and fallback extraction |
 | Integrity | SHA-256 + validated PNG processing | Exact duplicates, backup integrity and cached-cover validation |
 | Packaging | NSIS via the Tauri CLI | Current-user Windows setup and bundled runtime |
 | Quality checks | Rust tests + Node/CDP browser runners | Real backend fixtures, native smoke checks and browser regressions |
@@ -215,7 +227,7 @@ React UI running in WebView2
        ┌────┴───────────────┐
        │                   │
  SQLite + FTS5      Registered source PDFs
- local library      validated read-only access
+ local library      validated reads and metadata saves
        │
  AppData caches, snapshots and processing checkpoints
 ~~~
@@ -234,9 +246,9 @@ Recorded collection tests used 100, 1,000, 5,000 and 10,001 generated PDFs. On t
 | Warm metadata search including IPC, maximum of 10 samples | ~91.91 ms | ≤500 ms |
 | App + descendant WebView2 working set, maximum of 5 samples | ~457.91 MiB | ≤500 MiB |
 
-These are measured QA results, not universal hardware guarantees. The native scale run used an embedded-frontend debug build and idle catalog with parsing queues removed. Heavy indexing and complex PDF rendering have different resource needs.
+These historical v0.1.x results have not been remeasured for v0.2.0 metadata writes. They are measured QA results, not universal hardware guarantees. The native scale run used an embedded-frontend debug build and idle catalog with parsing queues removed. Heavy indexing and complex PDF rendering have different resource needs.
 
-Verification also covers 46 ordinary Rust tests, ten browser suites with mock native IPC and real PDF.js, cross-feature real SQLite/file integration, a 2,000-page PDF, a source over 300 MiB, restore rollback, SQL/FTS input handling and Windows junction safety. Installer checks verify versions, expected binary bytes, startup/offline navigation, uninstall and PDF/data preservation.
+Verification also covers 56 ordinary Rust tests, eleven browser suites with mock native IPC and real PDF.js, cross-feature real SQLite/file integration, a 2,000-page PDF, a source over 300 MiB, restore rollback, SQL/FTS input handling and Windows junction safety. Installer checks verify versions, expected binary bytes, startup/offline navigation, uninstall and PDF/data preservation.
 
 The bundled-runtime installer is checked on the current Windows machine; a fresh OS with no runtime is not claimed as a tested environment. See [performance details](docs/performance-report.md), [test strategy](docs/testing-strategy.md) and the [release report](docs/release-report.md).
 
@@ -271,7 +283,7 @@ The preview does not have the desktop app's local library/filesystem access.
 npm run tauri build -- --bundles nsis -- --locked
 ~~~
 
-Output: <code>src-tauri/target/release/bundle/nsis/LibraDesk_0.1.1_x64-setup.exe</code>.
+Output: <code>src-tauri/target/release/bundle/nsis/LibraDesk_0.2.0_x64-setup.exe</code>.
 
 The runtime is included through Tauri's offlineInstaller packaging mode. First packaging may download Microsoft's standalone installer; cached Cargo dependencies do not eliminate that prerequisite download.
 
@@ -306,7 +318,7 @@ Native/installer QA and performance commands are documented in the [testing stra
 | An encrypted book is not indexed | Open it manually with its password; background extraction cannot unlock it. |
 | A restored book path is unavailable | Restore preserves saved paths. Relink to the PDF's current location. |
 
-There is no OCR, account system, cloud synchronization, scheduled backup or automatic application updater in v0.1.1. Search/indexing, reader resource bounds and backup privacy limitations are described in [known limitations](docs/known-limitations.md).
+There is no OCR, account system, cloud synchronization, scheduled backup or automatic application updater in v0.2.0. Search/indexing, reader resource bounds and backup privacy limitations are described in [known limitations](docs/known-limitations.md).
 
 ## বাংলায় দ্রুত শুরু
 
@@ -315,7 +327,7 @@ There is no OCR, account system, cloud synchronization, scheduled backup or auto
 3. WebView2 না থাকলে setup-এর সঙ্গে থাকা standalone installer সেটি ইনস্টল করবে; setup ডাউনলোড হয়ে গেলে এই prerequisite-এর জন্য আলাদা internet download লাগে না।
 4. অ্যাপের **Import → Add folders** থেকে PDF-এর folder বেছে scan করুন।
 5. Preview দেখে import confirm করুন। মূল PDF সরানো, rename বা delete করা হবে না।
-6. Library থেকে বই খুলে পড়ুন, category/tag দিন এবং notes/bookmarks ব্যবহার করুন।
+6. Library থেকে বই খুলে পড়ুন, category/tag দিন এবং notes/bookmarks ব্যবহার করুন। **Metadata edit করলে মূল PDF-এও লেখা হয়, স্থায়ী backup ছাড়া।** Book details-এ “Saved to PDF” দেখুন। “Change thumbnail” থেকে নিজের ছবি দিন; সেটি library-তে সংরক্ষিত হয়।
 7. **Settings → Backup** থেকে library backup রাখুন। মূল PDF-গুলোর backup আলাদাভাবে সংরক্ষণ করুন।
 
 Interface মূলত English; বাংলা filename, metadata ও searchable PDF text সমর্থিত। বিস্তারিত জানতে [user guide](docs/user-guide.md) দেখুন।
@@ -336,4 +348,4 @@ Interface মূলত English; বাংলা filename, metadata ও searchabl
 
 For a bug report, include your Windows/app version, steps, expected/actual behavior and safe error text. Use [GitHub Issues](https://github.com/zabirarkam27/LibraDesk/issues). Do not upload personal PDFs, library databases, notes, backups or private file paths.
 
-When contributing code, preserve original source files, keep native operations validated, use transactions/migrations and run the relevant checks. Generated PDFs, databases, caches, local profiles and installers belong outside version control. Third-party components retain their respective licenses.
+When contributing code, keep imports, reads and record removal nonmutating; restrict source writes to validated manual metadata updates, keep native operations validated, use transactions/migrations and run the relevant checks. Generated PDFs, databases, caches, local profiles and installers belong outside version control. Third-party components retain their respective licenses.

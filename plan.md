@@ -1,5 +1,9 @@
 # LibraDesk - Detailed Development Plan
 
+## 2026-11-14 authorized follow-up: PDF metadata and manual thumbnails
+
+The owner requested original-PDF metadata write-back and selected **atomic save without a persistent backup**. This explicitly supersedes historical blanket “never overwrite source documents” wording for manual metadata/organization edits only. Import, reading and record removal still do not modify source PDFs; filenames and page content remain unchanged. Notes/progress/custom thumbnails remain local library data. See the [current release report](docs/release-report.md).
+
 **Project:** LibraDesk
 **Application Type:** Windows Desktop Application
 **Architecture:** Offline-first, Local-first
@@ -231,7 +235,7 @@ Never assume existing functionality.
 - Never automatically move original PDF files.
 - Never automatically rename original PDF files.
 - Never automatically delete original PDF files.
-- Never overwrite source documents.
+- Never overwrite source documents during import/read/removal. Authorized v0.2.0 manual metadata edits use validated atomic source replacement without persistent backups.
 - Preserve original paths.
 - Preserve user-edited metadata.
 - Use database transactions.
@@ -1588,7 +1592,7 @@ LibraDesk can be considered production-ready only when:
 - [x] Metadata extraction works.
 - [x] Cover thumbnails are generated.
 - [x] Duplicate detection works.
-- [x] Original PDF files remain untouched.
+- [x] Import, reading and removal preserve source PDFs. Authorized manual metadata writes preserve filenames/page content and expose per-file completion/failure.
 - [x] Categories and collections work.
 - [x] Bengali and English search work.
 - [x] Book Details pages work.

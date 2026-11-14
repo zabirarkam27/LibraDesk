@@ -1,6 +1,6 @@
 # Installation
 
-LibraDesk 0.1.1 targets Windows 11 x64 (Intel/AMD). Download [LibraDesk_0.1.1_x64-setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/LibraDesk_0.1.1_x64-setup.exe) from the public release. No developer tools are needed. The current-user NSIS installer includes Microsoft's full WebView2 Evergreen standalone installer and supplies the runtime when it is missing. Once setup is downloaded, the missing-runtime installation does not need a separate internet download. Existing runtimes are reused. Organization policies may restrict installation.
+LibraDesk 0.2.0 targets Windows 11 x64 (Intel/AMD). Download [LibraDesk_0.2.0_x64-setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/LibraDesk_0.2.0_x64-setup.exe) from the public release. No developer tools are needed. The current-user NSIS installer includes Microsoft's full WebView2 Evergreen standalone installer and supplies the runtime when it is missing. Once setup is downloaded, the missing-runtime installation does not need a separate internet download. Existing runtimes are reused. Organization policies may restrict installation.
 
 Suggested planning minimum: a Windows 11-compatible x64 dual-core CPU, 8 GB RAM, 2 GB free working space (plus PDFs/cache/backups), and a 1280 × 720 display. Prefer 16 GB RAM, 5 GB free space and SSD app storage for a large library. These are practical recommendations, not hardware limits measured on every configuration; testing used a Ryzen 5 8500G and about 32 GB RAM. No ARM64, 32-bit, macOS or Linux installer is published.
 
@@ -11,7 +11,7 @@ npm ci
 npm run tauri build -- --bundles nsis -- --locked
 ~~~
 
-Output: src-tauri/target/release/bundle/nsis/LibraDesk_0.1.1_x64-setup.exe. Rust packages, NSIS and the Microsoft standalone runtime must be cached or downloadable during development. Core application use needs no network. The produced application and installer are unsigned; Windows may show an unknown-publisher/SmartScreen prompt. Verify the official release and its [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/SHA256SUMS.txt) before installing. Do not disable security software to run the installer.
+Output: src-tauri/target/release/bundle/nsis/LibraDesk_0.2.0_x64-setup.exe. Rust packages, NSIS and the Microsoft standalone runtime must be cached or downloadable during development. Core application use needs no network. The produced application and installer are unsigned; Windows may show an unknown-publisher/SmartScreen prompt. Verify the official release and its [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.2.0/SHA256SUMS.txt) before installing. Do not disable security software to run the installer.
 
 Run the installer and select the destination. The default current-user destination is %LOCALAPPDATA%\LibraDesk. Library data lives in its database, thumbnails, cache, backups, logs and temp subfolders. A custom installation destination does not relocate that library data.
 

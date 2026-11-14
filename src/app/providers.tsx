@@ -10,6 +10,7 @@ import { desktop } from "@/shared/lib/preferences-client";
 import { guardReaderWindowClose } from "@/features/reader/window-close";
 import { useWorkspaceSettings } from "@/features/settings/workspace-store";
 import { StartupRoute } from "@/features/settings/startup-route";
+import { PdfWriteNotifications } from "./pdf-write-notifications";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const load = usePreferences((state) => state.load);
@@ -32,6 +33,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <HashRouter>
       <StartupRoute />
+      <PdfWriteNotifications />
       <TooltipProvider delayDuration={300}>
         {children}
         <Toaster theme={theme} position="bottom-right" closeButton />

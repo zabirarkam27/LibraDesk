@@ -109,3 +109,11 @@ No migration was added for Phase 7. Typed workspace defaults use settings scope 
 Restore stages compatible schema migrations, closes active sessions at their last checkpoint, resets active extraction leases, removes relink/verification drafts and rebuilds both FTS indexes. The online backup API replaces the live connection in place under maintenance exclusion; on failure it restores the mandatory safety snapshot. Idle worker connections remain valid.
 
 Analytics uses existing books.reading_status and reading_sessions pages_read/active_ms/start time, with a transactional aggregate and 20-item history pages. Distinct per-session page records support the view count. Activity uses local session-start dates; no lifetime unique-page estimate is invented.
+
+## Migration 0010 · manual PDF edits and thumbnails
+
+books.genre is optional bounded text, included in the normalized metadata/FTS projection. custom_covers stores one cascading book ID, positive revision, updated timestamp and validated PNG BLOB (at most 512 KiB, 240 × 320). It is user data, always part of a database snapshot.
+
+pdf_write_jobs stores one cascading file ID, monotonically increasing desired generation, queued/running/completed/failed status, error code and update time. pdf_write_attempts is a separate prepared replacement journal keyed by file ID, with generation, source revision/path/token, original/prepared SHA-256 and validated stage path. A later catalog edit must not overwrite an unreconciled attempt.
+
+Relationship and taxonomy rename/reparent triggers enqueue affected files transactionally. Finalization reconciles the prepared hash, advances source revision, reanchors metadata-only annotations/progress and completes only the matching generation. A newer generation remains queued. Removing a file with a prepared attempt is refused. Restore refuses live prepared attempts and clears jobs/attempts in staged backups to prevent source-write replay.

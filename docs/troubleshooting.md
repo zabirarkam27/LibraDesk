@@ -19,3 +19,11 @@
 | Installer QA refuses an installation | It protects an existing registered copy. Review/uninstall that copy yourself before testing; do not delete registry entries to force the test. |
 
 Report a reproducible sequence, app/Windows version, and safe error text. Avoid posting personal paths, documents, notes, extracted text, databases or backups in public issues. See the [test strategy](testing-strategy.md) for generated fixtures.
+
+## PDF metadata syncs and manual covers
+
+- Catalog saved but PDF unchanged: open Book details → PDF metadata sync. Queued/writing are pending; Saved to PDF confirms completion. A failure notification has View book. Close the reader/other PDF editors, check write access and staging space, then Retry.
+- Signed, encrypted/EFS, malformed or over-256-MiB PDFs: source writing is refused; the catalog edit remains. Use an appropriate external document workflow if needed. Do not remove signatures/passwords automatically.
+- Source changed: inspect/reverify the current file before retrying. Stop cancels pending work without undoing a replacement already completed.
+- Restore/removal says a PDF save is in progress: finish or Stop the affected prepared saves first. Restoring the database does not restore previous PDF metadata.
+- Manual cover rejected: select PNG/JPEG/WebP up to 10 MiB and 32 million pixels. Preview before saving. Change thumbnail → Use automatic thumbnail resets the choice; clearing generated caches does not remove manual covers.

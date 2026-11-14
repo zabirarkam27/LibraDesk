@@ -1,6 +1,6 @@
 # Security and data safety review · 2026-11-14
 
-Scope: LibraDesk 0.1.0 implementation plus the 0.1.1 distribution update, locked dependencies, packaged CSP/capabilities and generated Windows fixtures. This is an application review, not an independent penetration test or assurance against a privileged local attacker.
+Scope: LibraDesk 0.2.0 including explicitly authorized manual source-metadata writes, locked dependencies, packaged CSP/capabilities and generated Windows fixtures. This is an application review, not an independent penetration test or assurance against a privileged local attacker.
 
 | Boundary | Reviewed behavior and evidence |
 | --- | --- |
@@ -17,8 +17,18 @@ Scope: LibraDesk 0.1.0 implementation plus the 0.1.1 distribution update, locked
 | Installation | Current-user NSIS, downgrade prevention, expected bundle marker verified byte-for-byte, default silent uninstall preserves data subfolders and original fixture PDF. Release ignores the debug-only QA profile override by construction. |
 | Privacy | Local SQLite/notes/text/backups, no account/cloud/telemetry integration. Backups are unencrypted. Normal launch performs local metadata/file verification; it can update the database. |
 
-Tests: 46 ordinary Rust tests passed; one explicit scale benchmark passed separately; ten browser suites passed. Native IPC/backup/performance used an isolated 10,001-record debug profile. Installer install/uninstall passed in a clean destination. With explicit owner authorization, installed release startup, production IPC, settings/restore UI and offline library navigation also passed against the account's actual AppData. The QA installation was then removed with PDF/data preservation checks passing again.
+Tests: 56 ordinary Rust tests and eleven browser suites passed for 0.2.0. The earlier explicit scale benchmark passed separately and was not repeated for sustained source writes. Native IPC/backup/performance used an isolated 10,001-record debug profile. Installer install/uninstall passed in a clean destination. With explicit owner authorization, installed release startup, production IPC, settings/restore UI and offline library navigation also passed against the account's actual AppData. The QA installation was then removed with PDF/data preservation checks passing again.
 
 Version 0.1.1 distribution audit verified the full WebView2 standalone prerequisite is embedded, its Microsoft signature is valid, and no source PDF/database is in the setup payload. Install/startup/IPC/offline navigation/uninstall passed again with the updated version. Machine-readable evidence is linked from the current release report.
 
 Residual limits: checksums do not authenticate backup authorship; an attacker with the account's filesystem access can alter data. Native PDF parsing is not a separate process sandbox. File cleanup assumes the app's private cache is not being adversarially rewritten by another local process. App code signing and fresh-OS/absent-WebView execution testing were not performed. These are documented limits, not claims of unresolved source-file deletion or SQL injection.
+
+## Authorized source-write boundary · 0.2.0
+
+The owner explicitly requested original-PDF metadata write-back and selected atomic save without backup. This supersedes the earlier blanket source-read-only rule only for manual book metadata/organization edits. Imports, reads, relinks and record deletion retain their original nonmutating source behavior.
+
+Native code resolves registered IDs, validates source identities/revisions/hashes and rejects reparse changes, read-only/locked sources, signatures, encrypted/EFS sources and files over 256 MiB. XML parsing rejects DTD/unsafe or excessive packets and updates only managed Info/XMP properties. Staging receives source DACL and Zone.Identifier before writing; same-volume Windows replacement has no copy/delete fallback. Original PDFs are never deleted by a library removal operation.
+
+The prepared-attempt journal reconciles replacement-before-commit crashes and newer generations. An active reader defers replacement. Restore and record removal cannot discard prepared work; Retry/Stop make failures actionable. Database restore clears restored write intents and cannot roll back already changed PDF metadata.
+
+This is not a secure metadata scrubber, PDF/A validator or interprocess compare-and-swap guarantee against adversarial filesystem changes. Close other editors. No persistent original-PDF safety copy exists; independent document backups remain the owner's responsibility. Native fixture tests verify bytes, crash recovery and Windows access/origin preservation.

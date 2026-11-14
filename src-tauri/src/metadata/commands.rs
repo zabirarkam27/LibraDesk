@@ -129,6 +129,13 @@ pub async fn get_book_cover(
     if version != Some(revision) {
         return Err(stale_cover());
     }
+    if revision < 0 {
+        let image = with_database(app, move |db| db.custom_cover(file_id, revision))
+            .await?
+            .ok_or_else(stale_cover)?;
+        cover::check_png(&image).map_err(|_| stale_cover())?;
+        return Ok(Response::new(image));
+    }
     let root = cache_root(&app).await?;
     let result =
         tauri::async_runtime::spawn_blocking(move || cover::load_png(&root, file_id, revision))
@@ -170,7 +177,7 @@ pub async fn save_book_metadata(
         || ids.len() > 50
         || ids[0] < 1
         || edits.is_empty()
-        || edits.len() > 3
+        || edits.len() > 4
         || edits.iter().enumerate().any(|(index, edit)| {
             edit.value.chars().count() > 4096
                 || (edit.field == Field::Title && edit.value.trim().is_empty())

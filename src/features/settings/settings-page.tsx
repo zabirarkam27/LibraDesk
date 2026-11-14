@@ -50,7 +50,7 @@ function Panel({section}:{section:Section}) {
     case "privacy":return <div className="space-y-4 text-sm">
       <p className="font-medium">Your library is local to this device.</p>
       <p className="text-muted-foreground">Core library features work offline. No cloud account or synchronization is configured.</p>
-      <p className="text-muted-foreground">Extracted PDF text, metadata, notes, bookmarks, and reading activity are stored in local application data. Source PDFs are read in place.</p>
+      <p className="text-muted-foreground">Extracted PDF text, metadata, notes, bookmarks, custom thumbnails and reading activity are stored locally. Import and reading use PDFs in place. Book metadata edits also queue atomic updates to the original PDFs without a safety backup; check each book's sync status for failures.</p>
       <p className="text-muted-foreground">PDF scripting and external PDF links are disabled in the built-in reader.</p>
     </div>;
   }

@@ -29,7 +29,7 @@ pub fn cache_path(root: &Path, id: i64, revision: i64) -> io::Result<PathBuf> {
     Ok(directory.join(format!("{id}-{revision}.png")))
 }
 
-fn check_png(bytes: &[u8]) -> io::Result<(i64, i64)> {
+pub(crate) fn check_png(bytes: &[u8]) -> io::Result<(i64, i64)> {
     if bytes.is_empty() || bytes.len() > MAX_IMAGE_BYTES {
         return Err(io::ErrorKind::InvalidData.into());
     }

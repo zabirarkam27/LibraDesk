@@ -51,6 +51,7 @@
     transformCallback(fn) { callbacks.set(++callbackId, fn); return callbackId; },
     unregisterCallback(id) { callbacks.delete(id); },
     async invoke(command, args = {}) {
+      if(command==="pdf_metadata_status")return [];
       if (command === "plugin:event|listen") { subscriptions.set(args.handler, args.event); return args.handler; }
       if (command === "plugin:event|unlisten") return;
       if (command === "get_preferences") return { app: "system", reader: "system", schemaVersion: 5 };

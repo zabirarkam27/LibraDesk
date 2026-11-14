@@ -34,7 +34,7 @@ Exact duplicate review presents ten copies at a time within each bounded group p
 
 Resolve the Windows Local AppData known folder in Rust and initialize `%LOCALAPPDATA%\LibraDesk\` with `database/`, `thumbnails/`, `cache/`, `backups/`, `logs/`, and `temp/`. Report errors if the root is inaccessible. Use a single database writer and coordinate restore with app jobs. Treat cache directories as disposable, keep cleanup inside validated AppData directories, and use staging files for writes that must be promoted atomically.
 
-Keep original PDF locations and open source files read-only. Store the supplied display path separately from an identity key derived from the resolved Windows path and filesystem case semantics. Preserve Unicode in paths and account for case-sensitive directories. Use size, timestamp, and file identity to detect changes, and stream SHA-256 when needed for duplicate or replacement verification. Recheck identity and containment when opening a handle after discovery. Skip reparse points during recursion. An unavailable drive remains a recoverable library state.
+Keep original PDF locations and open source files read-only for import, extraction, reader and verification. Explicit manual metadata edits use the separate validated source-edit pipeline below. Store the supplied display path separately from an identity key derived from the resolved Windows path and filesystem case semantics. Preserve Unicode in paths and account for case-sensitive directories. Use size, timestamp, and file identity to detect changes, and stream SHA-256 when needed for duplicate or replacement verification. Recheck identity and containment when opening a handle after discovery. Skip reparse points during recursion. An unavailable drive remains a recoverable library state.
 
 ## PDF pipeline
 
@@ -77,3 +77,13 @@ References
 - [Tauri IPC](https://v2.tauri.app/concept/inter-process-communication/)
 - [Tauri capabilities](https://v2.tauri.app/security/capabilities/)
 - [PDF.js API](https://mozilla.github.io/pdf.js/api/)
+
+## Manual source edits and custom covers · 0.2.0
+
+Manual book edits enqueue a per-file generation in the same catalog transaction. Taxonomy relationship/name triggers queue affected files, including descendant category paths. The serialized Rust source_edits worker snapshots catalog metadata, reads a bounded source, rejects signed/encrypted/EFS/unsupported PDFs and merges Info plus namespace-aware XMP through lopdf/quick-xml. It preserves unrelated metadata and appends an incremental revision without rewriting pages.
+
+A same-folder NamedTempFile receives the source DACL and Zone.Identifier before document bytes. Output is synced, reopened and validated. A durable prepared-attempt record stores source revision/path/token, old/new SHA-256 and stage path. Under the exclusive maintenance gate the worker rechecks the source and uses same-volume MoveFileExW with REPLACE_EXISTING and WRITE_THROUGH, without a copy/delete fallback or persistent old-file backup. Startup reconciles a completed file replacement with an unfinished database commit; newer desired generations remain queued.
+
+Source revision/hash/stamps advance after replacement; notes/bookmarks/progress are reanchored because page content is unchanged. Open reader sessions defer writes. Failed jobs emit a global notification and retain per-file Retry/Stop controls. Prepared attempts block record removal and library restore until finished/stopped. Restore discards restored write intents.
+
+Manual covers are bounded PNG BLOBs in custom_covers, with optimistic book revisions. Negative cover versions identify manual data; positive versions identify generated source revisions. Manual covers take precedence and survive generated-cache cleanup and database backup/restore. They never alter PDF pages.

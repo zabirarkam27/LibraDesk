@@ -14,6 +14,7 @@ mod scan;
 #[cfg(test)]
 mod security_tests;
 mod settings;
+mod source_edits;
 mod storage;
 mod storage_management;
 
@@ -33,10 +34,15 @@ fn main() {
         .setup(|app| {
             scan::start(app.handle().clone());
             recovery::start(app.handle().clone());
+            source_edits::start(app.handle().clone());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_preferences,
+            source_edits::pdf_metadata_status,
+            source_edits::retry_pdf_metadata,
+            source_edits::cancel_pdf_metadata,
+            metadata::manual_cover::save_custom_cover,
             analytics::reading_analytics,
             backup::commands::create_backup,
             backup::commands::inspect_backup,
