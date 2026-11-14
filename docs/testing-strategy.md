@@ -48,4 +48,6 @@ Installer QA reads the current version from Tauri configuration, refuses an exis
 
 Installed release startup smoke is a separate opt-in: -IncludeReleaseSmoke. That option launches the real release using the account's actual AppData library. Obtain the owner's authorization before using it on their account. It can run normal metadata/file checks. It does not restore or delete library data. The isolated native test above is the default alternative.
 
+Distribution checks use scripts/test-distribution.ps1 (requires developer-side 7-Zip) to inspect the NSIS payload, validate the embedded runtime's Microsoft signature and generate SHA256SUMS.txt. After publishing, scripts/verify-release.ps1 verifies the public HTTP downloads, GitHub asset digest, checksum contents, Latest release and README link. These tools are not end-user installation requirements. Nonpersonal versioned receipts are kept in docs/qa.
+
 Raw reports are written under ignored target. Reviewed, nonpersonal snapshots and interpretation are in the performance and release reports. Tests on one Windows account do not prove behavior on every drive, permission setup, Windows version or fresh OS installation.

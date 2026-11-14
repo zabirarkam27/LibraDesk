@@ -225,3 +225,8 @@ Production build passed. Rust tests: 46 passed, explicit benchmark not rerun for
 
 Distribution audit checked the NSIS payload and valid Microsoft signature of the 215116512-byte runtime; no personal PDFs or library database are packaged. Final setup: 224490298 bytes, SHA256 570f70afa19afe04f247d757c1f9c9cf005cc487d21e30ebf1e072d56bda4e49. Generated checksum file prepared for public release assets. Historical 0.1.0 report retained; current installation/known-limitations/security/testing/release documentation updated. GitHub publication and download verification are recorded in the follow-up entry once completed.
 
+
+## 2026-11-14 · v0.1.1 publication verified
+
+Published public GitHub Release v0.1.1 as Latest, targeting source commit 80ef136fceb4040d7dc2f577313a1f64b6e07a9f, with the tested setup.exe and SHA256SUMS.txt. Public unauthenticated setup/checksum URLs returned HTTP 200; setup length 224490298, GitHub SHA256 asset digest, downloaded checksum contents and the local audited artifact all matched. Public README download link and release/tag routing verified. Added reusable publication verifier and nonpersonal receipt. Release URL: https://github.com/zabirarkam27/LibraDesk/releases/tag/v0.1.1. No private PDF, database or screenshot was uploaded.
+

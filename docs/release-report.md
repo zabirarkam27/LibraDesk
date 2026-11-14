@@ -28,6 +28,8 @@ Date: 2026-11-14. This distribution update packages the local Windows applicatio
 
 Source assets, metadata and documentation are versioned; generated installers, source PDFs, library databases, private caches and backups remain excluded from Git.
 
+Publication verified on 2026-11-14: the public, non-prerelease GitHub release is marked Latest and targets source commit 80ef136fceb4040d7dc2f577313a1f64b6e07a9f. Unauthenticated setup/checksum URLs returned HTTP 200. Setup Content-Length, GitHub's asset SHA-256 digest and downloaded checksum text all match the audited local artifact. The public README includes the setup link. See the [publication receipt](qa/published-0.1.1.json).
+
 ## Verification
 
 - Frontend production build passed.
@@ -38,7 +40,7 @@ Source assets, metadata and documentation are versioned; generated installers, s
 - With existing explicit launch authorization, installed release startup, production-protocol native IPC, Settings/Restore UI and offline Library navigation passed.
 - Uninstall returned 0, removed the program/registration and preserved source PDF bytes and a user-data subfolder.
 - Existing ten browser-suite and collection-performance results describe the unchanged UI/library implementation. No new low-memory or sustained-indexing benchmark is claimed for this packaging-only update.
-- README/doc local links and SVG XML are checked before publication; release assets are verified after upload.
+- README/doc local links and SVG XML passed validation. Public release assets, checksum, Latest routing, source commit and README download link passed post-upload verification.
 
 Machine-readable evidence: [distribution](qa/distribution-0.1.1.json), [installer](qa/installer-0.1.1.json), [release smoke](qa/release-smoke-0.1.1.json).
 
