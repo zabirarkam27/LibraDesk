@@ -1,47 +1,51 @@
-# LibraDesk 0.1.0 release report
+# LibraDesk 0.1.1 release report
 
-Completed 2026-11-14. Phase 7 and all Phase 8 implementation, QA, packaging and documentation tasks are complete. The owner authorized the installed-release launch on their live AppData, and that smoke check passed. Final project acceptance remains the owner's separate decision.
+Date: 2026-11-14. This distribution update packages the local Windows application for end users and adds a detailed public-facing README. The [0.1.0 implementation and Phase 8 report](releases/0.1.0.md) remains available as historical evidence.
 
-## Delivered behavior
+## Changes
 
-Offline Windows PDF library with confirmed resumable import, metadata/covers, bilingual metadata/page search, categories/tags/collections, favorites/statuses, virtualized library views, details/editing, range-based PDF reader, notes/bookmarks/progress, background extraction, file verification/relinking, safe duplicate review, settings/storage cleanup, validated backup/restore and persisted reading analytics.
+- Version synchronized to 0.1.1 across npm, Cargo and Tauri configuration.
+- Current-user Windows x64 NSIS installer embeds Microsoft's complete WebView2 Evergreen standalone installer. Setup can supply a missing runtime locally after the setup file is downloaded.
+- Publisher/homepage metadata identify the repository and maintainer handle.
+- Installer QA and release smoke read the current configured version.
+- Distribution audit verifies the NSIS mode/payload, the Microsoft runtime's valid signature, absence of PDF/database payloads and setup checksum.
+- README now provides a project banner, purpose/features, executable links, practical hardware recommendations, installation/update/uninstall steps, English/Bengali quick start, technology stack, architecture, performance evidence, backup/privacy, development and troubleshooting.
 
-Restore inspects and stages before replacing anything, checks versions/hashes/schema, creates a mandatory safety snapshot, rebuilds indexes, isolates restored covers and rolls back on injected failure. Original PDFs remain outside the archive and are never deleted by library record cleanup.
+## Artifacts and URLs
+
+| Item | Value |
+| --- | --- |
+| Platform | Windows 11 x64, Intel/AMD |
+| Setup | LibraDesk_0.1.1_x64-setup.exe |
+| Setup bytes | 224,490,298 (~214.09 MiB) |
+| SHA-256 | 570f70afa19afe04f247d757c1f9c9cf005cc487d21e30ebf1e072d56bda4e49 |
+| Runtime payload | Microsoft WebView2 Evergreen standalone, 215,116,512 bytes |
+| Runtime signature | Valid, Microsoft Corporation |
+| App/installer signing | Unsigned |
+| Release | [v0.1.1](https://github.com/zabirarkam27/LibraDesk/releases/tag/v0.1.1) |
+| Direct setup download | [setup.exe](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/LibraDesk_0.1.1_x64-setup.exe) |
+| Checksums | [SHA256SUMS.txt](https://github.com/zabirarkam27/LibraDesk/releases/download/v0.1.1/SHA256SUMS.txt) |
+
+Source assets, metadata and documentation are versioned; generated installers, source PDFs, library databases, private caches and backups remain excluded from Git.
 
 ## Verification
 
-- Strict frontend production build passed.
+- Frontend production build passed.
 - Rust formatting and Clippy with warnings denied passed.
-- 46 ordinary Rust tests passed; the explicit four-size performance benchmark passed separately.
-- Ten browser regression suites passed against the final production-built frontend, with mock native IPC and real PDF.js processing.
-- A real SQLite cross-feature fixture covers interrupted import through metadata/editing, reader/note persistence, backup/restore, relink and reopen, with unchanged source bytes.
-- A real embedded-frontend native QA profile contains 10,001 records and verifies IPC queries and a 10,001-book backup.
-- Agreed native budgets passed: startup 705 ms, warm search maximum 91.91 ms and full app/WebView2 process-tree working set maximum 457.91 MiB. See [performance report](performance-report.md) for workload bounds and all four sizes.
-- SQL/FTS metacharacter and Windows junction regressions passed. [Security review](security-review.md) records CSP, permissions, PDF actions, paths, backups and destructive operations.
-- Production x64 executable and NSIS installer built successfully. Current-user install/uninstall exited 0, executable/version checks passed, original PDF hash and user-data subfolder survived, and the uninstall registry entry was removed.
-- With explicit owner authorization, the installed release launched through its production protocol, returned native settings/version through IPC, displayed Backup/Restore and navigated the library with WebView network access disabled. The release correctly ignored the debug-only QA profile override. The library screenshot was visually checked; personal contents remain outside Git. Installation was then uninstalled and preservation checks passed again.
-- Installer tests used a clean directory on the existing Windows account. Isolated native profile QA used a debug build with embedded frontend. Fresh Windows/absent-WebView testing was not performed.
+- 46 ordinary Rust tests passed after the version bump, including archive/version compatibility; the explicit scale benchmark remains opt-in.
+- Final installer payload contains the executable and embedded runtime; no PDF or SQLite library payload was found. Microsoft's embedded runtime signature verified as valid.
+- Real current-user setup completed in a unique QA destination; version 0.1.1 and every executable byte after the expected Tauri bundle marker matched.
+- With existing explicit launch authorization, installed release startup, production-protocol native IPC, Settings/Restore UI and offline Library navigation passed.
+- Uninstall returned 0, removed the program/registration and preserved source PDF bytes and a user-data subfolder.
+- Existing ten browser-suite and collection-performance results describe the unchanged UI/library implementation. No new low-memory or sustained-indexing benchmark is claimed for this packaging-only update.
+- README/doc local links and SVG XML are checked before publication; release assets are verified after upload.
 
-## Installer artifact
+Machine-readable evidence: [distribution](qa/distribution-0.1.1.json), [installer](qa/installer-0.1.1.json), [release smoke](qa/release-smoke-0.1.1.json).
 
-Local path: src-tauri/target/release/bundle/nsis/LibraDesk_0.1.0_x64-setup.exe
+## Support scope and limits
 
-Size: 6,570,546 bytes.
+The application targets Windows 11 x64. Suggested 8 GB RAM / dual-core x64 / 2 GB free space / 1280 × 720 requirements are practical planning recommendations, not a measured minimum. Test hardware was a Ryzen 5 8500G with about 32 GB RAM. ARM64, 32-bit, macOS and Linux installers are not published.
 
-SHA-256:
+Runtime inclusion is verified, but the missing-runtime branch was not executed on a fresh Windows installation; no shared runtime or registry detection was removed from the test machine. Existing runtime installations should be kept updated. Organization policies and unsigned-app restrictions can prevent installation. Evergreen runtime maintenance is independent of the app's offline core.
 
-~~~text
-31F6F0FF6BAD1C3850E8AED869E9A7075CFBAA8B8CA44864252859B640D175F3
-~~~
-
-The installer and executable are unsigned. WebView2 must be preinstalled. Source and QA reports are versioned; generated installers, databases, PDFs, caches and private backups are excluded from Git. No GitHub release upload is implied by a source push.
-
-## Final acceptance
-
-The initial automatic approval review rejection was resolved by the owner's explicit instruction to run the release. The prepared install/smoke/uninstall test then passed on 2026-11-14. This launch used the account's real AppData and normal local background checks; no backup restore or record removal was performed against the owner's library.
-
-All planned implementation and verification work is complete within the documented test scope. The QA installation has been removed; the generated installer remains available for normal installation. Final project/release acceptance is requested separately and is not inferred from permission to run tests.
-
-## Documentation
-
-[Installation](installation.md), [user guide](user-guide.md), [backup/recovery](backup-recovery.md), [troubleshooting](troubleshooting.md), [known limitations](known-limitations.md), [architecture](architecture.md), [database](database-schema.md), [testing strategy](testing-strategy.md), [performance](performance-report.md) and [security](security-review.md).
+No source-PDF mutation, database migration or automatic application updater is introduced by this update. Back up original PDFs separately from database snapshots. Final project acceptance remains distinct from authorization to prepare and publish the requested installer.

@@ -1,6 +1,6 @@
-# Known limitations · 0.1.0
+# Known limitations · 0.1.1
 
-- Windows 11 x64 is the release target tested here. The installer requires preinstalled WebView2; a fresh OS without it was not tested. The installer/executable are unsigned.
+- Windows 11 x64 is the release target tested here. The installer now includes the full WebView2 Evergreen standalone prerequisite and installs it if missing; a fresh OS without it was not tested. Existing runtimes should be kept updated. The installer/executable are unsigned. ARM64/32-bit Windows, macOS and Linux builds are not published.
 - Offline local use is supported. Cloud sync, accounts, OCR and scheduled backups are outside this version.
 - Metadata and PDF page-content indexing run incrementally. Search coverage can be partial. Encrypted files require manual reader passwords and cannot be indexed in the background.
 - Source PDFs remain external to the database and backups. A database restore cannot recover a missing original PDF; preserve source files independently.

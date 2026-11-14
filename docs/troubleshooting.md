@@ -2,7 +2,7 @@
 
 | Symptom | Action |
 | --- | --- |
-| App will not open | Check Windows x64 and installed WebView2 Runtime. Close another running LibraDesk instance. Reinstall the application without removing AppData. |
+| App will not open | Use the Windows 11 x64 setup.exe, which includes the missing WebView2 prerequisite. Keep an existing runtime updated, close another running LibraDesk instance and reinstall without removing AppData. Check free space and organization policy if runtime installation fails. |
 | Storage/database unavailable | Check free space and write access to %LOCALAPPDATA%\LibraDesk. Close other tools that lock its files, then restart. Preserve database/WAL/SHM before manual recovery. |
 | Build cannot replace libradesk.exe | Close that executable, then rerun the failed build. Do not delete your library database. |
 | Missing books after drive removal | Reconnect the disk and run file verification. Relink if the source path changed. |

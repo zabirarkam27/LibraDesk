@@ -1,0 +1,12 @@
+﻿{
+    "version":  "0.1.1",
+    "filename":  "LibraDesk_0.1.1_x64-setup.exe",
+    "bytes":  224490298,
+    "sha256":  "570f70afa19afe04f247d757c1f9c9cf005cc487d21e30ebf1e072d56bda4e49",
+    "webviewInstallMode":  "offlineInstaller",
+    "embeddedRuntimeBytes":  215116512,
+    "embeddedRuntimeSignature":  "Valid",
+    "embeddedRuntimeSigner":  "Microsoft Corporation",
+    "payloadInspected":  true,
+    "runtimeAbsentExecutionTested":  false
+}

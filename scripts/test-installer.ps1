@@ -2,7 +2,8 @@ param([switch]$IncludeReleaseSmoke)
 $ErrorActionPreference = 'Stop'
 $workspace = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 Set-Location -LiteralPath $workspace
-$installer = (Resolve-Path -LiteralPath 'src-tauri/target/release/bundle/nsis/LibraDesk_0.1.0_x64-setup.exe').Path
+$expectedVersion = (Get-Content -LiteralPath 'src-tauri/tauri.conf.json' -Raw | ConvertFrom-Json).version
+$installer = (Resolve-Path -LiteralPath ("src-tauri/target/release/bundle/nsis/LibraDesk_" + $expectedVersion + "_x64-setup.exe")).Path
 if (Test-Path -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\LibraDesk') { throw 'An existing LibraDesk installation must be reviewed before this isolated installer test.' }
 $qa = Join-Path $workspace ('src-tauri\target\installer-qa-' + [guid]::NewGuid().ToString('N'))
 $install = Join-Path $qa 'installed'
@@ -16,7 +17,7 @@ $exe = Join-Path $install 'libradesk.exe'
 $uninstall = Join-Path $install 'uninstall.exe'
 if (!(Test-Path -LiteralPath $exe) -or !(Test-Path -LiteralPath $uninstall)) { throw 'Installed executable or uninstaller missing' }
 $version = (Get-Item -LiteralPath $exe).VersionInfo.ProductVersion
-if ($version -ne '0.1.0') { throw "Wrong installed version $version" }
+if ($version -ne $expectedVersion) { throw "Wrong installed version $version" }
 node scripts/check-installed-binary.mjs $exe
 if ($LASTEXITCODE -ne 0) { throw 'Installed binary differs from the expected NSIS release binary' }
 $markerDir = Join-Path $install 'database'

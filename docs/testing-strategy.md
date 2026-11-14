@@ -44,7 +44,7 @@ npm run tauri build -- --bundles nsis -- --locked
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-installer.ps1
 ~~~
 
-Installer QA refuses an existing registered installation, uses a unique workspace directory, validates version and all executable bytes after the expected three-byte Tauri NSIS bundle marker, silently uninstalls, and checks PDF bytes, a user-data subfolder and registry cleanup. It never recursively deletes the data folder.
+Installer QA reads the current version from Tauri configuration, refuses an existing registered installation, uses a unique workspace directory, validates version and all executable bytes after the expected three-byte Tauri NSIS bundle marker, silently uninstalls, and checks PDF bytes, a user-data subfolder and registry cleanup. It never recursively deletes the data folder. Version 0.1.1 bundles the full Microsoft standalone runtime; payload inspection and signature checks complement installation testing on the runtime-equipped test machine. No runtime is uninstalled or registry keys hidden to simulate an absent prerequisite.
 
 Installed release startup smoke is a separate opt-in: -IncludeReleaseSmoke. That option launches the real release using the account's actual AppData library. Obtain the owner's authorization before using it on their account. It can run normal metadata/file checks. It does not restore or delete library data. The isolated native test above is the default alternative.
 

@@ -216,3 +216,12 @@ The owner explicitly authorized installed release launch against real AppData. R
 
 The subsequent uninstall returned 0; original fixture PDF bytes, user-data subfolder and registry cleanup passed again. QA installation removed. Installer checksum remains 31F6F0FF6BAD1C3850E8AED869E9A7075CFBAA8B8CA44864252859B640D175F3. Updated Phase 8 tasks 8.6/8.7 and final release/security reports. All requested implementation/verification is complete; final project acceptance remains the owner's separate decision. Commit reference: see docs: finalize authorized Windows release verification.
 
+
+## 2026-11-14 · Public distribution v0.1.1
+
+User requested a locally installable public setup and detailed download/onboarding README. Updated npm/Cargo/Tauri to 0.1.1, enabled offlineInstaller with the complete WebView2 Evergreen standalone prerequisite, and set publisher/homepage metadata. README now includes a repository-native SVG banner, direct release/checksum links, purpose, features, practical supported-PC requirements, English/Bengali onboarding, architecture/actual technologies, backup/privacy, updates/uninstall, developer commands and documented limitations. Hardware recommendations are explicitly planning guidance rather than measured low-end guarantees.
+
+Production build passed. Rust tests: 46 passed, explicit benchmark not rerun for packaging-only update; fmt and Clippy warnings-denied passed. Version-aware installer QA passed install, expected binary bytes, authorized production startup/native IPC, settings/restore UI, offline Library navigation, uninstall, original PDF/data preservation and registry cleanup. The runtime-equipped host was used; no fresh-OS missing-runtime execution is claimed.
+
+Distribution audit checked the NSIS payload and valid Microsoft signature of the 215116512-byte runtime; no personal PDFs or library database are packaged. Final setup: 224490298 bytes, SHA256 570f70afa19afe04f247d757c1f9c9cf005cc487d21e30ebf1e072d56bda4e49. Generated checksum file prepared for public release assets. Historical 0.1.0 report retained; current installation/known-limitations/security/testing/release documentation updated. GitHub publication and download verification are recorded in the follow-up entry once completed.
+

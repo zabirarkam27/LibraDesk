@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-labelledby="title desc">
+  <title id="title">LibraDesk — Your books. Your space.</title>
+  <desc id="desc">A local PDF library for Windows, illustrated with books on a reading desk.</desc>
+  <rect width="1280" height="360" rx="24" fill="#17231d"/>
+  <circle cx="1178" cy="54" r="220" fill="#21382a"/>
+  <circle cx="1150" cy="340" r="160" fill="#294633" opacity=".65"/>
+  <rect x="66" y="54" width="62" height="62" rx="18" fill="#b3d3af"/>
+  <g fill="none" stroke="#1d3525" stroke-width="3" stroke-linejoin="round">
+    <path d="M97 72c-8-4-15-4-20-2v27c6-2 13-1 20 3 7-4 14-5 20-3V70c-5-2-12-2-20 2Z"/>
+    <path d="M97 72v28"/>
+  </g>
+  <text x="148" y="97" fill="#f6f1e7" font-family="Segoe UI,Arial,sans-serif" font-size="32" font-weight="650">LibraDesk</text>
+  <text x="66" y="185" fill="#f6f1e7" font-family="Georgia,serif" font-size="58">Your books. Your space.</text>
+  <text x="69" y="230" fill="#bfd0c2" font-family="Segoe UI,Arial,sans-serif" font-size="22">Organize, search, and read your PDF library offline.</text>
+  <rect x="68" y="269" width="153" height="34" rx="17" fill="#304c39"/>
+  <text x="144" y="292" text-anchor="middle" fill="#d9ebd5" font-family="Segoe UI,Arial,sans-serif" font-size="15">Windows desktop</text>
+  <text x="244" y="292" fill="#bfd0c2" font-family="Segoe UI,Arial,sans-serif" font-size="16">Local data · Original files preserved</text>
+  <g transform="translate(900 80)">
+    <rect x="-20" y="212" width="300" height="12" rx="6" fill="#98b68e"/>
+    <rect x="8" y="48" width="46" height="162" rx="5" fill="#b7cfaa"/>
+    <rect x="17" y="66" width="28" height="4" rx="2" fill="#486449"/>
+    <rect x="17" y="176" width="28" height="4" rx="2" fill="#486449"/>
+    <rect x="63" y="21" width="53" height="189" rx="5" fill="#d4b78f"/>
+    <path d="M74 43h31M74 50h31M74 184h31" stroke="#786347" stroke-width="3"/>
+    <g transform="rotate(-12 150 210)">
+      <rect x="128" y="60" width="47" height="150" rx="5" fill="#789783"/>
+      <path d="M139 79h25M139 185h25" stroke="#dce5d9" stroke-width="3"/>
+    </g>
+    <path d="M191 149h54v37c0 12-10 23-22 23h-10c-12 0-22-11-22-23Z" fill="#f0e5d2"/>
+    <path d="M245 156h10a13 13 0 0 1 0 26h-10" fill="none" stroke="#f0e5d2" stroke-width="7"/>
+    <path d="M207 133c-12-14 13-18 2-32M226 133c-12-14 13-18 2-32" stroke="#9ab59b" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

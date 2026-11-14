@@ -1,6 +1,6 @@
 # Security and data safety review · 2026-11-14
 
-Scope: LibraDesk 0.1.0 source, locked dependencies, packaged CSP/capabilities and generated Windows fixtures. This is an application review, not an independent penetration test or assurance against a privileged local attacker.
+Scope: LibraDesk 0.1.0 implementation plus the 0.1.1 distribution update, locked dependencies, packaged CSP/capabilities and generated Windows fixtures. This is an application review, not an independent penetration test or assurance against a privileged local attacker.
 
 | Boundary | Reviewed behavior and evidence |
 | --- | --- |
@@ -19,4 +19,6 @@ Scope: LibraDesk 0.1.0 source, locked dependencies, packaged CSP/capabilities an
 
 Tests: 46 ordinary Rust tests passed; one explicit scale benchmark passed separately; ten browser suites passed. Native IPC/backup/performance used an isolated 10,001-record debug profile. Installer install/uninstall passed in a clean destination. With explicit owner authorization, installed release startup, production IPC, settings/restore UI and offline library navigation also passed against the account's actual AppData. The QA installation was then removed with PDF/data preservation checks passing again.
 
-Residual limits: checksums do not authenticate backup authorship; an attacker with the account's filesystem access can alter data. Native PDF parsing is not a separate process sandbox. File cleanup assumes the app's private cache is not being adversarially rewritten by another local process. Code signing and fresh-OS/absent-WebView testing were not performed. These are documented limits, not claims of unresolved source-file deletion or SQL injection.
+Version 0.1.1 distribution audit verified the full WebView2 standalone prerequisite is embedded, its Microsoft signature is valid, and no source PDF/database is in the setup payload. Install/startup/IPC/offline navigation/uninstall passed again with the updated version. Machine-readable evidence is linked from the current release report.
+
+Residual limits: checksums do not authenticate backup authorship; an attacker with the account's filesystem access can alter data. Native PDF parsing is not a separate process sandbox. File cleanup assumes the app's private cache is not being adversarially rewritten by another local process. App code signing and fresh-OS/absent-WebView execution testing were not performed. These are documented limits, not claims of unresolved source-file deletion or SQL injection.
